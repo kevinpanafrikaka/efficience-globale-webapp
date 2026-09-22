@@ -9,12 +9,15 @@ export default function Footer() {
           <div className="flex items-center gap-2.5">
             <Image src="/img/logo-eg.png" alt="Efficience Globale" width={130} height={42} className="h-6 w-auto brightness-0 invert opacity-90" />
           </div>
-          <nav className="flex flex-wrap gap-5 text-[13.5px]">
+          <nav className="flex flex-wrap gap-x-5 gap-y-2 text-[13.5px] max-w-md">
             <Link href="/">Accueil</Link>
             <Link href="/a-propos">À propos</Link>
+            <Link href="/domaines">Domaines</Link>
+            <Link href="/services">Services</Link>
             <Link href="/realisations">Réalisations</Link>
-            <Link href="/equipe">Équipe</Link>
-            <Link href="/actualites">Actualités</Link>
+            <Link href="/equipe">Notre équipe</Link>
+            <Link href="/partenaires">Partenaires</Link>
+            <Link href="/annonces">Annonces</Link>
             <Link href="/contact">Contact</Link>
           </nav>
         </div>

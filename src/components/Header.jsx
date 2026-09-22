@@ -7,9 +7,13 @@ import { useState } from "react";
 const NAV_LINKS = [
   { href: "/", label: "Accueil" },
   { href: "/a-propos", label: "À propos" },
+  { href: "/domaines", label: "Domaines" },
+  { href: "/services", label: "Services" },
   { href: "/realisations", label: "Réalisations" },
-  { href: "/equipe", label: "Équipe" },
-  { href: "/actualites", label: "Actualités" },
+  { href: "/equipe", label: "Notre équipe" },
+  { href: "/partenaires", label: "Partenaires" },
+  { href: "/annonces", label: "Annonces" },
+  { href: "/contact", label: "Contact" },
 ];
 
 export default function Header() {
@@ -17,14 +21,14 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-line safe-top">
-      <div className="max-w-6xl mx-auto px-5 md:px-8 h-[72px] flex items-center justify-between">
-        <Link href="/" className="flex items-center" aria-label="Efficience Globale — Accueil">
+      <div className="max-w-7xl mx-auto px-5 md:px-8 h-[72px] flex items-center justify-between gap-4">
+        <Link href="/" className="flex items-center shrink-0" aria-label="Efficience Globale — Accueil">
           <Image src="/img/logo-eg.png" alt="Efficience Globale" width={160} height={52} className="h-9 w-auto" priority />
         </Link>
 
-        <nav className="hidden md:flex items-center gap-7 text-[14.5px] font-medium text-ink-soft">
+        <nav className="hidden lg:flex items-center gap-4 xl:gap-5 text-[13.5px] font-medium text-ink-soft overflow-x-auto">
           {NAV_LINKS.map((l) => (
-            <Link key={l.href} href={l.href} className="hoverable text-dark">
+            <Link key={l.href} href={l.href} className="hoverable text-dark whitespace-nowrap">
               {l.label}
             </Link>
           ))}
@@ -32,7 +36,7 @@ export default function Header() {
 
         <Link
           href="/contact"
-          className="hidden md:inline-flex items-center rounded-lg bg-lime px-5 py-3 text-[14px] font-semibold text-ink active:scale-[0.97] transition-transform"
+          className="hidden lg:inline-flex items-center rounded-lg bg-lime px-4 py-2.5 text-[13.5px] font-semibold text-ink active:scale-[0.97] transition-transform shrink-0"
         >
           Nous contacter
         </Link>
@@ -42,7 +46,7 @@ export default function Header() {
           aria-label="Ouvrir le menu"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="md:hidden p-2 -mr-2"
+          className="lg:hidden p-2 -mr-2"
         >
           <span className="relative block w-6 h-4">
             <span
@@ -56,7 +60,7 @@ export default function Header() {
       </div>
 
       {open && (
-        <div className="md:hidden fixed inset-x-0 top-[72px] bottom-0 bg-white overflow-y-auto safe-bottom">
+        <div className="lg:hidden fixed inset-x-0 top-[72px] bottom-0 bg-white overflow-y-auto safe-bottom">
           <nav className="flex flex-col px-5">
             {NAV_LINKS.map((l) => (
               <Link

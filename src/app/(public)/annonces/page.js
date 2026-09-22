@@ -1,20 +1,20 @@
 import { getAnnonces } from "@/lib/db";
 
 export const metadata = {
-  title: "Actualités",
-  description: "Les dernières actualités d'Efficience Globale.",
+  title: "Annonces",
+  description: "Les dernières annonces d'Efficience Globale.",
 };
 
 export const dynamic = "force-dynamic";
 
-export default async function ActualitesPage() {
+export default async function AnnoncesPage() {
   const annonces = await getAnnonces();
 
   return (
     <>
       <section className="py-14 md:py-16" style={{ background: "linear-gradient(120deg, #2e3f32 0%, #16211a 100%)" }}>
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <div className="text-lime-2 text-[12.5px] font-bold tracking-wide mb-3.5">ACTUALITÉS</div>
+          <div className="text-lime-2 text-[12.5px] font-bold tracking-wide mb-3.5">ANNONCES</div>
           <h1 className="text-white text-[28px] md:text-[42px] leading-tight">Les dernières nouvelles du cabinet</h1>
         </div>
       </section>
@@ -24,7 +24,7 @@ export default async function ActualitesPage() {
           <div className="text-center py-14">
             <p className="text-[16px] text-ink-soft">Aucune annonce publiée pour le moment.</p>
             <p className="text-[13.5px] text-ink-faint mt-2">
-              Les actualités publiées depuis l&apos;espace admin apparaîtront ici.
+              Les annonces publiées depuis l&apos;espace admin apparaîtront ici.
             </p>
           </div>
         ) : (

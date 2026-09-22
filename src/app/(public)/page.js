@@ -147,6 +147,11 @@ export default async function HomePage() {
             </Reveal>
           ))}
         </div>
+        <div className="mt-8">
+          <Link href="/domaines" className="text-[14.5px] font-semibold text-dark-2">
+            En savoir plus sur nos domaines →
+          </Link>
+        </div>
       </section>
 
       {/* CONVICTIONS */}
@@ -193,6 +198,9 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
+          <Link href="/services" className="inline-block mt-6 text-[14.5px] font-semibold text-dark-2">
+            Découvrir notre méthode en détail →
+          </Link>
         </div>
       </section>
 
@@ -261,6 +269,9 @@ export default async function HomePage() {
             </div>
           ))}
         </div>
+        <Link href="/partenaires" className="inline-block mt-8 text-[14.5px] font-semibold text-dark-2">
+          Voir tous nos partenaires →
+        </Link>
       </section>
 
       {/* CTA */}
