@@ -14,5 +14,18 @@
       "database_name": "efficience-globale-db",
       "database_id": "e0926e87-94cb-4645-a6bd-abf57518f3bd"
     }
-  ]
+  ],
+  "observability": {
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+      "persist": true
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "persist": true
+    }
+  }
 }
