@@ -21,6 +21,9 @@
 /.open-next/
 .wrangler/
 
+# local secrets — jamais commités
+.cf-token-eg
+
 # production
 /build
 

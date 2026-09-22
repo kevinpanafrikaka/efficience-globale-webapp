@@ -4,8 +4,7 @@ import SectionHead from "@/components/SectionHead";
 import DomainCard from "@/components/DomainCard";
 import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
-import { projets, getProjetBySlug } from "@/data/projects";
-import { fondateur } from "@/data/team";
+import { getProjetBySlug, getMembres } from "@/lib/db";
 import {
   IconHealth,
   IconEducation,
@@ -21,14 +20,14 @@ import {
   IconTeam,
 } from "@/components/icons";
 
-const PROJETS_PHARES = [
+const PROJETS_PHARES_SLUGS = [
   "gouvernance-pev-lmc",
   "chaine-froid-pev",
   "cartographie-nutrition-eu4sun",
   "guichet-vbg-enabel",
   "restructuration-sydam",
   "agents-ia-osc",
-].map(getProjetBySlug);
+];
 
 const PARTENAIRES = [
   { nom: "Gavi", logo: "partners/gavi-logo.png" },
@@ -41,7 +40,15 @@ const PARTENAIRES = [
   { nom: "Ministère de la Santé", logo: "partners/ministere-sante-logo.png" },
 ];
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const [projetsPhares, membres] = await Promise.all([
+    Promise.all(PROJETS_PHARES_SLUGS.map(getProjetBySlug)).then((list) => list.filter(Boolean)),
+    getMembres(),
+  ]);
+  const fondateur = membres[0];
+
   return (
     <>
       {/* HERO */}
@@ -197,7 +204,7 @@ export default function HomePage() {
           lead="Un aperçu de nos projets menés avec des bailleurs et institutions de référence entre 2022 et 2025."
         />
         <div className="grid md:grid-cols-3 gap-5 -mt-4">
-          {PROJETS_PHARES.map((p, i) => (
+          {projetsPhares.map((p, i) => (
             <Reveal key={p.slug} index={i}>
               <ProjectCard projet={p} />
             </Reveal>
@@ -217,18 +224,20 @@ export default function HomePage() {
       <section className="bg-cream py-16 md:py-20">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <SectionHead eyebrow="NOTRE ÉQUIPE" title="Une équipe pluridisciplinaire de 15 personnes" />
-          <div className="bg-white rounded-xl p-7 max-w-lg -mt-4">
-            <Image
-              src={`/img/${fondateur.photo}`}
-              alt={fondateur.nom}
-              width={72}
-              height={72}
-              className="rounded-full object-cover mb-5 h-[72px] w-[72px]"
-            />
-            <h3 className="text-[19px] mb-1">{fondateur.nom}</h3>
-            <div className="text-[13.5px] font-semibold text-lime mb-4">{fondateur.role}</div>
-            <p className="text-[14px] leading-relaxed text-ink-soft">{fondateur.bio}</p>
-          </div>
+          {fondateur && (
+            <div className="bg-white rounded-xl p-7 max-w-lg -mt-4">
+              <Image
+                src={fondateur.photo_url}
+                alt={fondateur.nom}
+                width={72}
+                height={72}
+                className="rounded-full object-cover mb-5 h-[72px] w-[72px]"
+              />
+              <h3 className="text-[19px] mb-1">{fondateur.nom}</h3>
+              <div className="text-[13.5px] font-semibold text-lime mb-4">{fondateur.role}</div>
+              <p className="text-[14px] leading-relaxed text-ink-soft">{fondateur.bio}</p>
+            </div>
+          )}
           <Link href="/equipe" className="inline-block mt-6 text-[14.5px] font-semibold text-dark-2">
             Voir toute l&apos;équipe →
           </Link>

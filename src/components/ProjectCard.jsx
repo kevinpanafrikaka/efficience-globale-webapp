@@ -1,9 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
-import { secteurs } from "@/data/projects";
+import { secteurs } from "@/lib/db";
 
 export default function ProjectCard({ projet }) {
-  const secteur = secteurs[projet.secteur];
+  const secteur = secteurs[projet.secteur] ?? { label: projet.secteur, color: "#3D5347" };
 
   return (
     <Link
@@ -12,7 +12,7 @@ export default function ProjectCard({ projet }) {
     >
       <div className="relative h-40 bg-dark-2">
         <Image
-          src={`/img/realisations/${projet.photo}`}
+          src={projet.photo_url}
           alt=""
           fill
           sizes="(min-width: 768px) 33vw, 100vw"

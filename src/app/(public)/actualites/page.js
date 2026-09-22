@@ -1,11 +1,15 @@
-import { annonces } from "@/data/announcements";
+import { getAnnonces } from "@/lib/db";
 
 export const metadata = {
   title: "Actualités",
   description: "Les dernières actualités d'Efficience Globale.",
 };
 
-export default function ActualitesPage() {
+export const dynamic = "force-dynamic";
+
+export default async function ActualitesPage() {
+  const annonces = await getAnnonces();
+
   return (
     <>
       <section className="py-14 md:py-16" style={{ background: "linear-gradient(120deg, #2e3f32 0%, #16211a 100%)" }}>
