@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "efficience-globale-webapp",
   "main": ".open-next/worker.js",
-  "compatibility_date": "2025-09-01",
+  "compatibility_date": "2026-09-01",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "directory": ".open-next/assets",
@@ -12,7 +12,7 @@
     {
       "binding": "DB",
       "database_name": "efficience-globale-db",
-      "database_id": "REMPLACER_APRES_wrangler_d1_create"
+      "database_id": "e0926e87-94cb-4645-a6bd-abf57518f3bd"
     }
   ]
 }
