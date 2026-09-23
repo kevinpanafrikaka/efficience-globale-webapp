@@ -183,7 +183,10 @@ export default async function HomePage() {
             ))}
           </div>
           <div className="mt-8">
-            <Link href="/domaines" className="text-[14.5px] font-semibold text-lime-2">
+            <Link
+              href="/domaines"
+              className="inline-flex w-fit items-center rounded bg-lime px-4 py-2 text-[13px] font-semibold text-ink active:scale-[0.97] transition-transform"
+            >
               En savoir plus sur nos domaines →
             </Link>
           </div>
@@ -239,7 +242,10 @@ export default async function HomePage() {
               </Reveal>
             ))}
           </div>
-          <Link href="/services" className="inline-block mt-8 text-[14.5px] font-semibold text-white border-b-2 border-lime pb-0.5">
+          <Link
+            href="/services"
+            className="inline-flex w-fit items-center rounded bg-lime mt-8 px-4 py-2 text-[13px] font-semibold text-ink active:scale-[0.97] transition-transform"
+          >
             Découvrir notre méthode en détail →
           </Link>
         </div>
@@ -260,7 +266,10 @@ export default async function HomePage() {
           ))}
         </div>
         <div className="mt-12">
-          <Link href="/realisations" className="inline-flex items-center text-[15px] font-semibold text-dark-2 border-b-2 border-dark-2 pb-0.5">
+          <Link
+            href="/realisations"
+            className="inline-flex w-fit items-center rounded bg-lime px-4 py-2 text-[13px] font-semibold text-ink active:scale-[0.97] transition-transform"
+          >
             Voir les 17 projets et partenariats →
           </Link>
         </div>
@@ -286,7 +295,10 @@ export default async function HomePage() {
               </div>
             </Reveal>
           )}
-          <Link href="/equipe" className="inline-block mt-8 text-[14.5px] font-semibold text-white border-b-2 border-lime pb-0.5">
+          <Link
+            href="/equipe"
+            className="inline-flex w-fit items-center rounded bg-lime mt-8 px-4 py-2 text-[13px] font-semibold text-ink active:scale-[0.97] transition-transform"
+          >
             Voir toute l&apos;équipe →
           </Link>
         </div>
@@ -312,7 +324,10 @@ export default async function HomePage() {
             </Reveal>
           ))}
         </div>
-        <Link href="/partenaires" className="inline-block mt-8 text-[14.5px] font-semibold text-dark-2 border-b-2 border-lime pb-0.5">
+        <Link
+          href="/partenaires"
+          className="inline-flex w-fit items-center rounded bg-lime mt-8 px-4 py-2 text-[13px] font-semibold text-ink active:scale-[0.97] transition-transform"
+        >
           Voir tous nos partenaires →
         </Link>
       </section>
