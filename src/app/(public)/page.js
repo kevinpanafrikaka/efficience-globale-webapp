@@ -163,10 +163,10 @@ export default async function HomePage() {
         <SectionHead eyebrow="DOMAINES D'INTERVENTION" title="Où nous créons de la valeur" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { titre: "Santé Globale", description: "Des solutions innovantes aux défis de la santé publique, centrées sur l'accessibilité et l'efficacité des services.", photo: "/img/domaines/sante-afrique.jpg", tint: "rgba(61,83,71,0.82)", icon: <IconHealth width="18" height="18" /> },
-            { titre: "Éducation", description: "Des stratégies pour révolutionner les méthodes pédagogiques et améliorer l'expérience d'apprentissage.", photo: "/img/domaines/education-afrique.jpg", tint: "rgba(124,179,66,0.82)", icon: <IconEducation width="18" height="18" /> },
-            { titre: "Industrie", description: "Stimuler la croissance industrielle : transformation des ressources locales et chaînes d'approvisionnement.", photo: "/img/domaines/industrie-afrique.jpg", tint: "rgba(183,194,51,0.82)", icon: <IconIndustry width="18" height="18" /> },
-            { titre: "TIC & IA", description: "L'IA et les nouvelles technologies au service de systèmes de gestion plus intelligents et efficaces.", photo: "/img/domaines/tic-afrique.jpg", tint: "rgba(0,137,123,0.82)", icon: <IconTic width="18" height="18" /> },
+            { titre: "Santé Globale", description: "Renforcer les systèmes de santé publique, de la vaccination à la nutrition, pour des services plus accessibles et mieux pilotés.", photo: "/img/domaines/sante-afrique.jpg", tint: "rgba(61,83,71,0.82)", icon: <IconHealth width="18" height="18" /> },
+            { titre: "Éducation", description: "Moderniser les pratiques pédagogiques et renforcer les compétences des enseignants comme des apprenants.", photo: "/img/domaines/education-afrique.jpg", tint: "rgba(124,179,66,0.82)", icon: <IconEducation width="18" height="18" /> },
+            { titre: "Industrie", description: "Structurer les chaînes de valeur locales et accompagner la mise aux normes des filières agro-industrielles.", photo: "/img/domaines/industrie-afrique.jpg", tint: "rgba(183,194,51,0.82)", icon: <IconIndustry width="18" height="18" /> },
+            { titre: "TIC & IA", description: "Déployer des outils numériques et des agents IA au service d'une décision publique plus rapide et plus fiable.", photo: "/img/domaines/tic-afrique.jpg", tint: "rgba(0,137,123,0.82)", icon: <IconTic width="18" height="18" /> },
           ].map((d, i) => (
             <Reveal key={d.titre} index={i} className={i % 2 === 1 ? "md:mt-10" : ""}>
               <DomainCard {...d} />
