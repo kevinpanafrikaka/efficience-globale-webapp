@@ -197,21 +197,20 @@ export default async function HomePage() {
       <section className="py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <SectionHead eyebrow="NOS CONVICTIONS" title="Ce qui nous caractérise" />
-          <div className="grid grid-cols-2 md:grid-cols-4">
+          <div className="border-t border-line">
             {[
-              ["01", "Transparence", "Une honnêteté et une ouverture qui renforcent la confiance de nos partenaires et clients."],
-              ["02", "Innovation", "Nous cultivons la pensée innovante pour rester à l'avant-garde des solutions stratégiques."],
-              ["03", "Durabilité", "Des stratégies qui servent les intérêts actuels sans compromettre ceux des générations futures."],
-              ["04", "Efficience", "Une optimisation constante pour offrir la meilleure valeur à nos clients."],
-            ].map(([num, titre, desc], i) => (
+              ["Transparence", "Une honnêteté et une ouverture qui renforcent la confiance de nos partenaires et clients."],
+              ["Innovation", "Nous cultivons la pensée innovante pour rester à l'avant-garde des solutions stratégiques."],
+              ["Durabilité", "Des stratégies qui servent les intérêts actuels sans compromettre ceux des générations futures."],
+              ["Efficience", "Une optimisation constante pour offrir la meilleure valeur à nos clients."],
+            ].map(([titre, desc], i, arr) => (
               <Reveal
                 key={titre}
                 index={i}
-                className={`py-6 md:py-0 md:pb-2 ${i >= 2 ? "border-t border-line md:border-t-0" : ""} ${i > 0 ? "md:pl-8 md:border-l md:border-line" : ""} ${i % 2 === 1 ? "pl-6" : "pr-6 md:pr-8"}`}
+                className={`md:grid md:grid-cols-[280px_1fr] md:items-center gap-2 md:gap-10 py-7 md:py-9 ${i < arr.length - 1 ? "border-b border-line" : ""}`}
               >
-                <div className="text-[46px] leading-none font-extrabold text-line mb-4 tabular-nums">{num}</div>
-                <h4 className="text-dark text-[18px] mb-2">{titre}</h4>
-                <p className="text-[13.5px] leading-relaxed text-ink-soft">{desc}</p>
+                <h4 className="text-[26px] md:text-[32px] tracking-[-0.01em]">{titre}</h4>
+                <p className="text-[15px] md:text-[16px] leading-relaxed text-ink-soft max-w-lg">{desc}</p>
               </Reveal>
             ))}
           </div>
