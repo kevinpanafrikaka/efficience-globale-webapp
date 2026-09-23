@@ -159,31 +159,34 @@ export default async function HomePage() {
       </section>
 
       {/* DOMAINES */}
-      <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
-        <SectionHead
-          eyebrow="DOMAINES D'INTERVENTION"
-          title={
-            <>
-              Quatre domaines, une même <span className="text-lime italic">exigence</span>
-            </>
-          }
-        />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {[
-            { titre: "Santé Globale", description: "Renforcer les systèmes de santé publique, de la vaccination à la nutrition, pour des services plus accessibles et mieux pilotés.", photo: "/img/domaines/sante-afrique.jpg", tint: "rgba(61,83,71,0.82)" },
-            { titre: "Éducation", description: "Moderniser les pratiques pédagogiques et renforcer les compétences des enseignants comme des apprenants.", photo: "/img/domaines/education-afrique.jpg", tint: "rgba(124,179,66,0.82)" },
-            { titre: "Industrie", description: "Structurer les chaînes de valeur locales et accompagner la mise aux normes des filières agro-industrielles.", photo: "/img/domaines/industrie-afrique.jpg", tint: "rgba(183,194,51,0.82)" },
-            { titre: "TIC & IA", description: "Déployer des outils numériques et des agents IA au service d'une décision publique plus rapide et plus fiable.", photo: "/img/domaines/tic-afrique.jpg", tint: "rgba(0,137,123,0.82)" },
-          ].map((d, i) => (
-            <Reveal key={d.titre} index={i} className={i % 2 === 1 ? "md:mt-10" : ""}>
-              <DomainCard {...d} />
-            </Reveal>
-          ))}
-        </div>
-        <div className="mt-8">
-          <Link href="/domaines" className="text-[14.5px] font-semibold text-dark-2">
-            En savoir plus sur nos domaines →
-          </Link>
+      <section className="bg-darker py-16 md:py-24">
+        <div className="max-w-6xl mx-auto px-5 md:px-8">
+          <SectionHead
+            eyebrow="DOMAINES D'INTERVENTION"
+            title={
+              <>
+                Quatre domaines, une même <span className="text-lime-2 italic">exigence</span>
+              </>
+            }
+            dark
+          />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { titre: "Santé Globale", description: "Renforcer les systèmes de santé publique, de la vaccination à la nutrition, pour des services plus accessibles et mieux pilotés.", photo: "/img/domaines/sante-afrique.jpg", tint: "rgba(61,83,71,0.82)" },
+              { titre: "Éducation", description: "Moderniser les pratiques pédagogiques et renforcer les compétences des enseignants comme des apprenants.", photo: "/img/domaines/education-afrique.jpg", tint: "rgba(124,179,66,0.82)" },
+              { titre: "Industrie", description: "Structurer les chaînes de valeur locales et accompagner la mise aux normes des filières agro-industrielles.", photo: "/img/domaines/industrie-afrique.jpg", tint: "rgba(183,194,51,0.82)" },
+              { titre: "TIC & IA", description: "Déployer des outils numériques et des agents IA au service d'une décision publique plus rapide et plus fiable.", photo: "/img/domaines/tic-afrique.jpg", tint: "rgba(0,137,123,0.82)" },
+            ].map((d, i) => (
+              <Reveal key={d.titre} index={i} className={i % 2 === 1 ? "md:mt-10" : ""}>
+                <DomainCard {...d} />
+              </Reveal>
+            ))}
+          </div>
+          <div className="mt-8">
+            <Link href="/domaines" className="text-[14.5px] font-semibold text-lime-2">
+              En savoir plus sur nos domaines →
+            </Link>
+          </div>
         </div>
       </section>
 
