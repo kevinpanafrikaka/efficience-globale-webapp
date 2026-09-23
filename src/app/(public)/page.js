@@ -5,7 +5,7 @@ import DomainCard from "@/components/DomainCard";
 import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
 import { getProjetBySlug, getMembres } from "@/lib/db";
-import { IconHealth, IconEducation, IconIndustry, IconTic } from "@/components/icons";
+import { IconHealth, IconEducation, IconIndustry, IconTic, IconBulb, IconChart, IconTrend } from "@/components/icons";
 
 const PROJETS_PHARES_SLUGS = [
   "gouvernance-pev-lmc",
@@ -106,34 +106,56 @@ export default async function HomePage() {
 
       {/* A PROPOS (résumé) */}
       <section className="bg-white max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
-        <SectionHead
-          eyebrow="QUI SOMMES-NOUS"
-          title="Pourquoi Efficience Globale existe"
-          lead="Une décennie d'expérience internationale, mise au service du contexte local de l'Afrique de l'Ouest."
-        />
+        <div className="grid md:grid-cols-12 gap-10 md:gap-0">
+          <Reveal className="md:col-span-5">
+            <div className="text-[12px] font-bold tracking-[0.14em] text-lime mb-4">QUI SOMMES-NOUS</div>
+            <h2 className="text-[32px] md:text-[42px] leading-[1.1] tracking-[-0.02em] text-dark mb-5">
+              Pourquoi Efficience Globale existe
+            </h2>
+            <p className="text-[16px] leading-relaxed text-ink-soft max-w-sm">
+              Fondée en <span className="italic text-lime">juillet 2022</span> à Conakry par Oumar Camara,
+              Efficience Globale est votre partenaire stratégique pour un impact durable en Afrique de
+              l&apos;Ouest.
+            </p>
+          </Reveal>
 
-        <Reveal>
-          <div className="grid md:grid-cols-4 gap-10 md:gap-10 pt-10 border-t border-line">
-            {[
-              [
-                "Fondation",
-                <>
-                  Fondée le 27 juillet 2022 à Conakry par{" "}
-                  <span className="text-dark-2 font-bold">Oumar Camara</span>, fort d&apos;une décennie
-                  d&apos;expérience chez PwC, EY et Accenture.
-                </>,
-              ],
-              ["Mission", "Accompagner les organisations à adresser efficacement les défis de développement structurel."],
-              ["Vision", "Devenir un acteur de référence en conseil stratégique et opérationnel en Afrique de l'Ouest."],
-              ["Positionnement", "Expertise locale, standards internationaux, au service de nos partenaires."],
-            ].map(([titre, texte]) => (
-              <div key={titre}>
-                <h3 className="text-[13px] font-bold tracking-[0.1em] text-lime mb-2.5">{titre.toUpperCase()}</h3>
-                <p className="text-[14.5px] leading-relaxed text-ink-soft">{texte}</p>
-              </div>
-            ))}
-          </div>
-        </Reveal>
+          <Reveal index={1} className="md:col-span-7 md:pl-14 md:border-l border-line">
+            <div className="flex flex-col gap-8">
+              {[
+                [
+                  <IconBulb key="i" stroke="var(--lime)" width="24" height="24" />,
+                  <>
+                    Efficience Globale se distingue par son{" "}
+                    <span className="text-lime font-semibold">approche innovante</span> et sa profonde
+                    connaissance des dynamiques locales et régionales de l&apos;Afrique de l&apos;Ouest.
+                  </>,
+                ],
+                [
+                  <IconChart key="i" stroke="var(--lime)" width="24" height="24" />,
+                  <>
+                    Notre mission est de développer et d&apos;implémenter des{" "}
+                    <span className="text-lime font-semibold">solutions sur mesure</span> qui s&apos;inscrivent
+                    parfaitement dans le contexte local de l&apos;Afrique de l&apos;Ouest, particulièrement en
+                    Guinée.
+                  </>,
+                ],
+                [
+                  <IconTrend key="i" stroke="var(--lime)" width="24" height="24" />,
+                  <>
+                    Notre ambition est de créer un <span className="text-lime font-semibold">impact durable</span>{" "}
+                    sur les communautés que nous servons, en alliant connaissances locales et meilleures
+                    pratiques internationales.
+                  </>,
+                ],
+              ].map(([icon, texte], i) => (
+                <div key={i} className="flex items-start gap-4">
+                  <div className="flex-shrink-0 mt-0.5">{icon}</div>
+                  <p className="text-[15.5px] leading-relaxed text-ink-soft">{texte}</p>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
       </section>
 
       {/* DOMAINES */}
