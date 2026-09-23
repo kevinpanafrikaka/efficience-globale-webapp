@@ -110,7 +110,7 @@ export default async function HomePage() {
           <Reveal className="md:col-span-5">
             <div className="text-[12px] font-bold tracking-[0.14em] text-lime mb-4">QUI SOMMES-NOUS</div>
             <h2 className="text-[32px] md:text-[42px] leading-[1.1] tracking-[-0.02em] text-dark mb-5">
-              Pourquoi Efficience Globale existe
+              Une conviction, un cabinet
             </h2>
             <p className="text-[16px] leading-relaxed text-ink-soft max-w-sm">
               Fondée en <span className="italic text-lime">juillet 2022</span> à Conakry par Oumar Camara,
