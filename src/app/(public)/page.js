@@ -106,29 +106,15 @@ export default async function HomePage() {
 
       {/* A PROPOS (résumé) */}
       <section className="bg-white max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
-        <SectionHead eyebrow="QUI SOMMES-NOUS" index="01" title="Pourquoi Efficience Globale existe" />
+        <SectionHead
+          eyebrow="QUI SOMMES-NOUS"
+          index="01"
+          title="Pourquoi Efficience Globale existe"
+          lead="Une décennie d'expérience internationale, mise au service du contexte local de l'Afrique de l'Ouest."
+        />
 
         <Reveal>
-          <div className="relative">
-            <span
-              aria-hidden="true"
-              className="pointer-events-none select-none italic absolute -top-10 md:-top-14 -left-1 text-[130px] md:text-[170px] leading-none text-dark/[0.06]"
-              style={{ fontFamily: "var(--font-head)" }}
-            >
-              &ldquo;
-            </span>
-            <p
-              className="relative text-[30px] md:text-[46px] leading-[1.2] tracking-[-0.01em] text-dark max-w-3xl pt-10 md:pt-14"
-              style={{ fontFamily: "var(--font-head)" }}
-            >
-              Accompagner les organisations à adresser efficacement les défis de{" "}
-              <span className="italic text-lime">développement structurel</span>.
-            </p>
-          </div>
-        </Reveal>
-
-        <Reveal index={1}>
-          <div className="grid md:grid-cols-3 gap-10 md:gap-14 mt-14 md:mt-16 pt-10 border-t border-line">
+          <div className="grid md:grid-cols-4 gap-10 md:gap-10 pt-10 border-t border-line">
             {[
               [
                 "Fondation",
@@ -138,11 +124,12 @@ export default async function HomePage() {
                   d&apos;expérience chez PwC, EY et Accenture.
                 </>,
               ],
+              ["Mission", "Accompagner les organisations à adresser efficacement les défis de développement structurel."],
               ["Vision", "Devenir un acteur de référence en conseil stratégique et opérationnel en Afrique de l'Ouest."],
               ["Positionnement", "Expertise locale, standards internationaux, au service de nos partenaires."],
             ].map(([titre, texte]) => (
               <div key={titre}>
-                <h3 className="text-[13px] font-bold tracking-[0.1em] text-ink-faint mb-2.5">{titre.toUpperCase()}</h3>
+                <h3 className="text-[13px] font-bold tracking-[0.1em] text-lime mb-2.5">{titre.toUpperCase()}</h3>
                 <p className="text-[14.5px] leading-relaxed text-ink-soft">{texte}</p>
               </div>
             ))}
