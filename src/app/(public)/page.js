@@ -128,25 +128,26 @@ export default async function HomePage() {
         </Reveal>
 
         <Reveal index={1}>
-          <p className="mt-8 text-[16px] leading-relaxed text-ink-soft max-w-xl">
-            Fondée le 27 juillet 2022 à Conakry par{" "}
-            <span className="text-dark-2 font-bold">Oumar Camara</span>, fort d&apos;une décennie
-            d&apos;expérience chez PwC, EY et Accenture, Efficience Globale développe des solutions sur mesure
-            qui s&apos;inscrivent dans le contexte local de l&apos;Afrique de l&apos;Ouest.
-          </p>
+          <div className="grid md:grid-cols-3 gap-10 md:gap-14 mt-14 md:mt-16 pt-10 border-t border-line">
+            {[
+              [
+                "Fondation",
+                <>
+                  Fondée le 27 juillet 2022 à Conakry par{" "}
+                  <span className="text-dark-2 font-bold">Oumar Camara</span>, fort d&apos;une décennie
+                  d&apos;expérience chez PwC, EY et Accenture.
+                </>,
+              ],
+              ["Vision", "Devenir un acteur de référence en conseil stratégique et opérationnel en Afrique de l'Ouest."],
+              ["Positionnement", "Expertise locale, standards internationaux, au service de nos partenaires."],
+            ].map(([titre, texte]) => (
+              <div key={titre}>
+                <h3 className="text-[13px] font-bold tracking-[0.1em] text-ink-faint mb-2.5">{titre.toUpperCase()}</h3>
+                <p className="text-[14.5px] leading-relaxed text-ink-soft">{texte}</p>
+              </div>
+            ))}
+          </div>
         </Reveal>
-
-        <div className="grid md:grid-cols-2 gap-8 md:gap-16 mt-16 md:mt-20 pt-10 border-t border-line max-w-3xl">
-          {[
-            ["Vision", "Devenir un acteur de référence en conseil stratégique et opérationnel en Afrique de l'Ouest."],
-            ["Positionnement", "Expertise locale, standards internationaux, au service de nos partenaires."],
-          ].map(([titre, texte]) => (
-            <div key={titre}>
-              <h3 className="text-[13px] font-bold tracking-[0.1em] text-ink-faint mb-2">{titre.toUpperCase()}</h3>
-              <p className="text-[14.5px] leading-relaxed text-ink-soft">{texte}</p>
-            </div>
-          ))}
-        </div>
       </section>
 
       {/* DOMAINES */}
