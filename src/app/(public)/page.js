@@ -160,7 +160,14 @@ export default async function HomePage() {
 
       {/* DOMAINES */}
       <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
-        <SectionHead eyebrow="DOMAINES D'INTERVENTION" title="Où nous créons de la valeur" />
+        <SectionHead
+          eyebrow="DOMAINES D'INTERVENTION"
+          title={
+            <>
+              Quatre domaines, une même <span className="text-lime italic">exigence</span>
+            </>
+          }
+        />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { titre: "Santé Globale", description: "Renforcer les systèmes de santé publique, de la vaccination à la nutrition, pour des services plus accessibles et mieux pilotés.", photo: "/img/domaines/sante-afrique.jpg", tint: "rgba(61,83,71,0.82)" },
