@@ -1,12 +1,13 @@
-import { Lexend, Source_Sans_3 } from "next/font/google";
+import { Fraunces, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-const lexend = Lexend({
-  variable: "--font-lexend",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
-  weight: ["500", "700", "800"],
+  weight: ["500", "600", "700"],
+  style: ["normal", "italic"],
 });
 
 const sourceSans = Source_Sans_3({
@@ -39,7 +40,7 @@ export default function RootLayout({ children, modal }) {
   return (
     <html
       lang="fr"
-      className={`${lexend.variable} ${sourceSans.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${sourceSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <Header />

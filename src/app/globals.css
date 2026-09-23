@@ -33,43 +33,49 @@
   --color-olive: var(--olive);
   --color-teal: var(--teal);
 
-  --font-head: var(--font-lexend);
+  --font-head: var(--font-fraunces);
   --font-body: var(--font-source-sans);
 }
 
 /* ===== Baseline mobile-native (viewport, tap, safe-areas) ===== */
-html {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-text-size-adjust: 100%;
-  overscroll-behavior: none;
-}
+/* @layer base : sans ça, ces règles element-selector passent devant les
+   utilitaires Tailwind (text-white, font-bold...) quelle que soit leur
+   spécificité, car Tailwind v4 range ses utilitaires dans @layer utilities
+   et un rang de cascade non-layé prime toujours sur un rang layé. */
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    overscroll-behavior: none;
+  }
 
-body {
-  background: var(--white);
-  color: var(--ink);
-  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-}
+  body {
+    background: var(--white);
+    color: var(--ink);
+    font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  }
 
-h1, h2, h3, h4 {
-  font-family: var(--font-head), ui-sans-serif, system-ui, sans-serif;
-  font-weight: 800;
-  color: var(--dark);
-}
+  h1, h2, h3, h4 {
+    font-family: var(--font-head), Georgia, serif;
+    font-weight: 600;
+    color: var(--dark);
+  }
 
-input, textarea, select {
-  font-size: 16px; /* évite le zoom automatique iOS au focus */
-}
+  input, textarea, select {
+    font-size: 16px; /* évite le zoom automatique iOS au focus */
+  }
 
-button, a, [role="button"] {
-  touch-action: manipulation;
-  -webkit-user-select: none;
-  user-select: none;
-}
+  button, a, [role="button"] {
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+  }
 
-/* le contenu texte (pas les contrôles) reste sélectionnable */
-p, li, span.selectable {
-  user-select: text;
-  -webkit-user-select: text;
+  /* le contenu texte (pas les contrôles) reste sélectionnable */
+  p, li, span.selectable {
+    user-select: text;
+    -webkit-user-select: text;
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {

@@ -47,7 +47,7 @@ export default async function HomePage() {
               <span className="text-[12px] text-white/40">Conakry, Guinée · depuis 2022</span>
             </div>
             <h1 className="text-[40px] leading-[1.02] md:text-[60px] md:leading-[1.0] tracking-[-0.02em] text-white mb-7">
-              Des solutions <span className="text-lime">stratégiques</span> pour un impact durable en Afrique de l&apos;Ouest
+              Des solutions <span className="text-lime italic">stratégiques</span> pour un impact durable en Afrique de l&apos;Ouest
             </h1>
             <p className="text-[16px] md:text-[17.5px] leading-relaxed text-[#d3ddce] mb-9 max-w-md">
               Nous accompagnons institutions publiques, bailleurs internationaux et entreprises en Guinée à travers la
