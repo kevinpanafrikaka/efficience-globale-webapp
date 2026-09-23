@@ -191,9 +191,9 @@ export default async function HomePage() {
       </section>
 
       {/* CONVICTIONS */}
-      <section className="bg-darker py-16 md:py-24">
+      <section className="py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <SectionHead eyebrow="NOS CONVICTIONS" title="Ce qui nous caractérise" dark />
+          <SectionHead eyebrow="NOS CONVICTIONS" title="Ce qui nous caractérise" />
           <div className="grid grid-cols-2 md:grid-cols-4">
             {[
               ["01", "Transparence", "Une honnêteté et une ouverture qui renforcent la confiance de nos partenaires et clients."],
@@ -204,11 +204,11 @@ export default async function HomePage() {
               <Reveal
                 key={titre}
                 index={i}
-                className={`py-6 md:py-0 md:pb-2 ${i >= 2 ? "border-t border-white/10 md:border-t-0" : ""} ${i > 0 ? "md:pl-8 md:border-l md:border-white/10" : ""} ${i % 2 === 1 ? "pl-6" : "pr-6 md:pr-8"}`}
+                className={`py-6 md:py-0 md:pb-2 ${i >= 2 ? "border-t border-line md:border-t-0" : ""} ${i > 0 ? "md:pl-8 md:border-l md:border-line" : ""} ${i % 2 === 1 ? "pl-6" : "pr-6 md:pr-8"}`}
               >
-                <div className="text-[46px] leading-none font-extrabold text-white/10 mb-4 tabular-nums">{num}</div>
-                <h4 className="text-white text-[18px] mb-2">{titre}</h4>
-                <p className="text-[13.5px] leading-relaxed text-[#b9c4b4]">{desc}</p>
+                <div className="text-[46px] leading-none font-extrabold text-line mb-4 tabular-nums">{num}</div>
+                <h4 className="text-dark text-[18px] mb-2">{titre}</h4>
+                <p className="text-[13.5px] leading-relaxed text-ink-soft">{desc}</p>
               </Reveal>
             ))}
           </div>
@@ -216,9 +216,9 @@ export default async function HomePage() {
       </section>
 
       {/* SERVICES */}
-      <section className="bg-cream py-16 md:py-24">
+      <section className="bg-darker py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <SectionHead eyebrow="SERVICES" title="Ce que nous faisons concrètement" />
+          <SectionHead eyebrow="SERVICES" title="Ce que nous faisons concrètement" dark />
           <div>
             {[
               ["01", "Diagnostic stratégique approfondi", "Identification des blocages et des leviers d'action pertinents."],
@@ -229,17 +229,17 @@ export default async function HomePage() {
               <Reveal
                 key={titre}
                 index={i}
-                className={`flex items-start gap-6 py-7 ${i < arr.length - 1 ? "border-b border-line" : ""}`}
+                className={`flex items-start gap-6 py-7 ${i < arr.length - 1 ? "border-b border-white/10" : ""}`}
               >
-                <div className="text-[15px] font-extrabold text-lime tabular-nums pt-0.5">{num}</div>
+                <div className="text-[15px] font-extrabold text-lime-2 tabular-nums pt-0.5">{num}</div>
                 <div>
-                  <h3 className="text-[18px] mb-1.5 tracking-[-0.01em]">{titre}</h3>
-                  <p className="text-[14.5px] text-ink-soft leading-relaxed">{desc}</p>
+                  <h3 className="text-white text-[18px] mb-1.5 tracking-[-0.01em]">{titre}</h3>
+                  <p className="text-[14.5px] text-[#b9c4b4] leading-relaxed">{desc}</p>
                 </div>
               </Reveal>
             ))}
           </div>
-          <Link href="/services" className="inline-block mt-8 text-[14.5px] font-semibold text-dark-2 border-b-2 border-lime pb-0.5">
+          <Link href="/services" className="inline-block mt-8 text-[14.5px] font-semibold text-white border-b-2 border-lime pb-0.5">
             Découvrir notre méthode en détail →
           </Link>
         </div>
@@ -267,11 +267,11 @@ export default async function HomePage() {
       </section>
 
       {/* EQUIPE (teaser) */}
-      <section className="bg-cream py-16 md:py-24">
+      <section className="bg-darker py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <SectionHead eyebrow="NOTRE ÉQUIPE" title="Une équipe pluridisciplinaire de 15 personnes" />
+          <SectionHead eyebrow="NOTRE ÉQUIPE" title="Une équipe pluridisciplinaire de 15 personnes" dark />
           {fondateur && (
-            <Reveal className="flex flex-col md:flex-row gap-7 md:items-start max-w-2xl border-t border-line pt-8">
+            <Reveal className="flex flex-col md:flex-row gap-7 md:items-start max-w-2xl border-t border-white/10 pt-8">
               <Image
                 src={fondateur.photo_url}
                 alt={fondateur.nom}
@@ -280,13 +280,13 @@ export default async function HomePage() {
                 className="object-cover h-[88px] w-[88px] flex-shrink-0 grayscale"
               />
               <div>
-                <h3 className="text-[20px] mb-1 tracking-[-0.01em]">{fondateur.nom}</h3>
-                <div className="text-[13.5px] font-semibold text-lime mb-4">{fondateur.role}</div>
-                <p className="text-[14.5px] leading-relaxed text-ink-soft">{fondateur.bio}</p>
+                <h3 className="text-white text-[20px] mb-1 tracking-[-0.01em]">{fondateur.nom}</h3>
+                <div className="text-[13.5px] font-semibold text-lime-2 mb-4">{fondateur.role}</div>
+                <p className="text-[14.5px] leading-relaxed text-[#b9c4b4]">{fondateur.bio}</p>
               </div>
             </Reveal>
           )}
-          <Link href="/equipe" className="inline-block mt-8 text-[14.5px] font-semibold text-dark-2 border-b-2 border-lime pb-0.5">
+          <Link href="/equipe" className="inline-block mt-8 text-[14.5px] font-semibold text-white border-b-2 border-lime pb-0.5">
             Voir toute l&apos;équipe →
           </Link>
         </div>
@@ -318,13 +318,13 @@ export default async function HomePage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-darker py-20 md:py-28">
+      <section className="border-t border-line py-20 md:py-28">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <div className="max-w-2xl">
-            <h2 className="text-white text-[32px] md:text-[48px] leading-[1.08] tracking-[-0.02em] mb-5">
+            <h2 className="text-dark text-[32px] md:text-[48px] leading-[1.08] tracking-[-0.02em] mb-5">
               Discutons de votre prochain projet
             </h2>
-            <p className="text-[#d3ddce] text-[16px] md:text-[17px] leading-relaxed max-w-lg mb-9">
+            <p className="text-ink-soft text-[16px] md:text-[17px] leading-relaxed max-w-lg mb-9">
               Gouvernance, digitalisation, intelligence artificielle ou renforcement de capacités — parlons de vos
               objectifs.
             </p>
