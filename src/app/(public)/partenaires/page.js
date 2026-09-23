@@ -24,23 +24,31 @@ export default async function PartenairesPage() {
 
   return (
     <>
-      <section className="py-14 md:py-16" style={{ background: "linear-gradient(120deg, #2e3f32 0%, #16211a 100%)" }}>
+      <section className="py-16 md:py-24 bg-darker">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <div className="text-lime-2 text-[12.5px] font-bold tracking-wide mb-3.5">PARTENAIRES</div>
-          <h1 className="text-white text-[28px] md:text-[42px] leading-tight">Ils nous font confiance</h1>
+          <div className="flex items-center gap-3 pb-4 mb-6 border-b border-white/15 w-fit">
+            <span className="text-[12px] font-bold tracking-[0.14em] text-lime-2">PARTENAIRES</span>
+          </div>
+          <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] max-w-2xl">
+            Ils nous font confiance
+          </h1>
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-5 md:px-8 py-14 md:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {BAILLEURS.map((p) => (
-            <div key={p.nom} className="border border-line rounded-xl h-[90px] flex items-center justify-center px-4">
+      <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
+        <div className="text-[12px] font-bold tracking-[0.1em] text-lime mb-8">BAILLEURS &amp; INSTITUTIONS</div>
+        <div className="grid grid-cols-2 md:grid-cols-4">
+          {BAILLEURS.map((p, i) => (
+            <div
+              key={p.nom}
+              className={`h-[100px] flex items-center px-4 md:px-6 ${i % 2 === 1 ? "border-l border-line" : ""} ${i >= 2 ? "border-t border-line" : ""} ${i % 4 !== 0 ? "md:border-l" : "md:border-l-0"} ${i >= 4 ? "md:border-t" : "md:border-t-0"}`}
+            >
               <Image
                 src={`/img/${p.logo}`}
                 alt={p.nom}
                 width={130}
                 height={50}
-                className="max-h-[50px] w-auto object-contain grayscale opacity-90"
+                className="max-h-[46px] w-auto object-contain grayscale opacity-80"
               />
             </div>
           ))}
@@ -48,17 +56,17 @@ export default async function PartenairesPage() {
       </section>
 
       {partenariats.length > 0 && (
-        <section className="bg-cream py-14 md:py-16">
+        <section className="bg-cream py-16 md:py-24">
           <div className="max-w-6xl mx-auto px-5 md:px-8">
-            <div className="text-[12.5px] font-bold tracking-wide text-lime mb-3.5">PARTENARIATS STRATÉGIQUES</div>
-            <h2 className="text-[26px] md:text-[32px] mb-10">Des collaborations de long terme</h2>
-            <div className="grid md:grid-cols-2 gap-5">
+            <div className="text-[12px] font-bold tracking-[0.1em] text-lime mb-3.5">PARTENARIATS STRATÉGIQUES</div>
+            <h2 className="text-[28px] md:text-[38px] tracking-[-0.01em] mb-12">Des collaborations de long terme</h2>
+            <div className="grid md:grid-cols-2 gap-x-10 gap-y-10">
               {partenariats.map((p) => (
-                <div key={p.slug} className="bg-white rounded-xl p-6 flex flex-col gap-2.5">
-                  <div className="text-[12px] font-semibold text-lime">{p.client}</div>
-                  <h3 className="text-[16.5px]">{p.titre}</h3>
-                  <p className="text-[13.5px] text-ink-soft leading-relaxed">{p.resume}</p>
-                  <div className="text-[12px] text-ink-faint border-t border-line pt-3 mt-2">{p.periode}</div>
+                <div key={p.slug} className="border-l-2 border-lime pl-6 flex flex-col gap-2">
+                  <div className="text-[12px] font-semibold text-dark-2 tracking-[0.05em]">{p.client.toUpperCase()}</div>
+                  <h3 className="text-[18px] tracking-[-0.01em]">{p.titre}</h3>
+                  <p className="text-[14px] text-ink-soft leading-relaxed">{p.resume}</p>
+                  <div className="text-[12px] text-ink-faint mt-1">{p.periode}</div>
                 </div>
               ))}
             </div>

@@ -84,51 +84,59 @@ export default async function DomainesPage() {
 
   return (
     <>
-      <section className="py-14 md:py-16" style={{ background: "linear-gradient(120deg, #2e3f32 0%, #16211a 100%)" }}>
+      <section className="py-16 md:py-24 bg-darker">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <div className="text-lime-2 text-[12.5px] font-bold tracking-wide mb-3.5">DOMAINES D&apos;INTERVENTION</div>
-          <h1 className="text-white text-[28px] md:text-[42px] leading-tight mb-4">Où nous créons de la valeur</h1>
-          <p className="text-[#d3ddce] text-[16px] max-w-2xl">
+          <div className="flex items-center gap-3 pb-4 mb-6 border-b border-white/15 w-fit">
+            <span className="text-[12px] font-bold tracking-[0.14em] text-lime-2">DOMAINES D&apos;INTERVENTION</span>
+          </div>
+          <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] mb-5 max-w-2xl">
+            Où nous créons de la valeur
+          </h1>
+          <p className="text-[#d3ddce] text-[16px] md:text-[17px] leading-relaxed max-w-xl">
             Quatre domaines, une même approche : diagnostic rigoureux, co-construction avec les acteurs locaux, et
             transfert de compétences pour ancrer les résultats dans la durée.
           </p>
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-5 md:px-8 py-14 md:py-16 space-y-16">
+      <section className="max-w-6xl mx-auto px-5 md:px-8">
         {DOMAINES.map((d, i) => (
-          <div key={d.titre} className="grid md:grid-cols-2 gap-8 items-start">
+          <div
+            key={d.titre}
+            className={`grid md:grid-cols-2 gap-8 md:gap-14 items-start py-14 md:py-20 ${i > 0 ? "border-t border-line" : ""}`}
+          >
             <div className={i % 2 === 1 ? "md:order-2" : ""}>
-              <div className="relative h-64 rounded-2xl overflow-hidden mb-6 md:mb-0">
+              <div className="relative h-64 md:h-80 overflow-hidden mb-6 md:mb-0">
                 <Image src={d.photo} alt="" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
                 <div className="absolute inset-0" style={{ backgroundColor: d.tint, mixBlendMode: "multiply" }} />
                 <div className="absolute top-5 left-5">{d.icon}</div>
               </div>
             </div>
             <div className={i % 2 === 1 ? "md:order-1" : ""}>
-              <h2 className="text-[24px] mb-3">{d.titre}</h2>
-              <p className="text-[15.5px] text-ink-soft leading-relaxed mb-5">{d.description}</p>
+              <div className="text-[42px] leading-none font-extrabold text-line mb-4 tabular-nums">0{i + 1}</div>
+              <h2 className="text-[26px] md:text-[30px] tracking-[-0.01em] mb-3">{d.titre}</h2>
+              <p className="text-[15.5px] text-ink-soft leading-relaxed mb-6">{d.description}</p>
 
-              <div className="text-[13px] font-bold text-lime tracking-wide mb-2.5">INTERVENTIONS TYPES</div>
-              <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5 mb-5">
+              <div className="text-[12px] font-bold text-lime tracking-[0.1em] mb-3">INTERVENTIONS TYPES</div>
+              <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5 mb-6">
                 {d.interventions.map((it) => (
                   <li key={it} className="text-[13.5px] text-ink-soft flex items-start gap-2">
-                    <span className="mt-1.5 h-1 w-1 rounded-full bg-lime flex-shrink-0" />
+                    <span className="mt-1.5 h-1 w-1 bg-lime flex-shrink-0" />
                     {it}
                   </li>
                 ))}
               </ul>
 
-              <div className="text-[13px] font-bold text-lime tracking-wide mb-2">EFFETS RECHERCHÉS</div>
-              <p className="text-[13.5px] text-ink-soft leading-relaxed mb-5">{d.effets}</p>
+              <div className="text-[12px] font-bold text-lime tracking-[0.1em] mb-2">EFFETS RECHERCHÉS</div>
+              <p className="text-[13.5px] text-ink-soft leading-relaxed mb-6">{d.effets}</p>
 
               {projetsParSecteur[i].length > 0 && (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-col gap-1.5">
                   {projetsParSecteur[i].slice(0, 3).map((p) => (
                     <Link
                       key={p.slug}
                       href={`/realisations/${p.slug}`}
-                      className="text-[12.5px] font-medium text-dark-2 border border-line rounded-full px-3 py-1.5 hoverable"
+                      className="text-[13px] font-medium text-dark-2 border-b border-line hoverable w-fit"
                     >
                       {p.titre}
                     </Link>

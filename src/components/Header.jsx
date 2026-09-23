@@ -36,7 +36,7 @@ export default function Header() {
 
         <Link
           href="/contact"
-          className="hidden lg:inline-flex items-center rounded-lg bg-lime px-4 py-2.5 text-[13.5px] font-semibold text-ink active:scale-[0.97] transition-transform shrink-0"
+          className="hidden lg:inline-flex items-center rounded bg-lime px-4 py-2.5 text-[13.5px] font-semibold text-ink active:scale-[0.97] transition-transform shrink-0"
         >
           Nous contacter
         </Link>
@@ -75,7 +75,7 @@ export default function Header() {
             <Link
               href="/contact"
               onClick={() => setOpen(false)}
-              className="mt-5 mb-6 inline-flex items-center justify-center rounded-lg bg-lime px-5 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform"
+              className="mt-5 mb-6 inline-flex items-center justify-center rounded bg-lime px-5 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform"
             >
               Nous contacter
             </Link>

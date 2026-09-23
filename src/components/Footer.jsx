@@ -85,7 +85,7 @@ export default function Footer() {
               </a>
               <Link
                 href="/contact"
-                className="inline-flex w-fit items-center rounded-lg bg-lime px-4 py-2 text-[13px] font-semibold text-ink mt-1 active:scale-[0.97] transition-transform"
+                className="inline-flex w-fit items-center rounded bg-lime px-4 py-2 text-[13px] font-semibold text-ink mt-1 active:scale-[0.97] transition-transform"
               >
                 Nous contacter
               </Link>

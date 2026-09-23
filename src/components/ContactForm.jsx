@@ -54,7 +54,7 @@ export default function ContactForm({ compact = false }) {
       </div>
       <button
         type="submit"
-        className="mt-1 inline-flex items-center justify-center rounded-lg bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform"
+        className="mt-1 inline-flex items-center justify-center rounded bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform"
       >
         Envoyer le message
       </button>

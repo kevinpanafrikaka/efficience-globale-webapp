@@ -16,16 +16,15 @@ export default async function RealisationsPage() {
 
   return (
     <>
-      <section
-        className="py-14 md:py-16"
-        style={{ background: "linear-gradient(120deg, #2e3f32 0%, #16211a 100%)" }}
-      >
+      <section className="py-16 md:py-24 bg-darker">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <div className="text-lime-2 text-[12.5px] font-bold tracking-wide mb-3.5">RÉALISATIONS</div>
-          <h1 className="text-white text-[28px] md:text-[42px] leading-tight mb-4">
+          <div className="flex items-center gap-3 pb-4 mb-6 border-b border-white/15 w-fit">
+            <span className="text-[12px] font-bold tracking-[0.14em] text-lime-2">RÉALISATIONS</span>
+          </div>
+          <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] mb-5 max-w-2xl">
             Nos projets et partenariats stratégiques
           </h1>
-          <p className="text-[#d3ddce] text-[16px] max-w-2xl">
+          <p className="text-[#d3ddce] text-[16px] md:text-[17px] leading-relaxed max-w-xl">
             Depuis 2022, Efficience Globale a conduit des interventions dans la santé publique, l&apos;intelligence
             artificielle, l&apos;éducation, la gouvernance et le développement local, aux côtés de bailleurs et
             institutions de référence.
@@ -33,7 +32,7 @@ export default async function RealisationsPage() {
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-5 md:px-8 py-14 md:py-16">
+      <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
         {projets.length === 0 ? (
           <p className="text-center text-ink-soft py-14">Aucun projet publié pour le moment.</p>
         ) : (

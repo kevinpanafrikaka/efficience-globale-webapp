@@ -32,44 +32,43 @@ export default async function ProjetDetailPage({ params }) {
             <Link href="/realisations" className="text-white/80 text-[13.5px] font-medium mb-3 inline-block">
               ← Toutes les réalisations
             </Link>
-            <span
-              className="inline-block text-[11px] font-bold tracking-wide px-2.5 py-1 rounded-full mb-3"
-              style={{ color: secteur.color, backgroundColor: "#ffffffcc" }}
-            >
+            <span className="inline-block text-[11px] font-bold tracking-[0.1em] mb-3" style={{ color: "#fff" }}>
               {secteur.label.toUpperCase()}
             </span>
-            <h1 className="text-white text-[24px] md:text-[36px] leading-tight max-w-2xl">{projet.titre}</h1>
+            <h1 className="text-white text-[26px] md:text-[40px] leading-[1.05] tracking-[-0.01em] max-w-2xl">
+              {projet.titre}
+            </h1>
           </div>
         </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-5 md:px-8 py-10 md:py-14">
-        <div className="grid md:grid-cols-3 gap-4 mb-10 text-[13.5px]">
-          <div className="border border-line rounded-lg p-4">
+      <section className="max-w-4xl mx-auto px-5 md:px-8 py-12 md:py-16">
+        <div className="grid grid-cols-3 mb-12 text-[13.5px] border-t border-b border-line">
+          <div className="py-5 pr-4">
             <div className="text-ink-faint mb-1">Client / bailleur</div>
             <div className="font-semibold text-dark">{projet.client}</div>
           </div>
-          <div className="border border-line rounded-lg p-4">
+          <div className="py-5 px-4 border-l border-line">
             <div className="text-ink-faint mb-1">Période</div>
             <div className="font-semibold text-dark">{projet.periode}</div>
           </div>
-          <div className="border border-line rounded-lg p-4">
+          <div className="py-5 pl-4 border-l border-line">
             <div className="text-ink-faint mb-1">Montant</div>
             <div className="font-semibold text-dark">{projet.montant ?? "Non communiqué"}</div>
           </div>
         </div>
 
         {projet.description && (
-          <p className="text-[16px] leading-relaxed text-ink-soft mb-10">{projet.description}</p>
+          <p className="text-[17px] leading-relaxed text-ink-soft mb-12 max-w-xl">{projet.description}</p>
         )}
 
         {projet.resultats?.length > 0 && (
           <>
-            <h2 className="text-[19px] mb-4">Résultats obtenus</h2>
-            <ul className="space-y-2.5 mb-10">
+            <h2 className="text-[20px] tracking-[-0.01em] mb-5">Résultats obtenus</h2>
+            <ul className="space-y-2.5 mb-12">
               {projet.resultats.map((r) => (
                 <li key={r} className="flex items-start gap-2.5 text-[14.5px] text-ink-soft">
-                  <span className="mt-2 h-1.5 w-1.5 rounded-full bg-lime flex-shrink-0" />
+                  <span className="mt-2 h-1.5 w-1.5 bg-lime flex-shrink-0" />
                   {r}
                 </li>
               ))}
@@ -79,7 +78,7 @@ export default async function ProjetDetailPage({ params }) {
 
         <Link
           href="/contact"
-          className="inline-flex items-center rounded-lg bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform"
+          className="inline-flex items-center rounded bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform"
         >
           Discuter d&apos;un projet similaire
         </Link>
