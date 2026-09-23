@@ -138,23 +138,18 @@ export default async function HomePage() {
             </Reveal>
           </div>
 
-          {fondateur && (
-            <Reveal index={1} className="md:pt-8">
-              <div className="max-w-[240px]">
-                <Image
-                  src={fondateur.photo_url}
-                  alt={fondateur.nom}
-                  width={240}
-                  height={280}
-                  className="object-cover w-full h-[260px] md:h-[280px] grayscale mb-4"
-                />
-                <div className="text-[16px] tracking-[-0.01em]" style={{ fontFamily: "var(--font-head)" }}>
-                  {fondateur.nom}
-                </div>
-                <div className="text-[13px] font-semibold text-lime">{fondateur.role}</div>
-              </div>
-            </Reveal>
-          )}
+          <Reveal index={1} className="md:pt-8 md:border-l md:border-line md:pl-12">
+            <div className="text-[13px] font-bold tracking-[0.14em] text-lime mb-5">FONDÉE À CONAKRY</div>
+            <div
+              className="text-[110px] md:text-[150px] leading-[0.85] font-extrabold tabular-nums text-transparent"
+              style={{
+                fontFamily: "var(--font-head)",
+                WebkitTextStroke: "1.5px var(--dark-2)",
+              }}
+            >
+              2022
+            </div>
+          </Reveal>
         </div>
 
         <div className="grid md:grid-cols-2 gap-8 md:gap-16 mt-16 md:mt-20 pt-10 border-t border-line max-w-3xl">
