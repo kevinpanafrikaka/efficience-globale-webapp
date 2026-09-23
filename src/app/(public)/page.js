@@ -105,43 +105,66 @@ export default async function HomePage() {
       </section>
 
       {/* A PROPOS (résumé) */}
-      <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
+      <section className="bg-white max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
         <SectionHead eyebrow="QUI SOMMES-NOUS" index="01" title="Pourquoi Efficience Globale existe" />
-        <div className="grid md:grid-cols-[1.3fr_0.9fr] gap-10 md:gap-16 items-start">
-          <p className="text-[22px] md:text-[28px] leading-[1.3] tracking-[-0.01em] text-dark">
-            Fondée le 27 juillet 2022 à Conakry par{" "}
-            <span className="text-dark-2 font-bold">Oumar Camara</span> — fort d&apos;une décennie d&apos;expérience chez
-            PwC, EY et Accenture — Efficience Globale développe des solutions sur mesure qui s&apos;inscrivent dans le
-            contexte local de l&apos;Afrique de l&apos;Ouest.
-          </p>
+
+        <div className="grid md:grid-cols-[1.4fr_1fr] gap-12 md:gap-16 items-start">
+          <div>
+            <Reveal>
+              <div className="relative">
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none select-none italic absolute -top-10 md:-top-14 -left-1 text-[130px] md:text-[170px] leading-none text-dark/[0.06]"
+                  style={{ fontFamily: "var(--font-head)" }}
+                >
+                  &ldquo;
+                </span>
+                <p
+                  className="relative italic text-[26px] md:text-[34px] leading-[1.25] tracking-[-0.01em] text-dark max-w-xl pt-10 md:pt-14"
+                  style={{ fontFamily: "var(--font-head)" }}
+                >
+                  Accompagner les organisations à adresser efficacement les défis de développement structurel.
+                </p>
+              </div>
+            </Reveal>
+
+            <Reveal index={1}>
+              <p className="mt-8 text-[16px] leading-relaxed text-ink-soft max-w-xl">
+                Fondée le 27 juillet 2022 à Conakry par{" "}
+                <span className="text-dark-2 font-bold">Oumar Camara</span>, fort d&apos;une décennie
+                d&apos;expérience chez PwC, EY et Accenture, Efficience Globale développe des solutions sur mesure
+                qui s&apos;inscrivent dans le contexte local de l&apos;Afrique de l&apos;Ouest.
+              </p>
+            </Reveal>
+          </div>
+
           {fondateur && (
-            <div className="flex items-center gap-4">
-              <Image
-                src={fondateur.photo_url}
-                alt={fondateur.nom}
-                width={84}
-                height={84}
-                className="object-cover h-[84px] w-[84px] flex-shrink-0 grayscale"
-              />
-              <div>
+            <Reveal index={1} className="md:pt-8">
+              <div className="max-w-[240px]">
+                <Image
+                  src={fondateur.photo_url}
+                  alt={fondateur.nom}
+                  width={240}
+                  height={280}
+                  className="object-cover w-full h-[260px] md:h-[280px] grayscale mb-4"
+                />
                 <div className="text-[16px] tracking-[-0.01em]" style={{ fontFamily: "var(--font-head)" }}>
                   {fondateur.nom}
                 </div>
                 <div className="text-[13px] font-semibold text-lime">{fondateur.role}</div>
               </div>
-            </div>
+            </Reveal>
           )}
         </div>
 
-        <div className="grid md:grid-cols-3 mt-14 md:mt-16 border-t border-line">
+        <div className="grid md:grid-cols-2 gap-8 md:gap-16 mt-16 md:mt-20 pt-10 border-t border-line max-w-3xl">
           {[
             ["Vision", "Devenir un acteur de référence en conseil stratégique et opérationnel en Afrique de l'Ouest."],
-            ["Mission", "Accompagner les organisations à adresser efficacement les défis de développement structurel."],
-            ["Positionnement", "Expertise locale, standards internationaux — au service de nos partenaires."],
-          ].map(([titre, texte], i) => (
-            <div key={titre} className={`py-8 ${i > 0 ? "md:pl-10 md:border-l border-line" : ""} ${i > 0 ? "pt-8 border-t md:border-t-0 border-line" : ""}`}>
-              <h3 className="text-[13px] font-bold tracking-[0.1em] text-lime mb-2.5">{titre.toUpperCase()}</h3>
-              <p className="text-[16px] leading-relaxed text-ink-soft max-w-xs">{texte}</p>
+            ["Positionnement", "Expertise locale, standards internationaux, au service de nos partenaires."],
+          ].map(([titre, texte]) => (
+            <div key={titre}>
+              <h3 className="text-[13px] font-bold tracking-[0.1em] text-ink-faint mb-2">{titre.toUpperCase()}</h3>
+              <p className="text-[14.5px] leading-relaxed text-ink-soft">{texte}</p>
             </div>
           ))}
         </div>
