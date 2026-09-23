@@ -317,26 +317,6 @@ export default async function HomePage() {
         </Link>
       </section>
 
-      {/* CTA */}
-      <section className="border-t border-line py-20 md:py-28">
-        <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <div className="max-w-2xl">
-            <h2 className="text-dark text-[32px] md:text-[48px] leading-[1.08] tracking-[-0.02em] mb-5">
-              Discutons de votre prochain projet
-            </h2>
-            <p className="text-ink-soft text-[16px] md:text-[17px] leading-relaxed max-w-lg mb-9">
-              Gouvernance, digitalisation, intelligence artificielle ou renforcement de capacités — parlons de vos
-              objectifs.
-            </p>
-            <Link
-              href="/contact"
-              className="inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform"
-            >
-              Nous écrire
-            </Link>
-          </div>
-        </div>
-      </section>
     </>
   );
 }
