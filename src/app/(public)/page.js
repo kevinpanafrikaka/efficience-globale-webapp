@@ -196,7 +196,14 @@ export default async function HomePage() {
       {/* CONVICTIONS */}
       <section className="py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <SectionHead eyebrow="NOS CONVICTIONS" title="Ce qui nous caractérise" />
+          <SectionHead
+            eyebrow="NOS CONVICTIONS"
+            title={
+              <>
+                Ce qui guide chaque <span className="text-lime italic">mission</span>
+              </>
+            }
+          />
           <div className="border-t border-line">
             {[
               ["Transparence", "Une honnêteté et une ouverture qui renforcent la confiance de nos partenaires et clients."],
