@@ -108,7 +108,6 @@ export default async function HomePage() {
       <section className="bg-white max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
         <SectionHead
           eyebrow="QUI SOMMES-NOUS"
-          index="01"
           title="Pourquoi Efficience Globale existe"
           lead="Une décennie d'expérience internationale, mise au service du contexte local de l'Afrique de l'Ouest."
         />
@@ -139,7 +138,7 @@ export default async function HomePage() {
 
       {/* DOMAINES */}
       <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
-        <SectionHead eyebrow="DOMAINES D'INTERVENTION" index="02" title="Où nous créons de la valeur" />
+        <SectionHead eyebrow="DOMAINES D'INTERVENTION" title="Où nous créons de la valeur" />
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { titre: "Santé Globale", desc: "Des solutions innovantes aux défis de la santé publique, centrées sur l'accessibilité et l'efficacité des services.", photo: "/img/domaines/sante-afrique.jpg", tint: "rgba(61,83,71,0.82)", icon: <IconHealth /> },
@@ -162,7 +161,7 @@ export default async function HomePage() {
       {/* CONVICTIONS */}
       <section className="bg-darker py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <SectionHead eyebrow="NOS CONVICTIONS" index="03" title="Ce qui nous caractérise" dark />
+          <SectionHead eyebrow="NOS CONVICTIONS" title="Ce qui nous caractérise" dark />
           <div className="grid grid-cols-2 md:grid-cols-4">
             {[
               ["01", "Transparence", "Une honnêteté et une ouverture qui renforcent la confiance de nos partenaires et clients."],
@@ -186,7 +185,7 @@ export default async function HomePage() {
       {/* SERVICES */}
       <section className="bg-cream py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <SectionHead eyebrow="SERVICES" index="04" title="Ce que nous faisons concrètement" />
+          <SectionHead eyebrow="SERVICES" title="Ce que nous faisons concrètement" />
           <div>
             {[
               ["01", "Diagnostic stratégique approfondi", "Identification des blocages et des leviers d'action pertinents."],
@@ -213,7 +212,6 @@ export default async function HomePage() {
       <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
         <SectionHead
           eyebrow="RÉALISATIONS"
-          index="05"
           title="Des résultats concrets, mesurables"
           lead="Un aperçu de nos projets menés avec des bailleurs et institutions de référence entre 2022 et 2025."
         />
@@ -234,7 +232,7 @@ export default async function HomePage() {
       {/* EQUIPE (teaser) */}
       <section className="bg-cream py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <SectionHead eyebrow="NOTRE ÉQUIPE" index="06" title="Une équipe pluridisciplinaire de 15 personnes" />
+          <SectionHead eyebrow="NOTRE ÉQUIPE" title="Une équipe pluridisciplinaire de 15 personnes" />
           {fondateur && (
             <div className="flex flex-col md:flex-row gap-7 md:items-start max-w-2xl border-t border-line pt-8">
               <Image
@@ -259,7 +257,7 @@ export default async function HomePage() {
 
       {/* PARTENAIRES */}
       <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
-        <SectionHead eyebrow="PARTENAIRES" index="07" title="Ils nous font confiance" />
+        <SectionHead eyebrow="PARTENAIRES" title="Ils nous font confiance" />
         <div className="grid grid-cols-2 md:grid-cols-4">
           {PARTENAIRES.map((p, i) => (
             <div
