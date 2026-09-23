@@ -38,14 +38,25 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* HERO */}
-      <section className="relative bg-darker overflow-hidden">
-        <div className="grid md:grid-cols-[1.15fr_1fr]">
-          <div className="relative z-10 px-5 md:pl-8 md:pr-12 py-12 md:py-28 md:ml-auto md:max-w-[620px] w-full">
-            <div className="flex items-center gap-3 pb-4 mb-7 border-b border-white/15 w-fit">
-              <span className="text-[12px] font-bold tracking-[0.14em] text-lime-2">CABINET DE CONSEIL</span>
-              <span className="text-[12px] text-white/40">Conakry, Guinée · depuis 2022</span>
-            </div>
+      {/* HERO — photo plein cadre en fond, stats intégrées en bas */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <Image src="/img/hero-conakry.jpg" alt="" fill className="object-cover" priority />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(13,19,14,0.65) 0%, rgba(13,19,14,0.3) 42%, rgba(13,19,14,0.1) 100%)",
+            }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(180deg, rgba(13,19,14,0.05) 0%, rgba(13,19,14,0.1) 55%, rgba(10,15,11,0.85) 100%)" }}
+          />
+        </div>
+
+        <div className="relative max-w-6xl mx-auto px-5 md:px-8 pt-16 pb-14 md:pt-28 md:pb-0">
+          <div className="max-w-xl">
             <h1 className="text-[40px] leading-[1.02] md:text-[60px] md:leading-[1.0] tracking-[-0.02em] text-white mb-7">
               Des solutions <span className="text-lime italic">stratégiques</span> pour un impact durable en Afrique de l&apos;Ouest
             </h1>
@@ -53,50 +64,43 @@ export default async function HomePage() {
               Nous accompagnons institutions publiques, bailleurs internationaux et entreprises en Guinée à travers la
               gouvernance, la digitalisation et l&apos;intelligence artificielle.
             </p>
-            <div className="flex flex-wrap items-center gap-7">
+            <div className="flex flex-wrap items-center gap-4">
               <Link
                 href="/realisations"
-                className="inline-flex items-center rounded bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform"
+                className="inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
               >
                 Découvrir nos réalisations
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center text-[15px] font-semibold text-white border-b-2 border-white/30 pb-0.5 active:opacity-70 transition-opacity"
+                className="inline-flex items-center rounded border-[1.5px] border-white/40 px-7 py-3.5 text-[15px] font-semibold text-white backdrop-blur-sm active:scale-[0.97] transition-transform hover:border-white hover:bg-white/10"
               >
-                Nous contacter →
+                Nous contacter
               </Link>
             </div>
           </div>
-          <div className="relative h-[240px] md:h-auto">
-            <Image src="/img/background_eg.png" alt="" fill className="object-cover" priority />
-            <div
-              className="absolute inset-0"
-              style={{ background: "linear-gradient(90deg, rgba(22,33,26,0.55) 0%, rgba(22,33,26,0.1) 30%)" }}
-            />
-          </div>
         </div>
-      </section>
 
-      {/* STATS */}
-      <section className="border-b border-line">
-        <div className="max-w-6xl mx-auto px-5 md:px-8 grid grid-cols-2 md:grid-cols-4">
-          {[
-            ["17+", "Projets réalisés depuis 2022"],
-            ["200+", "Acteurs formés sur le terrain"],
-            ["8", "Régions administratives couvertes"],
-            ["10+", "Partenaires institutionnels et bailleurs"],
-          ].map(([num, label], i) => (
-            <div
-              key={label}
-              className={`py-8 ${i % 2 === 1 ? "pl-5" : "pr-5"} ${i >= 2 ? "border-t border-line md:border-t-0" : ""} ${i > 0 ? "md:pl-8 md:border-l md:border-line" : ""}`}
-            >
-              <div className="text-[36px] md:text-[42px] leading-none tracking-[-0.02em] font-extrabold text-dark-2 tabular-nums">
-                {num}
+        {/* STATS */}
+        <div className="relative border-t border-white/15 mt-14 md:mt-16">
+          <div className="max-w-6xl mx-auto px-5 md:px-8 grid grid-cols-2 md:grid-cols-4">
+            {[
+              ["17+", "Projets réalisés depuis 2022"],
+              ["200+", "Acteurs formés sur le terrain"],
+              ["8", "Régions administratives couvertes"],
+              ["10+", "Partenaires institutionnels et bailleurs"],
+            ].map(([num, label], i) => (
+              <div
+                key={label}
+                className={`py-7 md:py-9 ${i % 2 === 1 ? "pl-5" : "pr-5"} ${i >= 2 ? "border-t border-white/15 md:border-t-0" : ""} ${i > 0 ? "md:pl-8 md:border-l md:border-white/15" : ""}`}
+              >
+                <div className="text-[34px] md:text-[42px] leading-none tracking-[-0.02em] font-extrabold text-white tabular-nums">
+                  {num}
+                </div>
+                <div className="text-[13px] text-[#c7d1c2] mt-2">{label}</div>
               </div>
-              <div className="text-[13px] text-ink-soft mt-2">{label}</div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
