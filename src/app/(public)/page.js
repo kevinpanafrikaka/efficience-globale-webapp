@@ -201,14 +201,15 @@ export default async function HomePage() {
               ["03", "Durabilité", "Des stratégies qui servent les intérêts actuels sans compromettre ceux des générations futures."],
               ["04", "Efficience", "Une optimisation constante pour offrir la meilleure valeur à nos clients."],
             ].map(([num, titre, desc], i) => (
-              <div
+              <Reveal
                 key={titre}
+                index={i}
                 className={`py-6 md:py-0 md:pb-2 ${i >= 2 ? "border-t border-white/10 md:border-t-0" : ""} ${i > 0 ? "md:pl-8 md:border-l md:border-white/10" : ""} ${i % 2 === 1 ? "pl-6" : "pr-6 md:pr-8"}`}
               >
                 <div className="text-[46px] leading-none font-extrabold text-white/10 mb-4 tabular-nums">{num}</div>
                 <h4 className="text-white text-[18px] mb-2">{titre}</h4>
                 <p className="text-[13.5px] leading-relaxed text-[#b9c4b4]">{desc}</p>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -225,13 +226,17 @@ export default async function HomePage() {
               ["03", "Optimisation par les nouvelles technologies", "Tableaux de bord interactifs, intégration de l'IA, suivi en temps réel."],
               ["04", "Renforcement des capacités", "Formations ciblées et coaching pour garantir la durabilité des résultats."],
             ].map(([num, titre, desc], i, arr) => (
-              <div key={titre} className={`flex items-start gap-6 py-7 ${i < arr.length - 1 ? "border-b border-line" : ""}`}>
+              <Reveal
+                key={titre}
+                index={i}
+                className={`flex items-start gap-6 py-7 ${i < arr.length - 1 ? "border-b border-line" : ""}`}
+              >
                 <div className="text-[15px] font-extrabold text-lime tabular-nums pt-0.5">{num}</div>
                 <div>
                   <h3 className="text-[18px] mb-1.5 tracking-[-0.01em]">{titre}</h3>
                   <p className="text-[14.5px] text-ink-soft leading-relaxed">{desc}</p>
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
           <Link href="/services" className="inline-block mt-8 text-[14.5px] font-semibold text-dark-2 border-b-2 border-lime pb-0.5">
@@ -266,7 +271,7 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <SectionHead eyebrow="NOTRE ÉQUIPE" title="Une équipe pluridisciplinaire de 15 personnes" />
           {fondateur && (
-            <div className="flex flex-col md:flex-row gap-7 md:items-start max-w-2xl border-t border-line pt-8">
+            <Reveal className="flex flex-col md:flex-row gap-7 md:items-start max-w-2xl border-t border-line pt-8">
               <Image
                 src={fondateur.photo_url}
                 alt={fondateur.nom}
@@ -279,7 +284,7 @@ export default async function HomePage() {
                 <div className="text-[13.5px] font-semibold text-lime mb-4">{fondateur.role}</div>
                 <p className="text-[14.5px] leading-relaxed text-ink-soft">{fondateur.bio}</p>
               </div>
-            </div>
+            </Reveal>
           )}
           <Link href="/equipe" className="inline-block mt-8 text-[14.5px] font-semibold text-dark-2 border-b-2 border-lime pb-0.5">
             Voir toute l&apos;équipe →
@@ -292,8 +297,9 @@ export default async function HomePage() {
         <SectionHead eyebrow="PARTENAIRES" title="Ils nous font confiance" />
         <div className="grid grid-cols-2 md:grid-cols-4">
           {PARTENAIRES.map((p, i) => (
-            <div
+            <Reveal
               key={p.nom}
+              index={i}
               className={`h-[90px] flex items-center px-4 md:px-6 ${i % 2 === 1 ? "border-l border-line" : ""} ${i >= 2 ? "border-t border-line" : ""} ${i % 4 !== 0 ? "md:border-l" : "md:border-l-0"} ${i >= 4 ? "md:border-t" : "md:border-t-0"}`}
             >
               <Image
@@ -303,7 +309,7 @@ export default async function HomePage() {
                 height={46}
                 className="max-h-[42px] w-auto object-contain grayscale opacity-80"
               />
-            </div>
+            </Reveal>
           ))}
         </div>
         <Link href="/partenaires" className="inline-block mt-8 text-[14.5px] font-semibold text-dark-2 border-b-2 border-lime pb-0.5">
