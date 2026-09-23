@@ -27,10 +27,7 @@ export default function ProjectCard({ projet }) {
           {projet.titre}
         </h3>
         <p className="text-[13.5px] text-ink-soft leading-relaxed flex-1">{projet.resume}</p>
-        <div className="text-[12px] text-ink-faint pt-1">
-          {projet.periode}
-          {projet.montant ? ` · ${projet.montant}` : ""}
-        </div>
+        <div className="text-[12px] text-ink-faint pt-1">{projet.periode}</div>
       </div>
     </Link>
   );

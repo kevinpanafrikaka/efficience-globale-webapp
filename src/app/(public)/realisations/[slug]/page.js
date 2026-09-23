@@ -43,18 +43,14 @@ export default async function ProjetDetailPage({ params }) {
       </section>
 
       <section className="max-w-4xl mx-auto px-5 md:px-8 py-12 md:py-16">
-        <div className="grid grid-cols-3 mb-12 text-[13.5px] border-t border-b border-line">
+        <div className="grid grid-cols-2 mb-12 text-[13.5px] border-t border-b border-line">
           <div className="py-5 pr-4">
             <div className="text-ink-faint mb-1">Client / bailleur</div>
             <div className="font-semibold text-dark">{projet.client}</div>
           </div>
-          <div className="py-5 px-4 border-l border-line">
+          <div className="py-5 pl-4 border-l border-line">
             <div className="text-ink-faint mb-1">Période</div>
             <div className="font-semibold text-dark">{projet.periode}</div>
-          </div>
-          <div className="py-5 pl-4 border-l border-line">
-            <div className="text-ink-faint mb-1">Montant</div>
-            <div className="font-semibold text-dark">{projet.montant ?? "Non communiqué"}</div>
           </div>
         </div>
 
