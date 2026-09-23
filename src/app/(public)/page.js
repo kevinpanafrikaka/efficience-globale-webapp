@@ -204,20 +204,17 @@ export default async function HomePage() {
               </>
             }
           />
-          <div className="border-t border-line">
+          <div className="grid md:grid-cols-2 gap-x-16 gap-y-12 md:gap-y-14">
             {[
               ["Transparence", "Une honnêteté et une ouverture qui renforcent la confiance de nos partenaires et clients."],
               ["Innovation", "Nous cultivons la pensée innovante pour rester à l'avant-garde des solutions stratégiques."],
               ["Durabilité", "Des stratégies qui servent les intérêts actuels sans compromettre ceux des générations futures."],
               ["Efficience", "Une optimisation constante pour offrir la meilleure valeur à nos clients."],
-            ].map(([titre, desc], i, arr) => (
-              <Reveal
-                key={titre}
-                index={i}
-                className={`md:grid md:grid-cols-[280px_1fr] md:items-center gap-2 md:gap-10 py-7 md:py-9 ${i < arr.length - 1 ? "border-b border-line" : ""}`}
-              >
-                <h4 className="text-[26px] md:text-[32px] tracking-[-0.01em]">{titre}</h4>
-                <p className="text-[15px] md:text-[16px] leading-relaxed text-ink-soft max-w-lg">{desc}</p>
+            ].map(([titre, desc], i) => (
+              <Reveal key={titre} index={i}>
+                <div className="w-9 h-[3px] bg-lime mb-5" />
+                <h4 className="text-[24px] md:text-[28px] tracking-[-0.01em] mb-3">{titre}</h4>
+                <p className="text-[15.5px] leading-relaxed text-ink-soft max-w-md">{desc}</p>
               </Reveal>
             ))}
           </div>
