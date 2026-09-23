@@ -108,49 +108,33 @@ export default async function HomePage() {
       <section className="bg-white max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
         <SectionHead eyebrow="QUI SOMMES-NOUS" index="01" title="Pourquoi Efficience Globale existe" />
 
-        <div className="grid md:grid-cols-[1.4fr_1fr] gap-12 md:gap-16 items-start">
-          <div>
-            <Reveal>
-              <div className="relative">
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none select-none italic absolute -top-10 md:-top-14 -left-1 text-[130px] md:text-[170px] leading-none text-dark/[0.06]"
-                  style={{ fontFamily: "var(--font-head)" }}
-                >
-                  &ldquo;
-                </span>
-                <p
-                  className="relative italic text-[26px] md:text-[34px] leading-[1.25] tracking-[-0.01em] text-dark max-w-xl pt-10 md:pt-14"
-                  style={{ fontFamily: "var(--font-head)" }}
-                >
-                  Accompagner les organisations à adresser efficacement les défis de développement structurel.
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal index={1}>
-              <p className="mt-8 text-[16px] leading-relaxed text-ink-soft max-w-xl">
-                Fondée le 27 juillet 2022 à Conakry par{" "}
-                <span className="text-dark-2 font-bold">Oumar Camara</span>, fort d&apos;une décennie
-                d&apos;expérience chez PwC, EY et Accenture, Efficience Globale développe des solutions sur mesure
-                qui s&apos;inscrivent dans le contexte local de l&apos;Afrique de l&apos;Ouest.
-              </p>
-            </Reveal>
-          </div>
-
-          <Reveal index={1} className="md:pt-8 md:border-l md:border-line md:pl-12">
-            <div className="text-[13px] font-bold tracking-[0.14em] text-lime mb-5">FONDÉE À CONAKRY</div>
-            <div
-              className="text-[110px] md:text-[150px] leading-[0.85] font-extrabold tabular-nums text-transparent"
-              style={{
-                fontFamily: "var(--font-head)",
-                WebkitTextStroke: "1.5px var(--dark-2)",
-              }}
+        <Reveal>
+          <div className="relative">
+            <span
+              aria-hidden="true"
+              className="pointer-events-none select-none italic absolute -top-10 md:-top-14 -left-1 text-[130px] md:text-[170px] leading-none text-dark/[0.06]"
+              style={{ fontFamily: "var(--font-head)" }}
             >
-              2022
-            </div>
-          </Reveal>
-        </div>
+              &ldquo;
+            </span>
+            <p
+              className="relative text-[30px] md:text-[46px] leading-[1.2] tracking-[-0.01em] text-dark max-w-3xl pt-10 md:pt-14"
+              style={{ fontFamily: "var(--font-head)" }}
+            >
+              Accompagner les organisations à adresser efficacement les défis de{" "}
+              <span className="italic text-lime">développement structurel</span>.
+            </p>
+          </div>
+        </Reveal>
+
+        <Reveal index={1}>
+          <p className="mt-8 text-[16px] leading-relaxed text-ink-soft max-w-xl">
+            Fondée le 27 juillet 2022 à Conakry par{" "}
+            <span className="text-dark-2 font-bold">Oumar Camara</span>, fort d&apos;une décennie
+            d&apos;expérience chez PwC, EY et Accenture, Efficience Globale développe des solutions sur mesure
+            qui s&apos;inscrivent dans le contexte local de l&apos;Afrique de l&apos;Ouest.
+          </p>
+        </Reveal>
 
         <div className="grid md:grid-cols-2 gap-8 md:gap-16 mt-16 md:mt-20 pt-10 border-t border-line max-w-3xl">
           {[
