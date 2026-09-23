@@ -84,6 +84,28 @@
   }
 }
 
+/* ===== Cartes domaines : zoom photo au survol ===== */
+.domain-card-media {
+  transition: transform 500ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.domain-card-text {
+  transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .domain-card:hover .domain-card-media {
+    transform: scale(1.06);
+  }
+  .domain-card:hover .domain-card-text {
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .domain-card-media,
+  .domain-card-text {
+    transition: none;
+  }
+}
+
 .safe-top {
   padding-top: env(safe-area-inset-top, 0px);
 }
