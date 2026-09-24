@@ -426,7 +426,7 @@ export default async function HomePage() {
           <div className="flex flex-wrap items-center gap-x-8 gap-y-4 mt-9">
             <Link
               href="/contact"
-              className="inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform"
+              className="inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
             >
               Nous contacter
             </Link>
