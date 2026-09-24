@@ -5,6 +5,7 @@ import DomainCard from "@/components/DomainCard";
 import RealisationTeaser from "@/components/RealisationTeaser";
 import Reveal from "@/components/Reveal";
 import { getProjetsRecents, getMembres } from "@/lib/db";
+import { equipeStats } from "@/data/team";
 import {
   IconBulb,
   IconChart,
@@ -302,22 +303,39 @@ export default async function HomePage() {
       <section className="bg-darker py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <SectionHead eyebrow="NOTRE ÉQUIPE" title="Une équipe pluridisciplinaire de 15 personnes" dark />
-          {fondateur && (
-            <Reveal className="flex flex-col md:flex-row gap-7 md:items-start max-w-2xl border-t border-white/10 pt-8">
-              <Image
-                src={fondateur.photo_url}
-                alt={fondateur.nom}
-                width={88}
-                height={88}
-                className="object-cover h-[88px] w-[88px] flex-shrink-0 grayscale"
-              />
-              <div>
-                <h3 className="text-white text-[20px] mb-1 tracking-[-0.01em]">{fondateur.nom}</h3>
-                <div className="text-[13.5px] font-semibold text-lime-2 mb-4">{fondateur.role}</div>
-                <p className="text-[14.5px] leading-relaxed text-[#b9c4b4]">{fondateur.bio}</p>
+          <div className="grid md:grid-cols-12 gap-10 md:gap-14 border-t border-white/10 pt-8">
+            {fondateur && (
+              <Reveal className="md:col-span-6 flex gap-6 items-start">
+                <Image
+                  src={fondateur.photo_url}
+                  alt={fondateur.nom}
+                  width={104}
+                  height={104}
+                  className="object-cover h-[104px] w-[104px] flex-shrink-0 grayscale"
+                />
+                <div>
+                  <h3 className="text-white text-[20px] mb-1 tracking-[-0.01em]">{fondateur.nom}</h3>
+                  <div className="text-[13.5px] font-semibold text-lime-2 mb-3">{fondateur.role}</div>
+                  <p className="text-[14px] leading-relaxed text-[#b9c4b4]">{fondateur.bio}</p>
+                </div>
+              </Reveal>
+            )}
+            <Reveal index={1} className="md:col-span-6 md:border-l md:border-white/10 md:pl-14">
+              <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+                {equipeStats.map((s) => (
+                  <div key={s.label}>
+                    <div
+                      className="text-[32px] leading-none font-extrabold text-white tabular-nums mb-1.5"
+                      style={{ fontFamily: "var(--font-head)" }}
+                    >
+                      {s.nombre}
+                    </div>
+                    <p className="text-[12.5px] text-[#b9c4b4] leading-snug">{s.label}</p>
+                  </div>
+                ))}
               </div>
             </Reveal>
-          )}
+          </div>
           <Link
             href="/equipe"
             className="inline-flex w-fit items-center rounded bg-lime mt-8 px-4 py-2 text-[13px] font-semibold text-ink active:scale-[0.97] transition-transform"
