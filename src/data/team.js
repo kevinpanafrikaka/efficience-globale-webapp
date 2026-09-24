@@ -3,7 +3,7 @@
 export const fondateur = {
   nom: 'Oumar Camara',
   role: 'Fondateur & Directeur Général',
-  bio: "Diplômé de la Sorbonne (Paris), fort d'une décennie d'expérience en gouvernance, finance et suivi-évaluation chez PwC, EY et Accenture — mise au service du développement en Afrique de l'Ouest.",
+  bio: "Diplômé de la Sorbonne (Paris), fort d'une décennie d'expérience en gouvernance, finance et suivi-évaluation chez PwC, EY et Accenture, mise au service du développement en Afrique de l'Ouest.",
   photo: 'equipe/oumar-camara.jpg',
 };
 

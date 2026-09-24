@@ -306,7 +306,7 @@ export default async function HomePage() {
             eyebrow="NOTRE ÉQUIPE"
             title={
               <>
-                Une équipe <span className="text-lime-2 italic">pluridisciplinaire</span> de 15 personnes
+                Une équipe <span className="text-lime-2 italic">pluridisciplinaire</span>
               </>
             }
             dark
@@ -319,7 +319,7 @@ export default async function HomePage() {
                   alt={fondateur.nom}
                   width={104}
                   height={104}
-                  className="object-cover h-[104px] w-[104px] flex-shrink-0 grayscale"
+                  className="object-cover h-[104px] w-[104px] flex-shrink-0"
                 />
                 <div>
                   <h3 className="text-white text-[20px] mb-1 tracking-[-0.01em]">{fondateur.nom}</h3>
