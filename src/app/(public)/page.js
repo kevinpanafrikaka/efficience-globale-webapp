@@ -21,7 +21,7 @@ import {
 const PROJETS_PHARES_SLUGS = [
   "gouvernance-pev-lmc",
   "chaine-froid-pev",
-  "cartographie-nutrition-eu4sun",
+  "assistant-pedagogique-matoto",
   "guichet-vbg-enabel",
   "restructuration-sydam",
   "agents-ia-osc",
