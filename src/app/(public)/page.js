@@ -185,7 +185,7 @@ export default async function HomePage() {
           <div className="mt-8">
             <Link
               href="/domaines"
-              className="inline-flex w-fit items-center rounded bg-lime px-4 py-2 text-[13px] font-semibold text-ink active:scale-[0.97] transition-transform"
+              className="inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
             >
               En savoir plus sur nos domaines →
             </Link>
@@ -264,7 +264,7 @@ export default async function HomePage() {
           </div>
           <Link
             href="/services"
-            className="inline-flex w-fit items-center rounded bg-lime mt-8 px-4 py-2 text-[13px] font-semibold text-ink active:scale-[0.97] transition-transform"
+            className="inline-flex items-center rounded bg-lime mt-8 px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
           >
             Découvrir notre méthode en détail →
           </Link>
@@ -292,7 +292,7 @@ export default async function HomePage() {
         <div className="mt-12">
           <Link
             href="/realisations"
-            className="inline-flex w-fit items-center rounded bg-lime px-4 py-2 text-[13px] font-semibold text-ink active:scale-[0.97] transition-transform"
+            className="inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
           >
             Voir les 17 projets et partenariats →
           </Link>
@@ -346,7 +346,7 @@ export default async function HomePage() {
           </div>
           <Link
             href="/equipe"
-            className="inline-flex w-fit items-center rounded bg-lime mt-8 px-4 py-2 text-[13px] font-semibold text-ink active:scale-[0.97] transition-transform"
+            className="inline-flex items-center rounded bg-lime mt-8 px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
           >
             Voir toute l&apos;équipe →
           </Link>
@@ -400,7 +400,7 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-5 md:px-8 mt-10">
           <Link
             href="/partenaires"
-            className="inline-flex w-fit items-center rounded bg-lime px-4 py-2 text-[13px] font-semibold text-ink active:scale-[0.97] transition-transform"
+            className="inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
           >
             Voir tous nos partenaires →
           </Link>
