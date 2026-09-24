@@ -302,7 +302,15 @@ export default async function HomePage() {
       {/* EQUIPE (teaser) */}
       <section className="bg-darker py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <SectionHead eyebrow="NOTRE ÉQUIPE" title="Une équipe pluridisciplinaire de 15 personnes" dark />
+          <SectionHead
+            eyebrow="NOTRE ÉQUIPE"
+            title={
+              <>
+                Une équipe <span className="text-lime-2 italic">pluridisciplinaire</span> de 15 personnes
+              </>
+            }
+            dark
+          />
           <div className="grid md:grid-cols-12 gap-10 md:gap-14 border-t border-white/10 pt-8">
             {fondateur && (
               <Reveal className="md:col-span-6 flex gap-6 items-start">
