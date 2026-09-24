@@ -247,24 +247,20 @@ export default async function HomePage() {
       <section className="bg-darker py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <SectionHead eyebrow="SERVICES" title="Ce que nous faisons concrètement" dark />
-          <div>
+          <div className="grid sm:grid-cols-2 gap-x-12 gap-y-8">
             {[
-              { titre: "Diagnostic stratégique approfondi", desc: "Identification des blocages et des leviers d'action pertinents.", icon: <IconSearch stroke="var(--lime-2)" width="19" height="19" /> },
-              { titre: "Structuration des cadres opérationnels", desc: "Mise en place d'outils et corpus documentaires : politiques, stratégies, procédures.", icon: <IconDocs stroke="var(--lime-2)" width="19" height="19" /> },
-              { titre: "Optimisation par les nouvelles technologies", desc: "Tableaux de bord interactifs, intégration de l'IA, suivi en temps réel.", icon: <IconChart stroke="var(--lime-2)" width="19" height="19" /> },
-              { titre: "Renforcement des capacités", desc: "Formations ciblées et coaching pour garantir la durabilité des résultats.", icon: <IconTeam stroke="var(--lime-2)" width="19" height="19" /> },
-            ].map((s, i, arr) => (
-              <Reveal
-                key={s.titre}
-                index={i}
-                className={`flex items-start gap-5 py-7 ${i < arr.length - 1 ? "border-b border-white/10" : ""}`}
-              >
-                <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/15 flex items-center justify-center shrink-0">
+              { titre: "Diagnostic stratégique approfondi", desc: "Identification des blocages et des leviers d'action pertinents.", icon: <IconSearch stroke="var(--lime-2)" width="18" height="18" /> },
+              { titre: "Structuration des cadres opérationnels", desc: "Mise en place d'outils et corpus documentaires : politiques, stratégies, procédures.", icon: <IconDocs stroke="var(--lime-2)" width="18" height="18" /> },
+              { titre: "Optimisation par les nouvelles technologies", desc: "Tableaux de bord interactifs, intégration de l'IA, suivi en temps réel.", icon: <IconChart stroke="var(--lime-2)" width="18" height="18" /> },
+              { titre: "Renforcement des capacités", desc: "Formations ciblées et coaching pour garantir la durabilité des résultats.", icon: <IconTeam stroke="var(--lime-2)" width="18" height="18" /> },
+            ].map((s, i) => (
+              <Reveal key={s.titre} index={i} className="flex items-start gap-4">
+                <div className="w-9 h-9 rounded-lg bg-white/5 border border-white/15 flex items-center justify-center shrink-0">
                   {s.icon}
                 </div>
                 <div>
-                  <h3 className="text-white text-[18px] mb-1.5 tracking-[-0.01em]">{s.titre}</h3>
-                  <p className="text-[14.5px] text-[#b9c4b4] leading-relaxed">{s.desc}</p>
+                  <h3 className="text-white text-[16.5px] mb-1 tracking-[-0.01em]">{s.titre}</h3>
+                  <p className="text-[13.5px] text-[#b9c4b4] leading-relaxed">{s.desc}</p>
                 </div>
               </Reveal>
             ))}
