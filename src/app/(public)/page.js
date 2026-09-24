@@ -246,7 +246,15 @@ export default async function HomePage() {
       {/* SERVICES */}
       <section className="bg-darker py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <SectionHead eyebrow="SERVICES" title="Ce que nous faisons concrètement" dark />
+          <SectionHead
+            eyebrow="SERVICES"
+            title={
+              <>
+                Ce que nous <span className="text-lime-2 italic">faisons</span> concrètement
+              </>
+            }
+            dark
+          />
           <div className="grid sm:grid-cols-2 gap-x-12 gap-y-8">
             {[
               { titre: "Diagnostic stratégique approfondi", desc: "Identification des blocages et des leviers d'action pertinents.", icon: <IconSearch stroke="var(--lime-2)" width="18" height="18" /> },
