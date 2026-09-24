@@ -36,7 +36,7 @@ export const viewport = {
   ],
 };
 
-export default function RootLayout({ children, modal }) {
+export default function RootLayout({ children }) {
   return (
     <html
       lang="fr"
@@ -46,7 +46,6 @@ export default function RootLayout({ children, modal }) {
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
-        {modal}
       </body>
     </html>
   );

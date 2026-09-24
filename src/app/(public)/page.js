@@ -407,6 +407,35 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* CONTACT */}
+      <section className="border-t border-line py-20 md:py-28">
+        <div className="max-w-6xl mx-auto px-5 md:px-8">
+          <SectionHead
+            eyebrow="CONTACT"
+            title={
+              <>
+                Discutons de votre prochain <span className="text-lime italic">projet</span>
+              </>
+            }
+            lead="Gouvernance, digitalisation, intelligence artificielle ou renforcement de capacités : parlons de vos objectifs."
+            className="mb-0"
+          />
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-4 mt-9">
+            <Link
+              href="/contact"
+              className="inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform"
+            >
+              Nous contacter
+            </Link>
+            <a
+              href="tel:+224626852951"
+              className="text-[14.5px] font-semibold text-dark-2 border-b-2 border-lime pb-0.5"
+            >
+              ou appelez-nous : +224 626 852 951
+            </a>
+          </div>
+        </div>
+      </section>
     </>
   );
 }
