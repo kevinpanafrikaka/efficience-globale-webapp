@@ -5,7 +5,18 @@ import DomainCard from "@/components/DomainCard";
 import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
 import { getProjetBySlug, getMembres } from "@/lib/db";
-import { IconBulb, IconChart, IconTrend, IconEye, IconSparkle, IconDrop, IconTarget } from "@/components/icons";
+import {
+  IconBulb,
+  IconChart,
+  IconTrend,
+  IconEye,
+  IconSparkle,
+  IconDrop,
+  IconTarget,
+  IconSearch,
+  IconDocs,
+  IconTeam,
+} from "@/components/icons";
 
 const PROJETS_PHARES_SLUGS = [
   "gouvernance-pev-lmc",
@@ -238,20 +249,22 @@ export default async function HomePage() {
           <SectionHead eyebrow="SERVICES" title="Ce que nous faisons concrètement" dark />
           <div>
             {[
-              ["01", "Diagnostic stratégique approfondi", "Identification des blocages et des leviers d'action pertinents."],
-              ["02", "Structuration des cadres opérationnels", "Mise en place d'outils et corpus documentaires — politiques, stratégies, procédures."],
-              ["03", "Optimisation par les nouvelles technologies", "Tableaux de bord interactifs, intégration de l'IA, suivi en temps réel."],
-              ["04", "Renforcement des capacités", "Formations ciblées et coaching pour garantir la durabilité des résultats."],
-            ].map(([num, titre, desc], i, arr) => (
+              { titre: "Diagnostic stratégique approfondi", desc: "Identification des blocages et des leviers d'action pertinents.", icon: <IconSearch stroke="var(--lime-2)" width="19" height="19" /> },
+              { titre: "Structuration des cadres opérationnels", desc: "Mise en place d'outils et corpus documentaires : politiques, stratégies, procédures.", icon: <IconDocs stroke="var(--lime-2)" width="19" height="19" /> },
+              { titre: "Optimisation par les nouvelles technologies", desc: "Tableaux de bord interactifs, intégration de l'IA, suivi en temps réel.", icon: <IconChart stroke="var(--lime-2)" width="19" height="19" /> },
+              { titre: "Renforcement des capacités", desc: "Formations ciblées et coaching pour garantir la durabilité des résultats.", icon: <IconTeam stroke="var(--lime-2)" width="19" height="19" /> },
+            ].map((s, i, arr) => (
               <Reveal
-                key={titre}
+                key={s.titre}
                 index={i}
-                className={`flex items-start gap-6 py-7 ${i < arr.length - 1 ? "border-b border-white/10" : ""}`}
+                className={`flex items-start gap-5 py-7 ${i < arr.length - 1 ? "border-b border-white/10" : ""}`}
               >
-                <div className="text-[15px] font-extrabold text-lime-2 tabular-nums pt-0.5">{num}</div>
+                <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/15 flex items-center justify-center shrink-0">
+                  {s.icon}
+                </div>
                 <div>
-                  <h3 className="text-white text-[18px] mb-1.5 tracking-[-0.01em]">{titre}</h3>
-                  <p className="text-[14.5px] text-[#b9c4b4] leading-relaxed">{desc}</p>
+                  <h3 className="text-white text-[18px] mb-1.5 tracking-[-0.01em]">{s.titre}</h3>
+                  <p className="text-[14.5px] text-[#b9c4b4] leading-relaxed">{s.desc}</p>
                 </div>
               </Reveal>
             ))}
