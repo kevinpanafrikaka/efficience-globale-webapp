@@ -279,7 +279,7 @@ export default async function HomePage() {
               Des résultats <span className="text-lime italic">concrets</span> et mesurables
             </>
           }
-          lead="Un aperçu de nos projets menés avec des bailleurs et institutions de référence entre 2022 et 2025."
+          lead="Un aperçu de nos projets menés avec des bailleurs et institutions de référence."
         />
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
           {projetsRecents.map((p, i) => (
