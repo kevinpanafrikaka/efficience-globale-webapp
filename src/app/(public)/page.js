@@ -108,7 +108,9 @@ export default async function HomePage() {
       <section className="bg-white max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
         <div className="grid md:grid-cols-12 gap-10 md:gap-0">
           <Reveal className="md:col-span-5">
-            <div className="text-[12px] font-bold tracking-[0.14em] text-lime mb-4">QUI SOMMES-NOUS</div>
+            <span className="inline-flex items-center border-[1.5px] border-lime text-[11px] font-bold tracking-[0.1em] px-3 py-1.5 text-lime mb-4">
+              QUI SOMMES-NOUS
+            </span>
             <h2 className="text-[32px] md:text-[42px] leading-[1.1] tracking-[-0.02em] text-dark mb-5">
               Une <span className="text-lime italic">conviction</span>, un cabinet
             </h2>
