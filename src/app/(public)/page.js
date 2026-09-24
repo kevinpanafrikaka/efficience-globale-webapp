@@ -61,8 +61,9 @@ export default async function HomePage() {
               Des solutions <span className="text-lime italic">stratégiques</span> pour un impact durable en Afrique de l&apos;Ouest
             </h1>
             <p className="text-[16px] md:text-[17.5px] leading-relaxed text-[#d3ddce] mb-9 max-w-md">
-              Nous accompagnons institutions publiques, bailleurs internationaux et entreprises en Guinée à travers la
-              gouvernance, la digitalisation et l&apos;intelligence artificielle.
+              Nous accompagnons institutions publiques, bailleurs internationaux et entreprises en Guinée et dans la
+              sous-région ouest-africaine à travers la gouvernance, la digitalisation et l&apos;intelligence
+              artificielle.
             </p>
             <div className="flex flex-wrap items-center gap-4">
               <Link
