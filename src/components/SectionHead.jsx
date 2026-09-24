@@ -3,8 +3,8 @@ export default function SectionHead({ eyebrow, title, lead, dark = false, classN
     <div className={`max-w-3xl mb-14 md:mb-16 ${className}`}>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
         <span
-          className={`shrink-0 inline-flex items-center border text-[11px] font-bold tracking-[0.1em] px-3 py-1.5 ${
-            dark ? "border-lime-2/50 text-lime-2" : "border-lime/50 text-lime"
+          className={`shrink-0 inline-flex items-center border-[1.5px] text-[11px] font-bold tracking-[0.1em] px-3 py-1.5 ${
+            dark ? "border-lime-2 text-lime-2" : "border-lime text-lime"
           }`}
         >
           {eyebrow}
