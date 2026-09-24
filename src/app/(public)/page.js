@@ -356,34 +356,44 @@ export default async function HomePage() {
       {/* PARTENAIRES */}
       <section className="py-16 md:py-24 overflow-hidden">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <SectionHead eyebrow="PARTENAIRES" title="Ils nous font confiance" />
+          <SectionHead
+            eyebrow="PARTENAIRES"
+            title={
+              <>
+                Ils nous font déjà <span className="text-lime italic">confiance</span>
+              </>
+            }
+            lead="Des institutions et organisations de premier plan nous ont accordé leur confiance pour mener à bien leurs projets à travers l'Afrique de l'Ouest."
+          />
         </div>
 
         <div className="partner-marquee-wrap">
           <div className="partner-marquee flex items-stretch gap-4 px-5 md:px-8">
-            {[...PARTENAIRES, ...PARTENAIRES].map((p, i) =>
-              p.logo ? (
-                <div
-                  key={i}
-                  className="flex-shrink-0 w-[170px] h-[96px] border border-line flex items-center justify-center px-6"
-                >
-                  <Image
-                    src={`/img/${p.logo}`}
-                    alt={p.nom}
-                    width={130}
-                    height={56}
-                    className="max-h-[52px] w-auto object-contain"
-                  />
+            {[...PARTENAIRES, ...PARTENAIRES].map((p, i) => (
+              <div
+                key={i}
+                className="partner-card relative flex-shrink-0 w-[190px] h-[124px] border border-line overflow-hidden"
+              >
+                <div className="w-full h-full flex items-center justify-center px-6">
+                  {p.logo ? (
+                    <Image
+                      src={`/img/${p.logo}`}
+                      alt={p.nom}
+                      width={160}
+                      height={90}
+                      className="max-h-[78px] w-auto object-contain"
+                    />
+                  ) : (
+                    <span className="text-[15px] font-bold tracking-[0.02em] text-dark-2 text-center">{p.nom}</span>
+                  )}
                 </div>
-              ) : (
-                <div
-                  key={i}
-                  className="flex-shrink-0 w-[170px] h-[96px] border border-line flex items-center justify-center px-4"
-                >
-                  <span className="text-[15px] font-bold tracking-[0.02em] text-dark-2 text-center">{p.nom}</span>
-                </div>
-              )
-            )}
+                {p.logo && (
+                  <div className="partner-card-name absolute inset-x-0 bottom-0 h-9 bg-darker flex items-center justify-center px-2">
+                    <span className="text-white text-[11.5px] font-semibold text-center leading-tight">{p.nom}</span>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
