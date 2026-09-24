@@ -274,7 +274,11 @@ export default async function HomePage() {
       <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
         <SectionHead
           eyebrow="RÉALISATIONS"
-          title="Des résultats concrets, mesurables"
+          title={
+            <>
+              Des résultats <span className="text-lime italic">concrets</span> et mesurables
+            </>
+          }
           lead="Un aperçu de nos projets menés avec des bailleurs et institutions de référence entre 2022 et 2025."
         />
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
