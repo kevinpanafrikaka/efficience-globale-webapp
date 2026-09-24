@@ -5,7 +5,7 @@ import DomainCard from "@/components/DomainCard";
 import ProjectCard from "@/components/ProjectCard";
 import Reveal from "@/components/Reveal";
 import { getProjetBySlug, getMembres } from "@/lib/db";
-import { IconBulb, IconChart, IconTrend } from "@/components/icons";
+import { IconBulb, IconChart, IconTrend, IconEye, IconSparkle, IconDrop, IconTarget } from "@/components/icons";
 
 const PROJETS_PHARES_SLUGS = [
   "gouvernance-pev-lmc",
@@ -204,19 +204,30 @@ export default async function HomePage() {
               </>
             }
           />
-          <div className="grid md:grid-cols-2 gap-x-16 gap-y-12 md:gap-y-14">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              ["Transparence", "Une honnêteté et une ouverture qui renforcent la confiance de nos partenaires et clients."],
-              ["Innovation", "Nous cultivons la pensée innovante pour rester à l'avant-garde des solutions stratégiques."],
-              ["Durabilité", "Des stratégies qui servent les intérêts actuels sans compromettre ceux des générations futures."],
-              ["Efficience", "Une optimisation constante pour offrir la meilleure valeur à nos clients."],
-            ].map(([titre, desc], i) => (
-              <Reveal key={titre} index={i}>
-                <div className="w-9 h-[3px] bg-lime mb-5" />
-                <h4 className="text-[24px] md:text-[28px] tracking-[-0.01em] mb-3">{titre}</h4>
-                <p className="text-[15.5px] leading-relaxed text-ink-soft max-w-md">{desc}</p>
+              { titre: "Transparence", desc: "Une honnêteté et une ouverture qui renforcent la confiance de nos partenaires et clients.", icon: <IconEye /> },
+              { titre: "Innovation", desc: "Nous cultivons la pensée innovante pour rester à l'avant-garde des solutions stratégiques.", icon: <IconSparkle /> },
+              { titre: "Durabilité", desc: "Des stratégies qui servent les intérêts actuels sans compromettre ceux des générations futures.", icon: <IconDrop /> },
+              { titre: "Efficience", desc: "Une optimisation constante pour offrir la meilleure valeur à nos clients.", icon: <IconTarget /> },
+            ].map((v, i) => (
+              <Reveal key={v.titre} index={i} className="conviction-card group bg-white rounded-xl p-4 sm:p-5 border border-line">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="conviction-icon w-9 h-9 rounded-lg bg-cream border border-line flex items-center justify-center text-lime shrink-0">
+                    {v.icon}
+                  </div>
+                  <h3 className="text-[16px] sm:text-[17px] tracking-[-0.01em] leading-tight">{v.titre}</h3>
+                </div>
+                <p className="text-[13.5px] text-ink-soft leading-relaxed">{v.desc}</p>
               </Reveal>
             ))}
+          </div>
+
+          <div className="mt-10 pt-8 border-t border-line text-center">
+            <p className="italic text-[16px] md:text-[17px] text-ink-soft max-w-2xl mx-auto" style={{ fontFamily: "var(--font-head)" }}>
+              En somme nous unissons nos forces pour façonner aujourd&apos;hui les solutions qui feront grandir le
+              monde de demain.
+            </p>
           </div>
         </div>
       </section>

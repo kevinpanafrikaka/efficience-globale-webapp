@@ -106,6 +106,24 @@
   }
 }
 
+/* ===== Cartes convictions : bordure + badge icône au survol ===== */
+.conviction-card {
+  transition: border-color 200ms ease, box-shadow 200ms ease;
+}
+.conviction-icon {
+  transition: background-color 200ms ease, color 200ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .conviction-card:hover {
+    border-color: var(--lime);
+    box-shadow: 0 8px 24px -12px rgba(38, 54, 42, 0.18);
+  }
+  .conviction-card:hover .conviction-icon {
+    background-color: var(--lime);
+    color: #fff;
+  }
+}
+
 .safe-top {
   padding-top: env(safe-area-inset-top, 0px);
 }
