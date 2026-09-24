@@ -13,9 +13,9 @@ const BAILLEURS = [
   { nom: "UNICEF", logo: "partners/unicef-logo.png" },
   { nom: "Expertise France", logo: "partners/expertise-france-logo.png" },
   { nom: "Banque Mondiale", logo: "partners/world-bank-logo.png" },
-  { nom: "Institut Français de Guinée", logo: "partners/institut-francais-logo.png" },
+  { nom: "Institut Français de Guinée", logo: "partners/institut-francais-logo-v2.png" },
   { nom: "Université Kofi Annan", logo: "partners/kofi-annan-logo.png" },
-  { nom: "AGUIPEL", logo: "partners/aguipel-logo.png" },
+  { nom: "AGUIPEL", logo: null },
   { nom: "Ministère de la Santé", logo: "partners/ministere-sante-logo.png" },
 ];
 
@@ -43,13 +43,17 @@ export default async function PartenairesPage() {
               key={p.nom}
               className={`h-[100px] flex items-center px-4 md:px-6 ${i % 2 === 1 ? "border-l border-line" : ""} ${i >= 2 ? "border-t border-line" : ""} ${i % 4 !== 0 ? "md:border-l" : "md:border-l-0"} ${i >= 4 ? "md:border-t" : "md:border-t-0"}`}
             >
-              <Image
-                src={`/img/${p.logo}`}
-                alt={p.nom}
-                width={130}
-                height={50}
-                className="max-h-[46px] w-auto object-contain grayscale opacity-80"
-              />
+              {p.logo ? (
+                <Image
+                  src={`/img/${p.logo}`}
+                  alt={p.nom}
+                  width={130}
+                  height={50}
+                  className="max-h-[46px] w-auto object-contain"
+                />
+              ) : (
+                <span className="text-[15px] font-bold tracking-[0.02em] text-dark-2">{p.nom}</span>
+              )}
             </div>
           ))}
         </div>

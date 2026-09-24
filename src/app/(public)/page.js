@@ -24,9 +24,9 @@ const PARTENAIRES = [
   { nom: "UNICEF", logo: "partners/unicef-logo.png" },
   { nom: "Expertise France", logo: "partners/expertise-france-logo.png" },
   { nom: "Banque Mondiale", logo: "partners/world-bank-logo.png" },
-  { nom: "Institut Français de Guinée", logo: "partners/institut-francais-logo.png" },
+  { nom: "Institut Français de Guinée", logo: "partners/institut-francais-logo-v2.png" },
   { nom: "Université Kofi Annan", logo: "partners/kofi-annan-logo.png" },
-  { nom: "AGUIPEL", logo: "partners/aguipel-logo.png" },
+  { nom: "AGUIPEL", logo: null },
   { nom: "Ministère de la Santé", logo: "partners/ministere-sante-logo.png" },
 ];
 
@@ -354,31 +354,47 @@ export default async function HomePage() {
       </section>
 
       {/* PARTENAIRES */}
-      <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
-        <SectionHead eyebrow="PARTENAIRES" title="Ils nous font confiance" />
-        <div className="grid grid-cols-2 md:grid-cols-4">
-          {PARTENAIRES.map((p, i) => (
-            <Reveal
-              key={p.nom}
-              index={i}
-              className={`h-[90px] flex items-center px-4 md:px-6 ${i % 2 === 1 ? "border-l border-line" : ""} ${i >= 2 ? "border-t border-line" : ""} ${i % 4 !== 0 ? "md:border-l" : "md:border-l-0"} ${i >= 4 ? "md:border-t" : "md:border-t-0"}`}
-            >
-              <Image
-                src={`/img/${p.logo}`}
-                alt={p.nom}
-                width={120}
-                height={46}
-                className="max-h-[42px] w-auto object-contain grayscale opacity-80"
-              />
-            </Reveal>
-          ))}
+      <section className="py-16 md:py-24 overflow-hidden">
+        <div className="max-w-6xl mx-auto px-5 md:px-8">
+          <SectionHead eyebrow="PARTENAIRES" title="Ils nous font confiance" />
         </div>
-        <Link
-          href="/partenaires"
-          className="inline-flex w-fit items-center rounded bg-lime mt-8 px-4 py-2 text-[13px] font-semibold text-ink active:scale-[0.97] transition-transform"
-        >
-          Voir tous nos partenaires →
-        </Link>
+
+        <div className="partner-marquee-wrap">
+          <div className="partner-marquee flex items-stretch gap-4 px-5 md:px-8">
+            {[...PARTENAIRES, ...PARTENAIRES].map((p, i) =>
+              p.logo ? (
+                <div
+                  key={i}
+                  className="flex-shrink-0 w-[170px] h-[96px] border border-line flex items-center justify-center px-6"
+                >
+                  <Image
+                    src={`/img/${p.logo}`}
+                    alt={p.nom}
+                    width={130}
+                    height={56}
+                    className="max-h-[52px] w-auto object-contain"
+                  />
+                </div>
+              ) : (
+                <div
+                  key={i}
+                  className="flex-shrink-0 w-[170px] h-[96px] border border-line flex items-center justify-center px-4"
+                >
+                  <span className="text-[15px] font-bold tracking-[0.02em] text-dark-2 text-center">{p.nom}</span>
+                </div>
+              )
+            )}
+          </div>
+        </div>
+
+        <div className="max-w-6xl mx-auto px-5 md:px-8 mt-10">
+          <Link
+            href="/partenaires"
+            className="inline-flex w-fit items-center rounded bg-lime px-4 py-2 text-[13px] font-semibold text-ink active:scale-[0.97] transition-transform"
+          >
+            Voir tous nos partenaires →
+          </Link>
+        </div>
       </section>
 
     </>

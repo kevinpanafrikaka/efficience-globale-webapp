@@ -146,6 +146,33 @@
   }
 }
 
+/* ===== Bandeau partenaires : défilement continu ===== */
+.partner-marquee-wrap {
+  overflow: hidden;
+}
+.partner-marquee {
+  width: max-content;
+  animation: partner-scroll 36s linear infinite;
+}
+@media (hover: hover) and (pointer: fine) {
+  .partner-marquee-wrap:hover .partner-marquee {
+    animation-play-state: paused;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .partner-marquee {
+    animation: none;
+  }
+}
+@keyframes partner-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 .safe-top {
   padding-top: env(safe-area-inset-top, 0px);
 }
