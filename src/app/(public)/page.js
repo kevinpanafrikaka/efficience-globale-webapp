@@ -2,9 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import SectionHead from "@/components/SectionHead";
 import DomainCard from "@/components/DomainCard";
-import ProjectCard from "@/components/ProjectCard";
+import RealisationTeaser from "@/components/RealisationTeaser";
 import Reveal from "@/components/Reveal";
-import { getProjetBySlug, getMembres } from "@/lib/db";
+import { getProjetsRecents, getMembres } from "@/lib/db";
 import {
   IconBulb,
   IconChart,
@@ -17,15 +17,6 @@ import {
   IconDocs,
   IconTeam,
 } from "@/components/icons";
-
-const PROJETS_PHARES_SLUGS = [
-  "gouvernance-pev-lmc",
-  "chaine-froid-pev",
-  "assistant-pedagogique-matoto",
-  "guichet-vbg-enabel",
-  "restructuration-sydam",
-  "agents-ia-osc",
-];
 
 const PARTENAIRES = [
   { nom: "Gavi", logo: "partners/gavi-logo.png" },
@@ -41,10 +32,7 @@ const PARTENAIRES = [
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [projetsPhares, membres] = await Promise.all([
-    Promise.all(PROJETS_PHARES_SLUGS.map(getProjetBySlug)).then((list) => list.filter(Boolean)),
-    getMembres(),
-  ]);
+  const [projetsRecents, membres] = await Promise.all([getProjetsRecents(6), getMembres()]);
   const fondateur = membres[0];
 
   return (
@@ -289,10 +277,10 @@ export default async function HomePage() {
           title="Des résultats concrets, mesurables"
           lead="Un aperçu de nos projets menés avec des bailleurs et institutions de référence entre 2022 et 2025."
         />
-        <div className="grid md:grid-cols-3 gap-x-5 gap-y-9">
-          {projetsPhares.map((p, i) => (
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {projetsRecents.map((p, i) => (
             <Reveal key={p.slug} index={i}>
-              <ProjectCard projet={p} />
+              <RealisationTeaser projet={p} />
             </Reveal>
           ))}
         </div>

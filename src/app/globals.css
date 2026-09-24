@@ -124,6 +124,28 @@
   }
 }
 
+/* ===== Cartes réalisations (accueil) : zoom photo au survol ===== */
+.realisation-teaser-media {
+  transition: transform 500ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.realisation-teaser-text {
+  transition: transform 300ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .realisation-teaser:hover .realisation-teaser-media {
+    transform: scale(1.06);
+  }
+  .realisation-teaser:hover .realisation-teaser-text {
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .realisation-teaser-media,
+  .realisation-teaser-text {
+    transition: none;
+  }
+}
+
 .safe-top {
   padding-top: env(safe-area-inset-top, 0px);
 }

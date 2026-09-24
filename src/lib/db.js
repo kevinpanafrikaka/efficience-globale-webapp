@@ -25,6 +25,15 @@ export async function getProjets({ secteur } = {}) {
   return results.map(parseProjet);
 }
 
+export async function getProjetsRecents(limit = 6) {
+  const db = await getDB();
+  const { results } = await db
+    .prepare("SELECT * FROM projets WHERE statut = 'publie' ORDER BY cree_le DESC LIMIT ?")
+    .bind(limit)
+    .all();
+  return results.map(parseProjet);
+}
+
 export async function getProjetBySlug(slug) {
   const db = await getDB();
   const row = await db
