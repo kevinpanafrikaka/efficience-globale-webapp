@@ -100,9 +100,8 @@ export default async function DomainesPage() {
           />
         </div>
         <div className="relative max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-28">
-          <div className="text-[12px] font-bold tracking-[0.14em] text-lime-2 mb-5">DOMAINES D&apos;INTERVENTION</div>
           <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] mb-5 max-w-2xl">
-            Où nous créons de la valeur
+            Où nous créons de la <span className="text-lime italic">valeur</span>
           </h1>
           <p className="text-[#d3ddce] text-[16px] md:text-[17px] leading-relaxed max-w-xl">
             Quatre domaines, une même approche : diagnostic rigoureux, co-construction avec les acteurs locaux, et
@@ -138,24 +137,40 @@ export default async function DomainesPage() {
               </div>
             </div>
             <div className={i % 2 === 1 ? "md:order-1" : ""}>
-              <div className="w-14 h-14 rounded-lg bg-cream border border-line flex items-center justify-center text-lime mb-5">
-                <d.Icon stroke="currentColor" width="26" height="26" />
+              <div className="flex items-center gap-4 mb-5">
+                <div className="w-12 h-12 rounded-lg bg-cream border border-line flex items-center justify-center text-lime shrink-0">
+                  <d.Icon stroke="currentColor" width="22" height="22" />
+                </div>
+                <h2 className="text-[24px] md:text-[28px] tracking-[-0.01em]">{d.titre}</h2>
               </div>
-              <h2 className="text-[26px] md:text-[30px] tracking-[-0.01em] mb-3">{d.titre}</h2>
-              <p className="text-[15.5px] text-ink-soft leading-relaxed mb-6">{d.description}</p>
+              <p className="text-[15.5px] text-ink-soft leading-relaxed mb-7">{d.description}</p>
 
-              <div className="text-[12px] font-bold text-lime tracking-[0.1em] mb-3">INTERVENTIONS TYPES</div>
-              <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5 mb-6">
+              <div className="text-[12px] font-bold text-lime tracking-[0.1em] mb-3.5">INTERVENTIONS TYPES</div>
+              <ul className="grid grid-cols-2 gap-x-4 gap-y-2.5 mb-7">
                 {d.interventions.map((it) => (
-                  <li key={it} className="text-[13.5px] text-ink-soft flex items-start gap-2">
-                    <span className="mt-1.5 h-1 w-1 bg-lime flex-shrink-0" />
+                  <li key={it} className="text-[13.5px] text-ink-soft leading-relaxed flex items-start gap-2">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.4"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-lime mt-[3px] shrink-0"
+                    >
+                      <path d="M5 12.5l4.5 4.5L19 7" />
+                    </svg>
                     {it}
                   </li>
                 ))}
               </ul>
 
-              <div className="text-[12px] font-bold text-lime tracking-[0.1em] mb-2">EFFETS RECHERCHÉS</div>
-              <p className="text-[13.5px] text-ink-soft leading-relaxed mb-6">{d.effets}</p>
+              <div className="border-l-2 border-lime pl-5 mb-7">
+                <div className="text-[12px] font-bold text-lime tracking-[0.1em] mb-1.5">EFFETS RECHERCHÉS</div>
+                <p className="text-[14.5px] text-ink-soft leading-relaxed">{d.effets}</p>
+              </div>
 
               {projetsParSecteur[i].length > 0 && (
                 <div className="flex flex-col gap-1.5">
