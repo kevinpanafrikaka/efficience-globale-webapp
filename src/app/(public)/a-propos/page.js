@@ -1,11 +1,17 @@
 import Image from "next/image";
+import { getMembres } from "@/lib/db";
 
 export const metadata = {
   title: "À propos",
   description: "Vision, mission et positionnement d'Efficience Globale, cabinet de conseil en stratégie fondé en 2022 à Conakry.",
 };
 
-export default function AProposPage() {
+export const dynamic = "force-dynamic";
+
+export default async function AProposPage() {
+  const membres = await getMembres();
+  const fondateur = membres[0];
+
   return (
     <>
       <section className="relative overflow-hidden">
@@ -36,24 +42,38 @@ export default function AProposPage() {
 
       <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
         <div className="grid md:grid-cols-[1.3fr_1fr] gap-10 md:gap-14 mb-16 md:mb-20">
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-6">
             <p className="text-[18px] md:text-[20px] leading-[1.5] tracking-[-0.01em] text-dark">
               Efficience Globale (EG), fondée le 27 juillet 2022 à Conakry, est une société de conseil en stratégie
               et gestion, qui a vocation à développer et implémenter des solutions sur mesure qui s&apos;inscrivent
               parfaitement dans le contexte local de l&apos;Afrique de l&apos;Ouest, particulièrement en Guinée.
             </p>
-            <p className="text-[15.5px] leading-relaxed text-ink-soft">
-              Fondée par Oumar Camara, fort d&apos;une décennie d&apos;expérience en gouvernance, finance,
-              planification stratégique, engagement des parties prenantes et suivi-évaluation chez PwC, EY et
-              Accenture à Paris, le cabinet allie expertise technique internationale et forte implication des
-              acteurs locaux.
-            </p>
+            {fondateur && (
+              <div className="flex items-start gap-5 pt-2">
+                <Image
+                  src={fondateur.photo_url}
+                  alt={fondateur.nom}
+                  width={110}
+                  height={110}
+                  className="object-cover h-[110px] w-[110px] flex-shrink-0"
+                />
+                <div>
+                  <p className="text-[15.5px] leading-relaxed text-ink-soft">
+                    Fondée par <span className="text-dark-2 font-bold">{fondateur.nom}</span>, fort d&apos;une
+                    décennie d&apos;expérience en gouvernance, finance, planification stratégique, engagement des
+                    parties prenantes et suivi-évaluation chez PwC, EY et Accenture à Paris, le cabinet allie
+                    expertise technique internationale et forte implication des acteurs locaux.
+                  </p>
+                  <div className="text-[13px] font-semibold text-lime mt-2">{fondateur.role}</div>
+                </div>
+              </div>
+            )}
           </div>
           <div className="flex flex-col gap-7">
             {[
               ["Vision", "Devenir un acteur de référence en conseil stratégique et opérationnel en Afrique de l'Ouest."],
               ["Mission", "Accompagner les organisations à adresser efficacement les défis de développement structurel."],
-              ["Positionnement", "Expertise locale, standards internationaux — le meilleur des deux mondes au service de nos partenaires."],
+              ["Positionnement", "Expertise locale, standards internationaux : le meilleur des deux mondes au service de nos partenaires."],
             ].map(([titre, texte]) => (
               <div key={titre} className="border-l-2 border-lime pl-5">
                 <h2 className="text-[13px] font-bold tracking-[0.1em] text-ink-faint mb-1.5">{titre.toUpperCase()}</h2>
