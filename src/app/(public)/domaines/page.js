@@ -112,9 +112,8 @@ export default async function DomainesPage() {
               <a
                 key={d.secteur}
                 href={`#${d.secteur}`}
-                className="inline-flex items-center gap-2 rounded border-[1.5px] border-white/40 px-5 py-2.5 text-[14px] font-semibold text-white backdrop-blur-sm transition-colors hover:border-white hover:bg-white/10"
+                className="inline-flex items-center rounded border-[1.5px] border-white/40 px-5 py-2.5 text-[14px] font-semibold text-white backdrop-blur-sm transition-colors hover:border-white hover:bg-white/10"
               >
-                <d.Icon stroke="currentColor" width="16" height="16" />
                 {d.titre}
               </a>
             ))}
