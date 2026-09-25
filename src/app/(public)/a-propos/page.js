@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { getMembres } from "@/lib/db";
+import { IconEye, IconSparkle, IconDrop, IconTarget } from "@/components/icons";
 
 export const metadata = {
   title: "À propos",
@@ -85,20 +86,21 @@ export default async function AProposPage() {
 
         <div className="border-t border-line pt-12 md:pt-16">
           <h2 className="text-[26px] md:text-[32px] tracking-[-0.01em] mb-10">Nos convictions</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              ["01", "Transparence", "Une honnêteté et une ouverture qui renforcent la confiance de nos partenaires et clients."],
-              ["02", "Innovation", "Nous cultivons la pensée innovante pour rester à l'avant-garde des solutions stratégiques."],
-              ["03", "Durabilité", "Des stratégies qui servent les intérêts actuels sans compromettre ceux des générations futures."],
-              ["04", "Efficience", "Une optimisation constante pour offrir la meilleure valeur à nos clients."],
-            ].map(([num, titre, desc], i) => (
-              <div
-                key={titre}
-                className={`py-6 md:py-0 ${i >= 2 ? "border-t border-line md:border-t-0" : ""} ${i > 0 ? "md:pl-8 md:border-l md:border-line" : ""} ${i % 2 === 1 ? "pl-6" : "pr-6 md:pr-8"}`}
-              >
-                <div className="text-[34px] leading-none font-extrabold text-line mb-3 tabular-nums">{num}</div>
-                <h3 className="text-[16px] mb-1.5">{titre}</h3>
-                <p className="text-[13.5px] leading-relaxed text-ink-soft">{desc}</p>
+              { titre: "Transparence", desc: "Une honnêteté et une ouverture qui renforcent la confiance de nos partenaires et clients.", icon: <IconEye /> },
+              { titre: "Innovation", desc: "Nous cultivons la pensée innovante pour rester à l'avant-garde des solutions stratégiques.", icon: <IconSparkle /> },
+              { titre: "Durabilité", desc: "Des stratégies qui servent les intérêts actuels sans compromettre ceux des générations futures.", icon: <IconDrop /> },
+              { titre: "Efficience", desc: "Une optimisation constante pour offrir la meilleure valeur à nos clients.", icon: <IconTarget /> },
+            ].map((v) => (
+              <div key={v.titre} className="conviction-card bg-white rounded-xl p-4 sm:p-5 border border-line">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="conviction-icon w-9 h-9 rounded-lg bg-cream border border-line flex items-center justify-center text-lime shrink-0">
+                    {v.icon}
+                  </div>
+                  <h3 className="text-[16px] sm:text-[17px] tracking-[-0.01em] leading-tight">{v.titre}</h3>
+                </div>
+                <p className="text-[13.5px] text-ink-soft leading-relaxed">{v.desc}</p>
               </div>
             ))}
           </div>
