@@ -24,12 +24,13 @@ export default function AProposPage() {
           />
         </div>
         <div className="relative max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-28">
-          <div className="flex items-center gap-3 pb-4 mb-6 border-b border-white/15 w-fit">
-            <span className="text-[12px] font-bold tracking-[0.14em] text-lime-2">À PROPOS</span>
-          </div>
-          <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] max-w-2xl">
-            Pourquoi Efficience Globale existe
+          <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] max-w-2xl mb-6">
+            Pourquoi nous <span className="text-lime italic">existons</span> ?
           </h1>
+          <p className="text-[#d3ddce] text-[16px] md:text-[17px] leading-relaxed max-w-lg">
+            Efficience Globale est née d&apos;une conviction simple : l&apos;Afrique de l&apos;Ouest a besoin d&apos;une
+            expertise qui comprend son contexte autant que ses standards internationaux.
+          </p>
         </div>
       </section>
 
@@ -42,9 +43,9 @@ export default function AProposPage() {
               parfaitement dans le contexte local de l&apos;Afrique de l&apos;Ouest, particulièrement en Guinée.
             </p>
             <p className="text-[15.5px] leading-relaxed text-ink-soft">
-              Fondée par Oumar Camara — fort d&apos;une décennie d&apos;expérience en gouvernance, finance,
+              Fondée par Oumar Camara, fort d&apos;une décennie d&apos;expérience en gouvernance, finance,
               planification stratégique, engagement des parties prenantes et suivi-évaluation chez PwC, EY et
-              Accenture à Paris — le cabinet allie expertise technique internationale et forte implication des
+              Accenture à Paris, le cabinet allie expertise technique internationale et forte implication des
               acteurs locaux.
             </p>
           </div>
