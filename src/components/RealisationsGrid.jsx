@@ -5,12 +5,12 @@ import ProjectCard from "@/components/ProjectCard";
 
 const FILTERS = [
   { key: "all", label: "Tous" },
-  { key: "sante", label: "Santé publique & Nutrition" },
-  { key: "ia", label: "Intelligence Artificielle" },
+  { key: "sante", label: "Santé publique" },
+  { key: "ia", label: "IA" },
   { key: "education", label: "Éducation" },
-  { key: "gouvernance", label: "Gouvernance & Leadership" },
-  { key: "local", label: "Développement local" },
-  { key: "partenariat", label: "Partenariats stratégiques" },
+  { key: "gouvernance", label: "Gouvernance" },
+  { key: "local", label: "Local" },
+  { key: "partenariat", label: "Partenariats" },
 ];
 
 export default function RealisationsGrid({ projets }) {
@@ -24,10 +24,10 @@ export default function RealisationsGrid({ projets }) {
             key={f.key}
             type="button"
             onClick={() => setFilter(f.key)}
-            className={`rounded-full border text-[13.5px] font-semibold px-4.5 py-2 transition-colors active:scale-[0.97] ${
+            className={`rounded text-[13.5px] font-semibold px-5 py-2.5 active:scale-[0.97] transition-transform ${
               filter === f.key
-                ? "bg-dark-2 border-dark-2 text-white"
-                : "bg-white border-line text-ink-soft hover:border-lime hover:text-lime"
+                ? "bg-lime text-ink"
+                : "border border-line bg-white text-ink-soft hover:border-lime hover:text-lime"
             }`}
           >
             {f.label}
