@@ -135,12 +135,7 @@ export default async function DomainesPage() {
               </div>
             </div>
             <div className={i % 2 === 1 ? "md:order-1" : ""}>
-              <div className="flex items-center gap-4 mb-5">
-                <div className="w-12 h-12 rounded-lg bg-cream border border-line flex items-center justify-center text-lime shrink-0">
-                  <d.Icon stroke="currentColor" width="22" height="22" />
-                </div>
-                <h2 className="text-[24px] md:text-[28px] tracking-[-0.01em]">{d.titre}</h2>
-              </div>
+              <h2 className="text-[24px] md:text-[28px] tracking-[-0.01em] mb-5">{d.titre}</h2>
               <p className="text-[15.5px] text-ink-soft leading-relaxed mb-7">{d.description}</p>
 
               <div className="text-[12px] font-bold text-lime tracking-[0.1em] mb-3.5">INTERVENTIONS TYPES</div>
