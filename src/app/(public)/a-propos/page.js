@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export const metadata = {
   title: "À propos",
   description: "Vision, mission et positionnement d'Efficience Globale, cabinet de conseil en stratégie fondé en 2022 à Conakry.",
@@ -6,8 +8,22 @@ export const metadata = {
 export default function AProposPage() {
   return (
     <>
-      <section className="py-16 md:py-24 bg-darker">
-        <div className="max-w-6xl mx-auto px-5 md:px-8">
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <Image src="/img/hero-a-propos.jpg" alt="" fill className="object-cover" priority />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(13,19,14,0.88) 0%, rgba(13,19,14,0.55) 45%, rgba(13,19,14,0.3) 100%)",
+            }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(0deg, rgba(10,15,11,0.55) 0%, rgba(10,15,11,0.1) 40%)" }}
+          />
+        </div>
+        <div className="relative max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-28">
           <div className="flex items-center gap-3 pb-4 mb-6 border-b border-white/15 w-fit">
             <span className="text-[12px] font-bold tracking-[0.14em] text-lime-2">À PROPOS</span>
           </div>
