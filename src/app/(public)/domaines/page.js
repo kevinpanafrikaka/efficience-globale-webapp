@@ -15,9 +15,9 @@ const DOMAINES = [
     titre: "Santé Globale",
     photo: "/img/domaines/sante-afrique.jpg",
     tint: "rgba(61,83,71,0.82)",
-    icon: <IconHealth />,
+    Icon: IconHealth,
     description:
-      "Renforcement de la gouvernance des programmes de santé, suivi-évaluation et digitalisation — de la vaccination à la nutrition.",
+      "Renforcement de la gouvernance des programmes de santé, suivi-évaluation et digitalisation, de la vaccination à la nutrition.",
     interventions: [
       "Diagnostics institutionnels",
       "Appui à la coordination multi-niveaux",
@@ -33,7 +33,7 @@ const DOMAINES = [
     titre: "Éducation",
     photo: "/img/domaines/education-afrique.jpg",
     tint: "rgba(124,179,66,0.82)",
-    icon: <IconEducation />,
+    Icon: IconEducation,
     description: "Innovation pédagogique, formation et transfert de compétences durable.",
     interventions: [
       "Ingénierie de formation (curricula, modules, guides)",
@@ -49,7 +49,7 @@ const DOMAINES = [
     titre: "Industrie",
     photo: "/img/domaines/industrie-afrique.jpg",
     tint: "rgba(183,194,51,0.82)",
-    icon: <IconIndustry />,
+    Icon: IconIndustry,
     description: "Restructuration agro-industrielle et renforcement des chaînes d'approvisionnement locales.",
     interventions: [
       "Diagnostics organisationnels et techniques",
@@ -65,7 +65,7 @@ const DOMAINES = [
     titre: "TIC & IA",
     photo: "/img/domaines/tic-afrique.jpg",
     tint: "rgba(0,137,123,0.82)",
-    icon: <IconTic />,
+    Icon: IconTic,
     description: "Outils numériques, IA responsable et systèmes de suivi interactifs au service de la décision publique.",
     interventions: [
       "Conception de plateformes web (cartographies, registres)",
@@ -84,11 +84,23 @@ export default async function DomainesPage() {
 
   return (
     <>
-      <section className="py-16 md:py-24 bg-darker">
-        <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <div className="flex items-center gap-3 pb-4 mb-6 border-b border-white/15 w-fit">
-            <span className="text-[12px] font-bold tracking-[0.14em] text-lime-2">DOMAINES D&apos;INTERVENTION</span>
-          </div>
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <Image src="/img/hero-domaines.jpg" alt="" fill className="object-cover" priority />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(13,19,14,0.88) 0%, rgba(13,19,14,0.55) 45%, rgba(13,19,14,0.3) 100%)",
+            }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(0deg, rgba(10,15,11,0.55) 0%, rgba(10,15,11,0.1) 40%)" }}
+          />
+        </div>
+        <div className="relative max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-28">
+          <div className="text-[12px] font-bold tracking-[0.14em] text-lime-2 mb-5">DOMAINES D&apos;INTERVENTION</div>
           <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] mb-5 max-w-2xl">
             Où nous créons de la valeur
           </h1>
@@ -100,20 +112,35 @@ export default async function DomainesPage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-5 md:px-8">
+        <div className="flex flex-wrap gap-2.5 py-10 md:py-12">
+          {DOMAINES.map((d) => (
+            <a
+              key={d.secteur}
+              href={`#${d.secteur}`}
+              className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-[13px] font-semibold text-dark-2 transition-colors hover:border-lime hover:text-lime"
+            >
+              <d.Icon stroke="currentColor" width="16" height="16" />
+              {d.titre}
+            </a>
+          ))}
+        </div>
+
         {DOMAINES.map((d, i) => (
           <div
             key={d.titre}
-            className={`grid md:grid-cols-2 gap-8 md:gap-14 items-start py-14 md:py-20 ${i > 0 ? "border-t border-line" : ""}`}
+            id={d.secteur}
+            className={`grid md:grid-cols-2 gap-8 md:gap-14 items-start py-14 md:py-20 scroll-mt-24 ${i > 0 ? "border-t border-line" : ""}`}
           >
             <div className={i % 2 === 1 ? "md:order-2" : ""}>
               <div className="relative h-64 md:h-80 overflow-hidden mb-6 md:mb-0">
                 <Image src={d.photo} alt="" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
                 <div className="absolute inset-0" style={{ backgroundColor: d.tint, mixBlendMode: "multiply" }} />
-                <div className="absolute top-5 left-5">{d.icon}</div>
               </div>
             </div>
             <div className={i % 2 === 1 ? "md:order-1" : ""}>
-              <div className="text-[42px] leading-none font-extrabold text-line mb-4 tabular-nums">0{i + 1}</div>
+              <div className="w-14 h-14 rounded-lg bg-cream border border-line flex items-center justify-center text-lime mb-5">
+                <d.Icon stroke="currentColor" width="26" height="26" />
+              </div>
               <h2 className="text-[26px] md:text-[30px] tracking-[-0.01em] mb-3">{d.titre}</h2>
               <p className="text-[15.5px] text-ink-soft leading-relaxed mb-6">{d.description}</p>
 
