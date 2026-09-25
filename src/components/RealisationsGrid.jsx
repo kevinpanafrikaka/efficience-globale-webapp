@@ -25,7 +25,9 @@ export default function RealisationsGrid({ projets }) {
             type="button"
             onClick={() => setFilter(f.key)}
             className={`rounded-full border text-[13.5px] font-semibold px-4.5 py-2 transition-colors active:scale-[0.97] ${
-              filter === f.key ? "bg-dark-2 border-dark-2 text-white" : "bg-white border-line text-ink-soft"
+              filter === f.key
+                ? "bg-dark-2 border-dark-2 text-white"
+                : "bg-white border-line text-ink-soft hover:border-lime hover:text-lime"
             }`}
           >
             {f.label}

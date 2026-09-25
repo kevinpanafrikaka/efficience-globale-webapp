@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProjetBySlug, secteurs } from "@/lib/db";
+import { getProjetBySlug, getProjets, secteurs } from "@/lib/db";
+import ProjectCard from "@/components/ProjectCard";
 
 // Dynamique : le slug est résolu contre D1 à la requête, pas connu au
 // build — nécessaire puisque l'admin peut ajouter des projets sans
@@ -21,6 +22,7 @@ export default async function ProjetDetailPage({ params }) {
   if (!projet) notFound();
 
   const secteur = secteurs[projet.secteur] ?? { label: projet.secteur, color: "#3D5347" };
+  const similaires = (await getProjets({ secteur: projet.secteur })).filter((p) => p.slug !== slug).slice(0, 3);
 
   return (
     <article>
@@ -29,10 +31,10 @@ export default async function ProjetDetailPage({ params }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" />
         <div className="absolute inset-0 flex items-end">
           <div className="max-w-4xl mx-auto px-5 md:px-8 pb-8 w-full">
-            <Link href="/realisations" className="text-white/80 text-[13.5px] font-medium mb-3 inline-block">
+            <Link href="/realisations" className="text-white/80 text-[13.5px] font-medium mb-4 block w-fit">
               ← Toutes les réalisations
             </Link>
-            <span className="inline-block text-[11px] font-bold tracking-[0.1em] mb-3" style={{ color: "#fff" }}>
+            <span className="block text-[11px] font-bold tracking-[0.1em] text-lime-2 mb-3">
               {secteur.label.toUpperCase()}
             </span>
             <h1 className="text-white text-[26px] md:text-[40px] leading-[1.05] tracking-[-0.01em] max-w-2xl">
@@ -63,8 +65,20 @@ export default async function ProjetDetailPage({ params }) {
             <h2 className="text-[20px] tracking-[-0.01em] mb-5">Résultats obtenus</h2>
             <ul className="space-y-2.5 mb-12">
               {projet.resultats.map((r) => (
-                <li key={r} className="flex items-start gap-2.5 text-[14.5px] text-ink-soft">
-                  <span className="mt-2 h-1.5 w-1.5 bg-lime flex-shrink-0" />
+                <li key={r} className="flex items-start gap-2.5 text-[14.5px] text-ink-soft leading-relaxed">
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-lime mt-[3px] shrink-0"
+                  >
+                    <path d="M5 12.5l4.5 4.5L19 7" />
+                  </svg>
                   {r}
                 </li>
               ))}
@@ -74,11 +88,24 @@ export default async function ProjetDetailPage({ params }) {
 
         <Link
           href="/contact"
-          className="inline-flex items-center rounded bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform"
+          className="inline-flex items-center rounded bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
         >
           Discuter d&apos;un projet similaire
         </Link>
       </section>
+
+      {similaires.length > 0 && (
+        <section className="bg-cream py-16 md:py-20">
+          <div className="max-w-6xl mx-auto px-5 md:px-8">
+            <h2 className="text-[22px] md:text-[26px] tracking-[-0.01em] mb-8">Projets similaires</h2>
+            <div className="grid md:grid-cols-3 gap-5">
+              {similaires.map((p) => (
+                <ProjectCard key={p.slug} projet={p} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </article>
   );
 }

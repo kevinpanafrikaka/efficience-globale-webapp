@@ -172,6 +172,28 @@
   }
 }
 
+/* ===== Cartes projets (page Réalisations) : zoom photo + soulèvement au survol ===== */
+.project-card-media {
+  transition: transform 500ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.project-card {
+  transition: transform 250ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .project-card:hover .project-card-media {
+    transform: scale(1.06);
+  }
+  .project-card:hover {
+    transform: translateY(-4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-card-media,
+  .project-card {
+    transition: none;
+  }
+}
+
 /* ===== Bandeau partenaires : défilement continu, fondu sur les bords ===== */
 .partner-marquee-wrap {
   overflow: hidden;

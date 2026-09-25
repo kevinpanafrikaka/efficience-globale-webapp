@@ -6,14 +6,14 @@ export default function ProjectCard({ projet }) {
   const secteur = secteurs[projet.secteur] ?? { label: projet.secteur, color: "#3D5347" };
 
   return (
-    <Link href={`/realisations/${projet.slug}`} className="group flex flex-col active:opacity-80 transition-opacity">
+    <Link href={`/realisations/${projet.slug}`} className="project-card group flex flex-col active:opacity-80">
       <div className="relative h-48 bg-dark-2 overflow-hidden">
         <Image
           src={projet.photo_url}
           alt=""
           fill
           sizes="(min-width: 768px) 33vw, 100vw"
-          className="object-cover grayscale-[15%] group-hover:grayscale-0 transition-[filter] duration-500"
+          className="project-card-media object-cover"
         />
       </div>
       <div className="flex flex-col gap-2.5 pt-4 border-t-2 border-dark flex-1">
