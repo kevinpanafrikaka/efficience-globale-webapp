@@ -99,31 +99,30 @@ export default async function DomainesPage() {
             style={{ background: "linear-gradient(0deg, rgba(10,15,11,0.55) 0%, rgba(10,15,11,0.1) 40%)" }}
           />
         </div>
-        <div className="relative max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-28">
+        <div className="relative max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
           <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] mb-5 max-w-2xl">
             Où nous créons de la <span className="text-lime italic">valeur</span>
           </h1>
-          <p className="text-[#d3ddce] text-[16px] md:text-[17px] leading-relaxed max-w-xl">
+          <p className="text-[#d3ddce] text-[16px] md:text-[17px] leading-relaxed max-w-xl mb-8">
             Quatre domaines, une même approche : diagnostic rigoureux, co-construction avec les acteurs locaux, et
             transfert de compétences pour ancrer les résultats dans la durée.
           </p>
+          <div className="flex flex-wrap gap-2.5">
+            {DOMAINES.map((d) => (
+              <a
+                key={d.secteur}
+                href={`#${d.secteur}`}
+                className="inline-flex items-center gap-2 rounded border-[1.5px] border-white/40 px-5 py-2.5 text-[14px] font-semibold text-white backdrop-blur-sm transition-colors hover:border-white hover:bg-white/10"
+              >
+                <d.Icon stroke="currentColor" width="16" height="16" />
+                {d.titre}
+              </a>
+            ))}
+          </div>
         </div>
       </section>
 
       <section className="max-w-6xl mx-auto px-5 md:px-8">
-        <div className="flex flex-wrap gap-2.5 py-10 md:py-12">
-          {DOMAINES.map((d) => (
-            <a
-              key={d.secteur}
-              href={`#${d.secteur}`}
-              className="inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 text-[13px] font-semibold text-dark-2 transition-colors hover:border-lime hover:text-lime"
-            >
-              <d.Icon stroke="currentColor" width="16" height="16" />
-              {d.titre}
-            </a>
-          ))}
-        </div>
-
         {DOMAINES.map((d, i) => (
           <div
             key={d.titre}
@@ -173,16 +172,19 @@ export default async function DomainesPage() {
               </div>
 
               {projetsParSecteur[i].length > 0 && (
-                <div className="flex flex-col gap-1.5">
-                  {projetsParSecteur[i].slice(0, 3).map((p) => (
-                    <Link
-                      key={p.slug}
-                      href={`/realisations/${p.slug}`}
-                      className="text-[13px] font-medium text-dark-2 border-b border-line hoverable w-fit"
-                    >
-                      {p.titre}
-                    </Link>
-                  ))}
+                <div>
+                  <div className="text-[12px] font-bold text-lime tracking-[0.1em] mb-2">PROJETS RÉALISÉS</div>
+                  <div className="flex flex-col gap-1.5">
+                    {projetsParSecteur[i].slice(0, 3).map((p) => (
+                      <Link
+                        key={p.slug}
+                        href={`/realisations/${p.slug}`}
+                        className="text-[13px] font-medium text-dark-2 border-b border-line hoverable w-fit"
+                      >
+                        {p.titre}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
