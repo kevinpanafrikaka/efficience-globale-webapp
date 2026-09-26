@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS projets (
   id TEXT PRIMARY KEY,
   slug TEXT NOT NULL UNIQUE,
   titre TEXT NOT NULL,
+  titre_accent TEXT,              -- sous-chaîne de titre à afficher en italique (hero détail), optionnel
   secteur TEXT NOT NULL,          -- sante | ia | education | gouvernance | local
   client TEXT,
   periode TEXT,

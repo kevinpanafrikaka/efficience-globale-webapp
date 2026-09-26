@@ -9,6 +9,21 @@ import ProjectCard from "@/components/ProjectCard";
 // redéploiement.
 export const dynamic = "force-dynamic";
 
+// Met en italique-lime la sous-chaîne désignée par titre_accent (colonne
+// D1 éditable par l'admin) — un choix humain par projet, pas une
+// heuristique automatique.
+function renderTitre(titre, accent) {
+  const i = accent ? titre.indexOf(accent) : -1;
+  if (i === -1) return titre;
+  return (
+    <>
+      {titre.slice(0, i)}
+      <span className="text-lime italic">{accent}</span>
+      {titre.slice(i + accent.length)}
+    </>
+  );
+}
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const projet = await getProjetBySlug(slug);
@@ -47,7 +62,7 @@ export default async function ProjetDetailPage({ params }) {
               ← Toutes les réalisations
             </Link>
             <h1 className="text-white text-[26px] md:text-[40px] leading-[1.05] tracking-[-0.01em] max-w-2xl mb-5">
-              {projet.titre}
+              {renderTitre(projet.titre, projet.titre_accent)}
             </h1>
             <div className="flex flex-wrap gap-x-8 gap-y-1.5 text-[13.5px] text-white/85">
               <div>
