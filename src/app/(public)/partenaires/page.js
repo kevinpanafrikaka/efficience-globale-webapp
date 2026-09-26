@@ -29,30 +29,38 @@ export default async function PartenairesPage() {
           <div className="flex items-center gap-3 pb-4 mb-6 border-b border-white/15 w-fit">
             <span className="text-[12px] font-bold tracking-[0.14em] text-lime-2">PARTENAIRES</span>
           </div>
-          <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] max-w-2xl">
-            Ils nous font confiance
+          <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] mb-5 max-w-2xl">
+            Ils nous font <span className="text-lime italic">confiance</span>
           </h1>
+          <p className="text-[#d3ddce] text-[16px] md:text-[17px] leading-relaxed max-w-xl">
+            Bailleurs, institutions académiques et organisations de la société civile : des partenaires de premier
+            plan qui nous accordent leur confiance à travers l&apos;Afrique de l&apos;Ouest.
+          </p>
         </div>
       </section>
 
       <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
         <div className="text-[12px] font-bold tracking-[0.1em] text-lime mb-8">BAILLEURS &amp; INSTITUTIONS</div>
-        <div className="grid grid-cols-2 md:grid-cols-4">
-          {BAILLEURS.map((p, i) => (
-            <div
-              key={p.nom}
-              className={`h-[100px] flex items-center px-4 md:px-6 ${i % 2 === 1 ? "border-l border-line" : ""} ${i >= 2 ? "border-t border-line" : ""} ${i % 4 !== 0 ? "md:border-l" : "md:border-l-0"} ${i >= 4 ? "md:border-t" : "md:border-t-0"}`}
-            >
-              {p.logo ? (
-                <Image
-                  src={`/img/${p.logo}`}
-                  alt={p.nom}
-                  width={130}
-                  height={50}
-                  className="max-h-[46px] w-auto object-contain"
-                />
-              ) : (
-                <span className="text-[15px] font-bold tracking-[0.02em] text-dark-2">{p.nom}</span>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          {BAILLEURS.map((p) => (
+            <div key={p.nom} className="partner-card relative h-[124px] border border-line overflow-hidden">
+              <div className="w-full h-full flex items-center justify-center px-6">
+                {p.logo ? (
+                  <Image
+                    src={`/img/${p.logo}`}
+                    alt={p.nom}
+                    width={160}
+                    height={90}
+                    className="max-h-[78px] w-auto object-contain"
+                  />
+                ) : (
+                  <span className="text-[15px] font-bold tracking-[0.02em] text-dark-2 text-center">{p.nom}</span>
+                )}
+              </div>
+              {p.logo && (
+                <div className="partner-card-name absolute inset-x-0 bottom-0 h-9 bg-darker flex items-center justify-center px-2">
+                  <span className="text-white text-[11.5px] font-semibold text-center leading-tight">{p.nom}</span>
+                </div>
               )}
             </div>
           ))}
