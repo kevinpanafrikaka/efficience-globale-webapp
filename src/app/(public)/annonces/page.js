@@ -14,21 +14,21 @@ export default async function AnnoncesPage() {
     <>
       <section className="py-16 md:py-24 bg-darker">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <div className="flex items-center gap-3 pb-4 mb-6 border-b border-white/15 w-fit">
-            <span className="text-[12px] font-bold tracking-[0.14em] text-lime-2">ANNONCES</span>
-          </div>
-          <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] max-w-2xl">
-            Les dernières nouvelles du cabinet
+          <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] mb-5 max-w-2xl">
+            Les dernières <span className="text-lime italic">nouvelles</span> du cabinet
           </h1>
+          <p className="text-[#d3ddce] text-[16px] md:text-[17px] leading-relaxed max-w-xl">
+            Missions, partenariats, prises de parole : ce qui se passe chez Efficience Globale, au fil de l&apos;eau.
+          </p>
         </div>
       </section>
 
       <section className="max-w-4xl mx-auto px-5 md:px-8 py-16 md:py-24">
         {annonces.length === 0 ? (
-          <div className="text-center py-14">
-            <p className="text-[16px] text-ink-soft">Aucune annonce publiée pour le moment.</p>
-            <p className="text-[13.5px] text-ink-faint mt-2">
-              Les annonces publiées depuis l&apos;espace admin apparaîtront ici.
+          <div className="text-center py-14 border border-dashed border-line">
+            <p className="text-[16px] text-dark mb-1.5">Aucune annonce publiée pour le moment</p>
+            <p className="text-[13.5px] text-ink-faint">
+              Les prochaines nouvelles du cabinet apparaîtront ici.
             </p>
           </div>
         ) : (
