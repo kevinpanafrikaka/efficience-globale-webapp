@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getAnnonces } from "@/lib/db";
 
 export const metadata = {
@@ -12,8 +13,22 @@ export default async function AnnoncesPage() {
 
   return (
     <>
-      <section className="py-16 md:py-24 bg-darker">
-        <div className="max-w-6xl mx-auto px-5 md:px-8">
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0">
+          <Image src="/img/hero-annonces.jpg" alt="" fill className="object-cover" priority />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(90deg, rgba(13,19,14,0.88) 0%, rgba(13,19,14,0.55) 45%, rgba(13,19,14,0.3) 100%)",
+            }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(0deg, rgba(10,15,11,0.55) 0%, rgba(10,15,11,0.1) 40%)" }}
+          />
+        </div>
+        <div className="relative max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-28">
           <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] mb-5 max-w-2xl">
             Les dernières <span className="text-lime italic">nouvelles</span> du cabinet
           </h1>
