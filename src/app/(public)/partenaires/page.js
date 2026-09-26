@@ -89,7 +89,6 @@ export default async function PartenairesPage() {
                   <div className="text-[12px] font-semibold text-dark-2 tracking-[0.05em]">{p.client.toUpperCase()}</div>
                   <h3 className="text-[18px] tracking-[-0.01em]">{p.titre}</h3>
                   <p className="text-[14px] text-ink-soft leading-relaxed">{p.resume}</p>
-                  <div className="text-[12px] text-ink-faint mt-1">{p.periode}</div>
                 </div>
               ))}
             </div>
