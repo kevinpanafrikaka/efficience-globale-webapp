@@ -51,7 +51,10 @@ export default async function PartenairesPage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
-        <div className="text-[12px] font-bold tracking-[0.1em] text-lime mb-8">BAILLEURS &amp; INSTITUTIONS</div>
+        <div className="flex items-baseline gap-3 mb-8">
+          <div className="text-[12px] font-bold tracking-[0.1em] text-lime">BAILLEURS &amp; INSTITUTIONS</div>
+          <div className="text-[12px] text-ink-faint">{BAILLEURS.length} institutions partenaires actives</div>
+        </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {BAILLEURS.map((p) => (
             <div key={p.nom} className="partner-card relative h-[124px] border border-line overflow-hidden">
@@ -82,7 +85,11 @@ export default async function PartenairesPage() {
         <section className="bg-cream py-16 md:py-24">
           <div className="max-w-6xl mx-auto px-5 md:px-8">
             <div className="text-[12px] font-bold tracking-[0.1em] text-lime mb-3.5">PARTENARIATS STRATÉGIQUES</div>
-            <h2 className="text-[28px] md:text-[38px] tracking-[-0.01em] mb-12">Des collaborations de long terme</h2>
+            <h2 className="text-[28px] md:text-[38px] tracking-[-0.01em] mb-4">Des collaborations de long terme</h2>
+            <p className="text-[15.5px] text-ink-soft leading-relaxed max-w-2xl mb-12">
+              Des accords-cadres et protocoles d&apos;entente qui structurent notre collaboration avec des
+              institutions académiques, associatives et internationales sur plusieurs années.
+            </p>
             <div className="grid md:grid-cols-2 gap-x-10 gap-y-10">
               {partenariats.map((p) => (
                 <div key={p.slug} className="border-l-2 border-lime pl-6 flex flex-col gap-2">
