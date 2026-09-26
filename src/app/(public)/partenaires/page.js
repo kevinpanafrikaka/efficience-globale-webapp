@@ -85,7 +85,9 @@ export default async function PartenairesPage() {
         <section className="bg-cream py-16 md:py-24">
           <div className="max-w-6xl mx-auto px-5 md:px-8">
             <div className="text-[12px] font-bold tracking-[0.1em] text-lime mb-3.5">PARTENARIATS STRATÉGIQUES</div>
-            <h2 className="text-[28px] md:text-[38px] tracking-[-0.01em] mb-4">Des collaborations de long terme</h2>
+            <h2 className="text-[28px] md:text-[38px] tracking-[-0.01em] mb-4">
+              Des <span className="text-lime italic">collaborations</span> de long terme
+            </h2>
             <p className="text-[15.5px] text-ink-soft leading-relaxed max-w-2xl mb-12">
               Des accords-cadres et protocoles d&apos;entente qui structurent notre collaboration avec des
               institutions académiques, associatives et internationales sur plusieurs années.
