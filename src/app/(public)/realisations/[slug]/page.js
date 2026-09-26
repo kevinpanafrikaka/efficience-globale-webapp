@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getProjetBySlug, getProjets, secteurs } from "@/lib/db";
+import { getProjetBySlug, getProjets } from "@/lib/db";
 import ProjectCard from "@/components/ProjectCard";
 
 // Dynamique : le slug est résolu contre D1 à la requête, pas connu au
@@ -21,7 +21,6 @@ export default async function ProjetDetailPage({ params }) {
   const projet = await getProjetBySlug(slug);
   if (!projet) notFound();
 
-  const secteur = secteurs[projet.secteur] ?? { label: projet.secteur, color: "#3D5347" };
   const similaires = (await getProjets({ secteur: projet.secteur })).filter((p) => p.slug !== slug).slice(0, 3);
 
   return (
@@ -47,9 +46,6 @@ export default async function ProjetDetailPage({ params }) {
             >
               ← Toutes les réalisations
             </Link>
-            <span className="block text-[11px] font-bold tracking-[0.1em] text-lime-2 mb-3">
-              {secteur.label.toUpperCase()}
-            </span>
             <h1 className="text-white text-[26px] md:text-[40px] leading-[1.05] tracking-[-0.01em] max-w-2xl mb-5">
               {projet.titre}
             </h1>
