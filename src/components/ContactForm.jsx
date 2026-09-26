@@ -1,6 +1,47 @@
+"use client";
+
+import { useState } from "react";
+
 export default function ContactForm() {
+  const [status, setStatus] = useState("idle"); // idle | sending | success | error
+  const [errorMsg, setErrorMsg] = useState("");
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setStatus("sending");
+    setErrorMsg("");
+
+    const form = e.currentTarget;
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        body: new FormData(form),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setErrorMsg(data.error || "Une erreur est survenue.");
+        setStatus("error");
+        return;
+      }
+      setStatus("success");
+      form.reset();
+    } catch {
+      setErrorMsg("Impossible d'envoyer le message. Vérifiez votre connexion.");
+      setStatus("error");
+    }
+  }
+
+  if (status === "success") {
+    return (
+      <div className="border border-lime bg-cream p-6">
+        <p className="text-[16px] text-dark mb-1.5">Message envoyé</p>
+        <p className="text-[13.5px] text-ink-soft">Nous vous répondrons dès que possible.</p>
+      </div>
+    );
+  }
+
   return (
-    <form className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1.5 col-span-2 sm:col-span-1">
           <label htmlFor="nom" className="text-[13px] font-semibold text-dark">
@@ -52,11 +93,15 @@ export default function ContactForm() {
           className="rounded-lg border border-line px-3.5 py-2.5 text-[15px] resize-none focus:outline-none focus:ring-2 focus:ring-lime"
         />
       </div>
+
+      {status === "error" && <p className="text-[13.5px] text-red-600">{errorMsg}</p>}
+
       <button
         type="submit"
-        className="mt-1 inline-flex items-center justify-center rounded bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+        disabled={status === "sending"}
+        className="mt-1 inline-flex items-center justify-center rounded bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2 disabled:opacity-60 disabled:pointer-events-none"
       >
-        Envoyer le message
+        {status === "sending" ? "Envoi en cours…" : "Envoyer le message"}
       </button>
       <p className="text-[12.5px] text-ink-faint">
         Vous pouvez aussi écrire directement à{" "}

@@ -23,6 +23,7 @@
 
 # local secrets — jamais commités
 .cf-token-eg
+.dev.vars
 
 # production
 /build
