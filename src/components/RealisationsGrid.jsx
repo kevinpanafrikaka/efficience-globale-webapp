@@ -37,11 +37,13 @@ export default function RealisationsGrid({ projets }) {
       </div>
 
       <div className="grid md:grid-cols-3 gap-5">
-        {projets.map((p) => (
-          <div key={p.slug} hidden={filter !== "all" && filter !== p.secteur}>
-            <ProjectCard projet={p} />
-          </div>
-        ))}
+        {projets
+          .filter((p) => filter === "all" || filter === p.secteur)
+          .map((p) => (
+            <div key={`${filter}-${p.slug}`} className="project-card-enter">
+              <ProjectCard projet={p} />
+            </div>
+          ))}
       </div>
     </div>
   );
