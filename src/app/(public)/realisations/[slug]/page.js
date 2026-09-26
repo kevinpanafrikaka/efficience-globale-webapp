@@ -26,36 +26,48 @@ export default async function ProjetDetailPage({ params }) {
 
   return (
     <article>
-      <section className="relative h-[280px] md:h-[380px]">
+      <section className="relative h-[380px] md:h-[480px] overflow-hidden">
         <Image src={projet.photo_url} alt="" fill priority className="object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/10" />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(13,19,14,0.88) 0%, rgba(13,19,14,0.55) 45%, rgba(13,19,14,0.3) 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(0deg, rgba(10,15,11,0.8) 0%, rgba(10,15,11,0.15) 45%)" }}
+        />
         <div className="absolute inset-0 flex items-end">
           <div className="max-w-4xl mx-auto px-5 md:px-8 pb-8 w-full">
-            <Link href="/realisations" className="text-white/80 text-[13.5px] font-medium mb-4 block w-fit">
+            <Link
+              href="/realisations"
+              className="inline-flex items-center rounded border-[1.5px] border-white/40 px-3.5 py-1.5 text-[12.5px] font-semibold text-white backdrop-blur-sm transition-colors hover:border-white hover:bg-white/10 mb-5 w-fit"
+            >
               ← Toutes les réalisations
             </Link>
             <span className="block text-[11px] font-bold tracking-[0.1em] text-lime-2 mb-3">
               {secteur.label.toUpperCase()}
             </span>
-            <h1 className="text-white text-[26px] md:text-[40px] leading-[1.05] tracking-[-0.01em] max-w-2xl">
+            <h1 className="text-white text-[26px] md:text-[40px] leading-[1.05] tracking-[-0.01em] max-w-2xl mb-5">
               {projet.titre}
             </h1>
+            <div className="flex flex-wrap gap-x-8 gap-y-1.5 text-[13.5px] text-white/85">
+              <div>
+                <span className="text-white/50">Client / bailleur : </span>
+                {projet.client}
+              </div>
+              <div>
+                <span className="text-white/50">Période : </span>
+                {projet.periode}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       <section className="max-w-4xl mx-auto px-5 md:px-8 py-12 md:py-16">
-        <div className="grid grid-cols-2 mb-12 text-[13.5px] border-t border-b border-line">
-          <div className="py-5 pr-4">
-            <div className="text-ink-faint mb-1">Client / bailleur</div>
-            <div className="font-semibold text-dark">{projet.client}</div>
-          </div>
-          <div className="py-5 pl-4 border-l border-line">
-            <div className="text-ink-faint mb-1">Période</div>
-            <div className="font-semibold text-dark">{projet.periode}</div>
-          </div>
-        </div>
-
         {projet.description && (
           <p className="text-[17px] leading-relaxed text-ink-soft mb-12 max-w-xl">{projet.description}</p>
         )}
