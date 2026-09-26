@@ -2,7 +2,7 @@ import ContactForm from "@/components/ContactForm";
 
 export const metadata = {
   title: "Contact",
-  description: "Discutons de votre prochain projet avec Efficience Globale — gouvernance, digitalisation, intelligence artificielle.",
+  description: "Discutons de votre prochain projet avec Efficience Globale : gouvernance, digitalisation, intelligence artificielle.",
 };
 
 export default function ContactPage() {

@@ -1,4 +1,4 @@
-export default function ContactForm({ compact = false }) {
+export default function ContactForm() {
   return (
     <form className="flex flex-col gap-4">
       <div className="grid grid-cols-2 gap-3">
@@ -47,14 +47,14 @@ export default function ContactForm({ compact = false }) {
         <textarea
           id="message"
           name="message"
-          rows={compact ? 4 : 5}
+          rows={5}
           required
           className="rounded-lg border border-line px-3.5 py-2.5 text-[15px] resize-none focus:outline-none focus:ring-2 focus:ring-lime"
         />
       </div>
       <button
         type="submit"
-        className="mt-1 inline-flex items-center justify-center rounded bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform"
+        className="mt-1 inline-flex items-center justify-center rounded bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
       >
         Envoyer le message
       </button>
