@@ -39,6 +39,8 @@ export async function POST(request) {
   });
 
   if (!resendRes.ok) {
+    const errBody = await resendRes.text();
+    console.error("Resend error:", resendRes.status, errBody);
     return Response.json({ error: "L'envoi a échoué. Réessayez ou écrivez directement par email." }, { status: 502 });
   }
 
