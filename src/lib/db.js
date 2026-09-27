@@ -194,6 +194,45 @@ export async function getAnnonces() {
   return results;
 }
 
+// ===== Admin : annonces (tous statuts) =====
+
+export async function getAllAnnonces() {
+  const db = await getDB();
+  const { results } = await db.prepare("SELECT * FROM annonces ORDER BY date DESC").all();
+  return results;
+}
+
+export async function getAnnonceById(id) {
+  const db = await getDB();
+  return db.prepare("SELECT * FROM annonces WHERE id = ?").bind(id).first();
+}
+
+export async function createAnnonce(data) {
+  const db = await getDB();
+  const id = slugify(data.titre);
+  await db
+    .prepare(
+      `INSERT INTO annonces (id, slug, titre, texte, image_url, date, statut)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
+    )
+    .bind(id, id, data.titre, data.texte, data.image_url || null, data.date, data.statut || "brouillon")
+    .run();
+  return id;
+}
+
+export async function updateAnnonce(id, data) {
+  const db = await getDB();
+  await db
+    .prepare(`UPDATE annonces SET titre = ?, texte = ?, image_url = ?, date = ?, statut = ? WHERE id = ?`)
+    .bind(data.titre, data.texte, data.image_url || null, data.date, data.statut || "brouillon", id)
+    .run();
+}
+
+export async function deleteAnnonce(id) {
+  const db = await getDB();
+  await db.prepare("DELETE FROM annonces WHERE id = ?").bind(id).run();
+}
+
 export const secteurs = {
   sante: { label: "Santé publique", color: "#00897B" },
   ia: { label: "Intelligence Artificielle", color: "#7CB342" },
