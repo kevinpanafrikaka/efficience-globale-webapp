@@ -79,8 +79,8 @@ export async function createProjet(data) {
   const id = slugify(data.titre);
   await db
     .prepare(
-      `INSERT INTO projets (id, slug, titre, titre_accent, secteur, client, periode, montant, resume, description, resultats, photo_url, statut, ordre_affichage)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO projets (id, slug, titre, titre_accent, secteur, client, periode, resume, description, resultats, photo_url, statut, ordre_affichage)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .bind(
       id,
@@ -90,7 +90,6 @@ export async function createProjet(data) {
       data.secteur,
       data.client || null,
       data.periode || null,
-      data.montant || null,
       data.resume || null,
       data.description || null,
       JSON.stringify(data.resultats || []),
@@ -106,7 +105,7 @@ export async function updateProjet(id, data) {
   const db = await getDB();
   await db
     .prepare(
-      `UPDATE projets SET titre = ?, titre_accent = ?, secteur = ?, client = ?, periode = ?, montant = ?, resume = ?, description = ?, resultats = ?, photo_url = ?, statut = ?, ordre_affichage = ?, maj_le = datetime('now')
+      `UPDATE projets SET titre = ?, titre_accent = ?, secteur = ?, client = ?, periode = ?, resume = ?, description = ?, resultats = ?, photo_url = ?, statut = ?, ordre_affichage = ?, maj_le = datetime('now')
        WHERE id = ?`
     )
     .bind(
@@ -115,7 +114,6 @@ export async function updateProjet(id, data) {
       data.secteur,
       data.client || null,
       data.periode || null,
-      data.montant || null,
       data.resume || null,
       data.description || null,
       JSON.stringify(data.resultats || []),

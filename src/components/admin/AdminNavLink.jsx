@@ -11,7 +11,7 @@ export default function AdminNavLink({ href, children }) {
     <Link
       href={href}
       className={`block px-3.5 py-2.5 rounded text-[14px] font-medium transition-colors ${
-        active ? "bg-lime text-ink" : "text-ink-soft hover:bg-cream hover:text-dark"
+        active ? "bg-lime text-ink" : "text-[#b9c4b4] hover:bg-white/10 hover:text-white"
       }`}
     >
       {children}

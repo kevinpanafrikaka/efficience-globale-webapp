@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 const SECTEURS = [
   { value: "sante", label: "Santé publique" },
@@ -26,7 +27,6 @@ export default function ProjetForm({ projet }) {
     secteur: projet?.secteur || "sante",
     client: projet?.client || "",
     periode: projet?.periode || "",
-    montant: projet?.montant || "",
     resume: projet?.resume || "",
     description: projet?.description || "",
     resultats: projet?.resultats?.join("\n") || "",
@@ -43,8 +43,14 @@ export default function ProjetForm({ projet }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setLoading(true);
     setError("");
+
+    if (!form.photo_url) {
+      setError("Une image est requise.");
+      return;
+    }
+
+    setLoading(true);
 
     const payload = {
       ...form,
@@ -126,11 +132,6 @@ export default function ProjetForm({ projet }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>Montant (optionnel)</label>
-        <input value={form.montant} onChange={(e) => update("montant", e.target.value)} className={inputClass} />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
         <label className={labelClass}>Résumé (aperçu sur les cartes)</label>
         <textarea
           value={form.resume}
@@ -161,16 +162,8 @@ export default function ProjetForm({ projet }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>Chemin de la photo</label>
-        <input
-          value={form.photo_url}
-          onChange={(e) => update("photo_url", e.target.value)}
-          placeholder="/img/realisations/exemple.jpg"
-          className={inputClass}
-        />
-        <p className="text-[12px] text-ink-faint">
-          Le fichier doit déjà exister dans le projet (pas d&apos;upload depuis cet écran pour l&apos;instant).
-        </p>
+        <label className={labelClass}>Image du projet</label>
+        <ImageUpload value={form.photo_url} onChange={(url) => update("photo_url", url)} required />
       </div>
 
       <div className="flex flex-col gap-1.5">

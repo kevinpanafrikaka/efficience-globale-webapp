@@ -34,7 +34,7 @@ export default async function AdminLayout({ children }) {
 
   return (
     <div className="flex min-h-[calc(100vh-64px)]">
-      <aside className="w-[220px] shrink-0 border-r border-line px-3 py-6 flex flex-col justify-between">
+      <aside className="w-[220px] shrink-0 bg-darker px-3 py-6 flex flex-col justify-between">
         <nav className="flex flex-col gap-1">
           {NAV.map((item) => (
             <AdminNavLink key={item.href} href={item.href}>

@@ -15,6 +15,12 @@
       "database_id": "e0926e87-94cb-4645-a6bd-abf57518f3bd"
     }
   ],
+  "r2_buckets": [
+    {
+      "binding": "UPLOADS",
+      "bucket_name": "eg-uploads"
+    }
+  ],
   "observability": {
     "logs": {
       "enabled": true,
