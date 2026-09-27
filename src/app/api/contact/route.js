@@ -27,7 +27,10 @@ export async function POST(request) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Site Efficience Globale <contact@efficienceglobale.com>",
+      // Adresse de test Resend, valable sans domaine vérifié. À remplacer par
+      // "Site Efficience Globale <contact@efficienceglobale.com>" une fois le
+      // domaine efficienceglobale.com acquis et vérifié dans Resend.
+      from: "Site Efficience Globale <onboarding@resend.dev>",
       to: DEST_EMAIL,
       reply_to: email,
       subject: sujet ? `Nouveau message : ${sujet}` : "Nouveau message depuis le site",
