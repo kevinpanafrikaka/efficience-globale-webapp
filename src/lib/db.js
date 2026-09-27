@@ -51,6 +51,87 @@ export async function getAllProjetSlugs() {
   return results.map((r) => r.slug);
 }
 
+// ===== Admin : projets (tous statuts) =====
+
+export function slugify(str) {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export async function getAllProjets() {
+  const db = await getDB();
+  const { results } = await db.prepare("SELECT * FROM projets ORDER BY ordre_affichage ASC").all();
+  return results.map(parseProjet);
+}
+
+export async function getProjetById(id) {
+  const db = await getDB();
+  const row = await db.prepare("SELECT * FROM projets WHERE id = ?").bind(id).first();
+  return row ? parseProjet(row) : null;
+}
+
+export async function createProjet(data) {
+  const db = await getDB();
+  const id = slugify(data.titre);
+  await db
+    .prepare(
+      `INSERT INTO projets (id, slug, titre, titre_accent, secteur, client, periode, montant, resume, description, resultats, photo_url, statut, ordre_affichage)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+    )
+    .bind(
+      id,
+      id,
+      data.titre,
+      data.titre_accent || null,
+      data.secteur,
+      data.client || null,
+      data.periode || null,
+      data.montant || null,
+      data.resume || null,
+      data.description || null,
+      JSON.stringify(data.resultats || []),
+      data.photo_url || null,
+      data.statut || "brouillon",
+      data.ordre_affichage ?? 0
+    )
+    .run();
+  return id;
+}
+
+export async function updateProjet(id, data) {
+  const db = await getDB();
+  await db
+    .prepare(
+      `UPDATE projets SET titre = ?, titre_accent = ?, secteur = ?, client = ?, periode = ?, montant = ?, resume = ?, description = ?, resultats = ?, photo_url = ?, statut = ?, ordre_affichage = ?, maj_le = datetime('now')
+       WHERE id = ?`
+    )
+    .bind(
+      data.titre,
+      data.titre_accent || null,
+      data.secteur,
+      data.client || null,
+      data.periode || null,
+      data.montant || null,
+      data.resume || null,
+      data.description || null,
+      JSON.stringify(data.resultats || []),
+      data.photo_url || null,
+      data.statut || "brouillon",
+      data.ordre_affichage ?? 0,
+      id
+    )
+    .run();
+}
+
+export async function deleteProjet(id) {
+  const db = await getDB();
+  await db.prepare("DELETE FROM projets WHERE id = ?").bind(id).run();
+}
+
 export async function getMembres() {
   const db = await getDB();
   const { results } = await db
