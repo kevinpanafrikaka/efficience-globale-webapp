@@ -142,6 +142,48 @@ export async function getMembres() {
   return results;
 }
 
+// ===== Admin : membres (tous statuts) =====
+
+export async function getAllMembres() {
+  const db = await getDB();
+  const { results } = await db.prepare("SELECT * FROM membres ORDER BY ordre_affichage ASC").all();
+  return results;
+}
+
+export async function getMembreById(id) {
+  const db = await getDB();
+  return db.prepare("SELECT * FROM membres WHERE id = ?").bind(id).first();
+}
+
+export async function createMembre(data) {
+  const db = await getDB();
+  const id = slugify(data.nom);
+  await db
+    .prepare(
+      `INSERT INTO membres (id, nom, role, bio, photo_url, ordre_affichage, statut)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`
+    )
+    .bind(id, data.nom, data.role || null, data.bio || null, data.photo_url || null, data.ordre_affichage ?? 0, data.statut || "brouillon")
+    .run();
+  return id;
+}
+
+export async function updateMembre(id, data) {
+  const db = await getDB();
+  await db
+    .prepare(
+      `UPDATE membres SET nom = ?, role = ?, bio = ?, photo_url = ?, ordre_affichage = ?, statut = ?, maj_le = datetime('now')
+       WHERE id = ?`
+    )
+    .bind(data.nom, data.role || null, data.bio || null, data.photo_url || null, data.ordre_affichage ?? 0, data.statut || "brouillon", id)
+    .run();
+}
+
+export async function deleteMembre(id) {
+  const db = await getDB();
+  await db.prepare("DELETE FROM membres WHERE id = ?").bind(id).run();
+}
+
 export async function getAnnonces() {
   const db = await getDB();
   const { results } = await db
