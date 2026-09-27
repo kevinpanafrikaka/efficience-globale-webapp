@@ -14,12 +14,6 @@ const SECTEUR_FILTERS = [
   { key: "partenariat", label: "Partenariat" },
 ];
 
-const STATUT_FILTERS = [
-  { key: "all", label: "Tous" },
-  { key: "publie", label: "Publiés" },
-  { key: "brouillon", label: "Brouillons" },
-];
-
 function FilterRow({ options, active, onChange }) {
   return (
     <div className="flex flex-wrap gap-2">
@@ -42,19 +36,13 @@ function FilterRow({ options, active, onChange }) {
 }
 
 export default function AdminProjetsGrid({ projets, secteurs }) {
-  const [statutFilter, setStatutFilter] = useState("all");
   const [secteurFilter, setSecteurFilter] = useState("all");
 
-  const filtered = projets.filter(
-    (p) =>
-      (statutFilter === "all" || p.statut === statutFilter) &&
-      (secteurFilter === "all" || p.secteur === secteurFilter)
-  );
+  const filtered = projets.filter((p) => secteurFilter === "all" || p.secteur === secteurFilter);
 
   return (
     <div>
-      <div className="flex flex-col gap-2.5 mb-6">
-        <FilterRow options={STATUT_FILTERS} active={statutFilter} onChange={setStatutFilter} />
+      <div className="mb-6">
         <FilterRow options={SECTEUR_FILTERS} active={secteurFilter} onChange={setSecteurFilter} />
       </div>
 
