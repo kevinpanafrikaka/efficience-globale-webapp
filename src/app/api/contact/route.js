@@ -40,8 +40,12 @@ export async function POST(request) {
 
   if (!resendRes.ok) {
     const errBody = await resendRes.text();
-    console.error("Resend error:", resendRes.status, errBody);
-    return Response.json({ error: "L'envoi a échoué. Réessayez ou écrivez directement par email." }, { status: 502 });
+    // DIAGNOSTIC TEMPORAIRE — expose le détail Resend pour déboguer le 502 en prod.
+    // À retirer une fois l'envoi confirmé fonctionnel.
+    return Response.json(
+      { error: "L'envoi a échoué. Réessayez ou écrivez directement par email.", debug: { status: resendRes.status, body: errBody } },
+      { status: 502 }
+    );
   }
 
   return Response.json({ success: true });
