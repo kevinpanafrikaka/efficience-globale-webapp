@@ -16,6 +16,7 @@ const NAV = [
   { href: "/admin/projets", label: "Projets" },
   { href: "/admin/membres", label: "Membres" },
   { href: "/admin/annonces", label: "Annonces" },
+  { href: "/admin/apercu", label: "Aperçu du site" },
 ];
 
 export default async function AdminLayout({ children }) {
