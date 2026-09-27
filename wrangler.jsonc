@@ -18,7 +18,7 @@
   "r2_buckets": [
     {
       "binding": "UPLOADS",
-      "bucket_name": "eg-uploads"
+      "bucket_name": "eguploads"
     }
   ],
   "observability": {
