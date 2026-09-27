@@ -1,6 +1,9 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-const DEST_EMAIL = "oumar.camara@efficienceglobale.com";
+// TEMPORAIRE : Resend, sans domaine vérifié, n'autorise l'envoi qu'à l'adresse
+// du compte Resend lui-même. Remettre "oumar.camara@efficienceglobale.com"
+// une fois efficienceglobale.com acquis et vérifié dans Resend.
+const DEST_EMAIL = "kevinkandet05@gmail.com";
 
 export async function POST(request) {
   const { env } = await getCloudflareContext({ async: true });
