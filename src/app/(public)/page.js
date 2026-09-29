@@ -81,7 +81,7 @@ export default async function HomePage() {
         <div className="relative border-t border-white/15 mt-14 md:mt-16">
           <div className="max-w-6xl mx-auto px-5 md:px-8 grid grid-cols-2 md:grid-cols-4">
             {[
-              ["17+", "Projets réalisés depuis 2022"],
+              [`${nbProjets.realises}+`, "Projets réalisés depuis 2022"],
               ["200+", "Acteurs formés sur le terrain"],
               ["8", "Régions administratives couvertes"],
               ["10+", "Partenaires institutionnels et bailleurs"],
@@ -292,7 +292,7 @@ export default async function HomePage() {
             href="/realisations"
             className="inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
           >
-            Voir les {nbProjets} projets et partenariats →
+            Voir les {nbProjets.total} projets et partenariats →
           </Link>
         </div>
       </section>

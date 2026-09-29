@@ -35,10 +35,15 @@ export async function getProjetsRecents(limit = 6) {
   return results.map(parseProjet);
 }
 
+// Projets publiés : `total` (tout) et `realises` (hors partenariats).
 export async function countProjets() {
   const db = await getDB();
-  const row = await db.prepare("SELECT COUNT(*) AS n FROM projets WHERE statut = 'publie'").first();
-  return row?.n ?? 0;
+  const row = await db
+    .prepare(
+      "SELECT COUNT(*) AS total, SUM(secteur != 'partenariat') AS realises FROM projets WHERE statut = 'publie'"
+    )
+    .first();
+  return { total: row?.total ?? 0, realises: row?.realises ?? 0 };
 }
 
 export async function getProjetBySlug(slug) {
