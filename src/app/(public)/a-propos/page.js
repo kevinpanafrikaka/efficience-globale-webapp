@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "@/components/SiteImage";
 import { getMembres } from "@/lib/db";
 import { IconEye, IconSparkle, IconDrop, IconTarget } from "@/components/icons";
 
