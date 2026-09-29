@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function ContactForm() {
+export default function ContactForm({ emailContact }) {
   const [status, setStatus] = useState("idle"); // idle | sending | success | error
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -42,6 +42,11 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      {/* Champ piège anti-spam : invisible pour les humains, rempli par les robots. */}
+      <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+        <label htmlFor="site_web">Ne pas remplir</label>
+        <input id="site_web" name="site_web" type="text" tabIndex={-1} autoComplete="off" />
+      </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1.5 col-span-2 sm:col-span-1">
           <label htmlFor="nom" className="text-[13px] font-semibold text-dark">
@@ -103,12 +108,14 @@ export default function ContactForm() {
       >
         {status === "sending" ? "Envoi en cours…" : "Envoyer le message"}
       </button>
-      <p className="text-[12.5px] text-ink-faint">
-        Vous pouvez aussi écrire directement à{" "}
-        <a href="mailto:oumar.camara@efficienceglobale.com" className="text-dark-2 font-medium">
-          oumar.camara@efficienceglobale.com
-        </a>
-      </p>
+      {emailContact && (
+        <p className="text-[12.5px] text-ink-faint">
+          Vous pouvez aussi écrire directement à{" "}
+          <a href={`mailto:${emailContact}`} className="text-dark-2 font-medium">
+            {emailContact}
+          </a>
+        </p>
+      )}
     </form>
   );
 }

@@ -54,3 +54,41 @@ CREATE INDEX IF NOT EXISTS idx_projets_statut ON projets(statut);
 CREATE INDEX IF NOT EXISTS idx_projets_secteur ON projets(secteur);
 CREATE INDEX IF NOT EXISTS idx_membres_statut ON membres(statut);
 CREATE INDEX IF NOT EXISTS idx_annonces_statut ON annonces(statut);
+
+-- Ajouts de la migration 001 (voir migrations/001_admin_completion.sql pour l'application sur une base existante)
+CREATE TABLE IF NOT EXISTS partenaires (
+  id TEXT PRIMARY KEY,
+  nom TEXT NOT NULL,
+  logo_url TEXT,
+  site_web TEXT,
+  ordre_affichage INTEGER DEFAULT 0,
+  statut TEXT NOT NULL DEFAULT 'brouillon',
+  cree_le TEXT NOT NULL DEFAULT (datetime('now')),
+  maj_le TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS messages (
+  id TEXT PRIMARY KEY,
+  nom TEXT NOT NULL,
+  email TEXT NOT NULL,
+  sujet TEXT,
+  message TEXT NOT NULL,
+  lu INTEGER NOT NULL DEFAULT 0,
+  envoye INTEGER NOT NULL DEFAULT 0,
+  cree_le TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE TABLE IF NOT EXISTS reglages (
+  cle TEXT PRIMARY KEY,
+  valeur TEXT NOT NULL DEFAULT ''
+);
+
+CREATE TABLE IF NOT EXISTS tentatives_login (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ip TEXT NOT NULL,
+  cree_le TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_partenaires_statut ON partenaires(statut);
+CREATE INDEX IF NOT EXISTS idx_messages_lu ON messages(lu);
+CREATE INDEX IF NOT EXISTS idx_tentatives_ip ON tentatives_login(ip, cree_le);

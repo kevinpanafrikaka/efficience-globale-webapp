@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function DeleteButton({ endpoint, confirmMessage }) {
+export default function DeleteButton({ endpoint, confirmMessage, redirectTo }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -11,6 +11,7 @@ export default function DeleteButton({ endpoint, confirmMessage }) {
     if (!window.confirm(confirmMessage || "Supprimer définitivement ?")) return;
     setLoading(true);
     await fetch(endpoint, { method: "DELETE" });
+    if (redirectTo) router.push(redirectTo);
     router.refresh();
   }
 

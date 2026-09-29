@@ -21,6 +21,17 @@ async function sign(payload, secret) {
   return toHex(sig);
 }
 
+// Comparaison en temps constant (évite de deviner une signature caractère par caractère).
+export function safeEqual(a, b) {
+  const enc = new TextEncoder();
+  const x = enc.encode(String(a));
+  const y = enc.encode(String(b));
+  let diff = x.length ^ y.length;
+  const len = Math.max(x.length, y.length);
+  for (let i = 0; i < len; i++) diff |= (x[i] ?? 0) ^ (y[i] ?? 0);
+  return diff === 0;
+}
+
 export async function createSessionCookieValue(env) {
   const expires = Date.now() + SESSION_HOURS * 60 * 60 * 1000;
   const payload = `admin.${expires}`;
@@ -36,7 +47,7 @@ async function verifyToken(token, env) {
   if (role !== "admin") return false;
   if (Date.now() > Number(expires)) return false;
   const expectedSig = await sign(`${role}.${expires}`, env.ADMIN_PASSWORD);
-  return sig === expectedSig;
+  return safeEqual(sig, expectedSig);
 }
 
 export async function isAdminAuthenticated(env) {
