@@ -24,7 +24,6 @@ export default function ProjetForm({ projet }) {
   const [form, setForm] = useState({
     titre: projet?.titre || "",
     slug: projet?.slug || "",
-    montant: projet?.montant || "",
     titre_accent: projet?.titre_accent || "",
     secteur: projet?.secteur || "sante",
     client: projet?.client || "",
@@ -143,10 +142,6 @@ export default function ProjetForm({ projet }) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>Montant (optionnel, non affiché publiquement)</label>
-        <input value={form.montant} onChange={(e) => update("montant", e.target.value)} className={inputClass} />
-      </div>
 
       <div className="flex flex-col gap-1.5">
         <label className={labelClass}>Résumé (aperçu sur les cartes)</label>
