@@ -16,7 +16,6 @@ CREATE TABLE IF NOT EXISTS projets (
   secteur TEXT NOT NULL,          -- sante | ia | education | gouvernance | local
   client TEXT,
   periode TEXT,
-  montant TEXT,
   resume TEXT,
   description TEXT,
   resultats TEXT,                 -- JSON: tableau de chaînes
