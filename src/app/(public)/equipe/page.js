@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "@/components/SiteImage";
 import { getMembres, getEquipeStats } from "@/lib/db";
 
 export const metadata = {
