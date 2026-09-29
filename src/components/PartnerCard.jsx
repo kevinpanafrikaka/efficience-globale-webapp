@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image from "@/components/SiteImage";
 
 // Carte partenaire (logo + nom au survol). `className` règle la taille selon le contexte.
 export default function PartnerCard({ partenaire, className = "" }) {
