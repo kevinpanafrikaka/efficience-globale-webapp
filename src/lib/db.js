@@ -35,6 +35,12 @@ export async function getProjetsRecents(limit = 6) {
   return results.map(parseProjet);
 }
 
+export async function countProjets() {
+  const db = await getDB();
+  const row = await db.prepare("SELECT COUNT(*) AS n FROM projets WHERE statut = 'publie'").first();
+  return row?.n ?? 0;
+}
+
 export async function getProjetBySlug(slug) {
   const db = await getDB();
   const row = await db
