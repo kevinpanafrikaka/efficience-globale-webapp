@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
+import { countMessagesNonLus } from "@/lib/db";
 import LoginForm from "@/components/admin/LoginForm";
 import LogoutButton from "@/components/admin/LogoutButton";
 import AdminNavLink from "@/components/admin/AdminNavLink";
@@ -17,6 +18,10 @@ const NAV = [
   { href: "/admin/projets", label: "Projets" },
   { href: "/admin/membres", label: "Membres" },
   { href: "/admin/annonces", label: "Annonces" },
+  { href: "/admin/partenaires", label: "Partenaires" },
+  { href: "/admin/messages", label: "Messages" },
+  { href: "/admin/medias", label: "Médias" },
+  { href: "/admin/reglages", label: "Réglages" },
   { href: "/admin/apercu", label: "Aperçu du site" },
 ];
 
@@ -33,6 +38,8 @@ export default async function AdminLayout({ children }) {
     );
   }
 
+  const messagesNonLus = await countMessagesNonLus();
+
   return (
     <div className="flex min-h-screen">
       <aside className="w-[220px] shrink-0 bg-darker px-3 py-6 flex flex-col justify-between">
@@ -46,7 +53,7 @@ export default async function AdminLayout({ children }) {
           />
           <nav className="flex flex-col gap-1">
             {NAV.map((item) => (
-              <AdminNavLink key={item.href} href={item.href}>
+              <AdminNavLink key={item.href} href={item.href} badge={item.href === "/admin/messages" ? messagesNonLus : 0}>
                 {item.label}
               </AdminNavLink>
             ))}

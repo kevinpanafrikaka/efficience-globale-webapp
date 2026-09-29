@@ -4,8 +4,8 @@ import SectionHead from "@/components/SectionHead";
 import DomainCard from "@/components/DomainCard";
 import RealisationTeaser from "@/components/RealisationTeaser";
 import Reveal from "@/components/Reveal";
-import { getProjetsRecents, getMembres } from "@/lib/db";
-import { equipeStats } from "@/data/team";
+import { getProjetsRecents, getMembres, getPartenaires, getEquipeStats } from "@/lib/db";
+import PartnerCard from "@/components/PartnerCard";
 import {
   IconBulb,
   IconChart,
@@ -19,21 +19,15 @@ import {
   IconTeam,
 } from "@/components/icons";
 
-const PARTENAIRES = [
-  { nom: "Gavi", logo: "partners/gavi-logo.png" },
-  { nom: "UNICEF", logo: "partners/unicef-logo.png" },
-  { nom: "Expertise France", logo: "partners/expertise-france-logo.png" },
-  { nom: "Banque Mondiale", logo: "partners/world-bank-logo.png" },
-  { nom: "Institut Français de Guinée", logo: "partners/institut-francais-logo-v2.png" },
-  { nom: "Université Kofi Annan", logo: "partners/kofi-annan-logo.png" },
-  { nom: "AGUIPEL", logo: null },
-  { nom: "Ministère de la Santé", logo: "partners/ministere-sante-logo.png" },
-];
-
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [projetsRecents, membres] = await Promise.all([getProjetsRecents(6), getMembres()]);
+  const [projetsRecents, membres, partenaires, equipeStats] = await Promise.all([
+    getProjetsRecents(6),
+    getMembres(),
+    getPartenaires(),
+    getEquipeStats(),
+  ]);
   const fondateur = membres[0];
 
   return (
@@ -372,30 +366,8 @@ export default async function HomePage() {
 
         <div className="partner-marquee-wrap">
           <div className="partner-marquee flex items-stretch gap-4 px-5 md:px-8">
-            {[...PARTENAIRES, ...PARTENAIRES].map((p, i) => (
-              <div
-                key={i}
-                className="partner-card relative flex-shrink-0 w-[190px] h-[124px] border border-line overflow-hidden"
-              >
-                <div className="w-full h-full flex items-center justify-center px-6">
-                  {p.logo ? (
-                    <Image
-                      src={`/img/${p.logo}`}
-                      alt={p.nom}
-                      width={160}
-                      height={90}
-                      className="max-h-[78px] w-auto object-contain"
-                    />
-                  ) : (
-                    <span className="text-[15px] font-bold tracking-[0.02em] text-dark-2 text-center">{p.nom}</span>
-                  )}
-                </div>
-                {p.logo && (
-                  <div className="partner-card-name absolute inset-x-0 bottom-0 h-9 bg-darker flex items-center justify-center px-2">
-                    <span className="text-white text-[11.5px] font-semibold text-center leading-tight">{p.nom}</span>
-                  </div>
-                )}
-              </div>
+            {[...partenaires, ...partenaires].map((p, i) => (
+              <PartnerCard key={i} partenaire={p} className="flex-shrink-0 w-[190px]" />
             ))}
           </div>
         </div>

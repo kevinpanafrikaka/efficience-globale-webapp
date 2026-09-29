@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { getProjets } from "@/lib/db";
+import { getProjets, getPartenaires } from "@/lib/db";
+import PartnerCard from "@/components/PartnerCard";
 
 export const metadata = {
   title: "Partenaires",
@@ -8,19 +9,11 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-const BAILLEURS = [
-  { nom: "Gavi", logo: "partners/gavi-logo.png" },
-  { nom: "UNICEF", logo: "partners/unicef-logo.png" },
-  { nom: "Expertise France", logo: "partners/expertise-france-logo.png" },
-  { nom: "Banque Mondiale", logo: "partners/world-bank-logo.png" },
-  { nom: "Institut Français de Guinée", logo: "partners/institut-francais-logo-v2.png" },
-  { nom: "Université Kofi Annan", logo: "partners/kofi-annan-logo.png" },
-  { nom: "AGUIPEL", logo: null },
-  { nom: "Ministère de la Santé", logo: "partners/ministere-sante-logo.png" },
-];
-
 export default async function PartenairesPage() {
-  const partenariats = await getProjets({ secteur: "partenariat" });
+  const [partenariats, bailleurs] = await Promise.all([
+    getProjets({ secteur: "partenariat" }),
+    getPartenaires(),
+  ]);
 
   return (
     <>
@@ -53,30 +46,11 @@ export default async function PartenairesPage() {
       <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
         <div className="flex items-baseline gap-3 mb-8">
           <div className="text-[12px] font-bold tracking-[0.1em] text-lime">BAILLEURS &amp; INSTITUTIONS</div>
-          <div className="text-[12px] text-ink-faint">{BAILLEURS.length} institutions partenaires actives</div>
+          <div className="text-[12px] text-ink-faint">{bailleurs.length} institutions partenaires actives</div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {BAILLEURS.map((p) => (
-            <div key={p.nom} className="partner-card relative h-[124px] border border-line overflow-hidden">
-              <div className="w-full h-full flex items-center justify-center px-6">
-                {p.logo ? (
-                  <Image
-                    src={`/img/${p.logo}`}
-                    alt={p.nom}
-                    width={160}
-                    height={90}
-                    className="max-h-[78px] w-auto object-contain"
-                  />
-                ) : (
-                  <span className="text-[15px] font-bold tracking-[0.02em] text-dark-2 text-center">{p.nom}</span>
-                )}
-              </div>
-              {p.logo && (
-                <div className="partner-card-name absolute inset-x-0 bottom-0 h-9 bg-darker flex items-center justify-center px-2">
-                  <span className="text-white text-[11.5px] font-semibold text-center leading-tight">{p.nom}</span>
-                </div>
-              )}
-            </div>
+          {bailleurs.map((p) => (
+            <PartnerCard key={p.id} partenaire={p} />
           ))}
         </div>
       </section>

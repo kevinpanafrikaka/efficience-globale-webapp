@@ -23,6 +23,8 @@ export default function ProjetForm({ projet }) {
 
   const [form, setForm] = useState({
     titre: projet?.titre || "",
+    slug: projet?.slug || "",
+    montant: projet?.montant || "",
     titre_accent: projet?.titre_accent || "",
     secteur: projet?.secteur || "sante",
     client: projet?.client || "",
@@ -90,6 +92,16 @@ export default function ProjetForm({ projet }) {
         />
       </div>
 
+      {isEdit && (
+        <div className="flex flex-col gap-1.5">
+          <label className={labelClass}>Adresse de la page (slug)</label>
+          <input value={form.slug} onChange={(e) => update("slug", e.target.value)} className={inputClass} />
+          <p className="text-[12px] text-ink-faint">
+            /realisations/{form.slug || "…"} — modifier ce champ change le lien public du projet.
+          </p>
+        </div>
+      )}
+
       <div className="flex flex-col gap-1.5">
         <label className={labelClass}>Mot en italique (optionnel)</label>
         <input
@@ -129,6 +141,11 @@ export default function ProjetForm({ projet }) {
           <label className={labelClass}>Période</label>
           <input value={form.periode} onChange={(e) => update("periode", e.target.value)} className={inputClass} />
         </div>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label className={labelClass}>Montant (optionnel, non affiché publiquement)</label>
+        <input value={form.montant} onChange={(e) => update("montant", e.target.value)} className={inputClass} />
       </div>
 
       <div className="flex flex-col gap-1.5">

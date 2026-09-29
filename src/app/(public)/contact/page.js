@@ -1,12 +1,17 @@
 import Image from "next/image";
 import ContactForm from "@/components/ContactForm";
+import { getReglages } from "@/lib/db";
 
 export const metadata = {
   title: "Contact",
   description: "Discutons de votre prochain projet avec Efficience Globale : gouvernance, digitalisation, intelligence artificielle.",
 };
 
-export default function ContactPage() {
+export const dynamic = "force-dynamic";
+
+export default async function ContactPage() {
+  const reglages = await getReglages();
+  const telHref = `tel:${reglages.telephone.replace(/[^\d+]/g, "")}`;
   return (
     <>
       <section className="relative overflow-hidden">
@@ -39,7 +44,7 @@ export default function ContactPage() {
         <div className="grid md:grid-cols-[1.3fr_1fr] gap-12 md:gap-16">
           <div>
             <div className="text-[12px] font-bold tracking-[0.1em] text-lime mb-6">ENVOYEZ-NOUS UN MESSAGE</div>
-            <ContactForm />
+            <ContactForm emailContact={reglages.email} />
           </div>
 
           <div className="bg-cream border border-line p-6 md:p-8 h-fit">
@@ -54,11 +59,11 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <div className="text-[12px] font-semibold text-ink-faint mb-0.5">ADRESSE</div>
-                  <div className="text-[14.5px] text-dark">Camayenne, Conakry, Guinée</div>
+                  <div className="text-[14.5px] text-dark">{reglages.adresse}</div>
                 </div>
               </div>
 
-              <a href="mailto:oumar.camara@efficienceglobale.com" className="flex items-start gap-3.5 group">
+              <a href={`mailto:${reglages.email}`} className="flex items-start gap-3.5 group">
                 <div className="w-9 h-9 rounded-lg bg-white border border-line flex items-center justify-center text-lime shrink-0 transition-colors group-hover:border-lime">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                     <rect x="3" y="5" width="18" height="14" rx="2" />
@@ -68,12 +73,12 @@ export default function ContactPage() {
                 <div>
                   <div className="text-[12px] font-semibold text-ink-faint mb-0.5">EMAIL</div>
                   <div className="text-[14.5px] text-dark group-hover:text-lime transition-colors">
-                    oumar.camara@efficienceglobale.com
+                    {reglages.email}
                   </div>
                 </div>
               </a>
 
-              <a href="tel:+224626852951" className="flex items-start gap-3.5 group">
+              <a href={telHref} className="flex items-start gap-3.5 group">
                 <div className="w-9 h-9 rounded-lg bg-white border border-line flex items-center justify-center text-lime shrink-0 transition-colors group-hover:border-lime">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                     <path d="M4 4h4l2 5-2.5 1.5a12 12 0 0 0 6 6L15 14l5 2v4a2 2 0 0 1-2 2C9.5 22 2 14.5 2 6a2 2 0 0 1 2-2z" />
@@ -82,7 +87,7 @@ export default function ContactPage() {
                 <div>
                   <div className="text-[12px] font-semibold text-ink-faint mb-0.5">TÉLÉPHONE</div>
                   <div className="text-[14.5px] text-dark group-hover:text-lime transition-colors">
-                    +224 626 852 951
+                    {reglages.telephone}
                   </div>
                 </div>
               </a>

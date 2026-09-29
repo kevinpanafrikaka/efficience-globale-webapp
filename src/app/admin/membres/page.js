@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getAllMembres } from "@/lib/db";
 import DeleteButton from "@/components/admin/DeleteButton";
+import ReorderButtons from "@/components/admin/ReorderButtons";
 
 export default async function AdminMembresPage() {
   const membres = await getAllMembres();
@@ -21,7 +22,7 @@ export default async function AdminMembresPage() {
         <p className="text-[14.5px] text-ink-soft">Aucun membre pour le moment.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {membres.map((m) => (
+          {membres.map((m, i) => (
             <div key={m.id} className="border border-line rounded-lg overflow-hidden flex flex-col bg-white">
               <div className="relative h-44 bg-cream">
                 {m.photo_url ? (
@@ -44,13 +45,16 @@ export default async function AdminMembresPage() {
                 <h3 className="text-[15px] font-semibold text-dark leading-snug">{m.nom}</h3>
                 <div className="text-[12.5px] text-ink-faint">{m.role || "—"}</div>
                 <div className="mt-auto flex items-center justify-between pt-3 border-t border-line">
-                  <Link
-                    href={`/admin/membres/${m.id}/modifier`}
-                    className="text-[12.5px] font-semibold text-dark-2 hover:text-lime transition-colors"
-                  >
-                    Modifier
-                  </Link>
-                  <DeleteButton endpoint={`/api/admin/membres/${m.id}`} confirmMessage={`Supprimer "${m.nom}" ?`} />
+                  <ReorderButtons table="membres" id={m.id} prevId={membres[i - 1]?.id} nextId={membres[i + 1]?.id} />
+                  <div className="flex items-center gap-4">
+                    <Link
+                      href={`/admin/membres/${m.id}/modifier`}
+                      className="text-[12.5px] font-semibold text-dark-2 hover:text-lime transition-colors"
+                    >
+                      Modifier
+                    </Link>
+                    <DeleteButton endpoint={`/api/admin/membres/${m.id}`} confirmMessage={`Supprimer "${m.nom}" ?`} />
+                  </div>
                 </div>
               </div>
             </div>

@@ -1,6 +1,5 @@
 import Image from "next/image";
-import { getMembres } from "@/lib/db";
-import { equipeStats } from "@/data/team";
+import { getMembres, getEquipeStats } from "@/lib/db";
 
 export const metadata = {
   title: "Équipe",
@@ -10,7 +9,7 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function EquipePage() {
-  const membres = await getMembres();
+  const [membres, equipeStats] = await Promise.all([getMembres(), getEquipeStats()]);
   const [fondateur, ...autres] = membres;
 
   return (

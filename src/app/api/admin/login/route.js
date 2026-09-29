@@ -1,14 +1,26 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { createSessionCookieValue, COOKIE_NAME } from "@/lib/adminAuth";
+import { createSessionCookieValue, safeEqual, COOKIE_NAME } from "@/lib/adminAuth";
+import { isLoginBlocked, recordFailedLogin, clearFailedLogins } from "@/lib/loginThrottle";
 
 export async function POST(request) {
   const { env } = await getCloudflareContext({ async: true });
+  const ip = request.headers.get("cf-connecting-ip") || request.headers.get("x-forwarded-for") || "inconnue";
+
+  if (await isLoginBlocked(ip)) {
+    return Response.json(
+      { error: "Trop de tentatives. Réessayez dans quelques minutes." },
+      { status: 429, headers: { "Retry-After": "900" } }
+    );
+  }
+
   const { password } = await request.json();
 
-  if (!password || password !== env.ADMIN_PASSWORD) {
+  if (!password || !env.ADMIN_PASSWORD || !safeEqual(password, env.ADMIN_PASSWORD)) {
+    await recordFailedLogin(ip);
     return Response.json({ error: "Mot de passe incorrect." }, { status: 401 });
   }
 
+  await clearFailedLogins(ip);
   const value = await createSessionCookieValue(env);
   const headers = new Headers();
   headers.append(

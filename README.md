@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Efficience Globale — site & espace admin
 
-## Getting Started
+Site vitrine (Next.js 16, App Router) déployé sur Cloudflare Workers via OpenNext, avec un espace
+d'administration (`/admin`) pour gérer le contenu.
 
-First, run the development server:
+## Stack
+- **Next.js 16 / React 19 / Tailwind 4**, déploiement `@opennextjs/cloudflare`
+- **D1** (binding `DB`) : projets, membres, annonces, partenaires, messages, réglages
+- **R2** (binding `UPLOADS`, bucket `eguploads`) : images envoyées depuis l'admin, servies par `/uploads/...`
+- **Resend** : notification email des messages du formulaire de contact
 
+## Secrets / variables
+| Nom | Rôle |
+|---|---|
+| `ADMIN_PASSWORD` | mot de passe de l'admin (sert aussi à signer le cookie de session) |
+| `RESEND_API_KEY` | envoi de la notification email (optionnel : les messages sont de toute façon enregistrés) |
+
+En local, créer un fichier `.dev.vars` (ignoré par git) : `ADMIN_PASSWORD=...`.
+
+## Base de données
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Nouvelle base
+wrangler d1 execute efficience-globale-db --remote --file=schema.sql
+wrangler d1 execute efficience-globale-db --remote --file=seed.sql
+wrangler d1 execute efficience-globale-db --remote --file=migrations/001_admin_completion.sql
+
+# Base existante : appliquer seulement les migrations manquantes
+wrangler d1 execute efficience-globale-db --remote --file=migrations/001_admin_completion.sql
 ```
+Utiliser `--local` à la place de `--remote` pour la base de développement. Les migrations sont idempotentes.
+Tant que la migration 001 n'est pas appliquée, le site public retombe sur des valeurs par défaut (partenaires,
+coordonnées) et les écrans concernés de l'admin l'indiquent.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Espace admin
+Tableau de bord, projets, membres, annonces, **partenaires**, **messages** (formulaire de contact),
+**médias** (images R2), **réglages** (coordonnées, réseaux sociaux, destinataire des emails, chiffres de l'équipe).
+Les projets, membres et partenaires se réordonnent avec les boutons ↑ / ↓. Le login est limité à 5 échecs par
+15 minutes et par IP.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Développement
+```bash
+npm install
+npm run dev        # http://localhost:3000
+npm run lint
+npm run preview    # build OpenNext + aperçu Workers
+npm run deploy
+```
