@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "@/components/SiteImage";
 import { memberOffset, wrapMember } from "@/lib/team-carousel.mjs";
 import "./team-gallery.css";
@@ -18,9 +18,37 @@ export default function TeamGallery({ members }) {
   const [selected, setSelected] = useState(0);
   const gesture = useRef(null);
   const ignoreClick = useRef(false);
+  const [playing, setPlaying] = useState(true);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [pageVisible, setPageVisible] = useState(true);
+  const carousel = members.length > 1;
+  const activeIndex = wrapMember(selected, members.length);
+  const autoRunning = carousel && playing && !hovered && !focused && !reducedMotion && pageVisible;
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const motionChanged = () => setReducedMotion(media.matches);
+    const visibilityChanged = () => setPageVisible(!document.hidden);
+    motionChanged();
+    visibilityChanged();
+    media.addEventListener("change", motionChanged);
+    document.addEventListener("visibilitychange", visibilityChanged);
+    return () => {
+      media.removeEventListener("change", motionChanged);
+      document.removeEventListener("visibilitychange", visibilityChanged);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!autoRunning) return;
+    const timer = window.setTimeout(() => setSelected((index) => wrapMember(index + 1, members.length)), 5000);
+    return () => window.clearTimeout(timer);
+  }, [autoRunning, selected, members.length]);
+
   if (!members.length) return <p className="text-ink-soft py-12">Les portraits de notre équipe seront bientôt disponibles.</p>;
-  const active = members[selected];
-  const carousel = members.length >= 4;
+  const active = members[activeIndex];
   function move(direction) { setSelected((index) => wrapMember(index + direction, members.length)); }
   function handleKey(event) {
     if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
@@ -41,19 +69,23 @@ export default function TeamGallery({ members }) {
   }
 
   return (
-    <div className="team-gallery" onKeyDown={handleKey}>
+    <div className="team-gallery" onKeyDown={handleKey}
+      onPointerEnter={(event) => { if (event.pointerType === "mouse") setHovered(true); }}
+      onPointerLeave={() => setHovered(false)}
+      onFocusCapture={() => setFocused(true)}
+      onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
       <div className={carousel ? "team-stage" : "team-grid"} role="group"
         aria-label={carousel ? "Portraits de l’équipe, utilisez les flèches pour naviguer" : "Choisir un membre de l’équipe"}
         onPointerDown={(event) => { ignoreClick.current = false; gesture.current = { x: event.clientX, y: event.clientY }; }}
         onPointerUp={finishGesture} onPointerCancel={() => { gesture.current = null; }}>
         {members.map((member, index) => {
-          const offset = carousel ? memberOffset(index, selected, members.length) : 0;
+          const offset = carousel ? memberOffset(index, activeIndex, members.length) : 0;
           const hidden = carousel && Math.abs(offset) > 1;
           return (
             <button key={member.id} type="button"
-              className={`team-card ${selected === index ? "is-selected" : ""}`}
+              className={`team-card ${activeIndex === index ? "is-selected" : ""}`}
               style={carousel ? { "--offset": offset, "--depth": Math.abs(offset), zIndex: members.length - Math.abs(offset) } : undefined}
-              aria-pressed={selected === index} aria-controls="team-biography" aria-hidden={hidden || undefined}
+              aria-pressed={activeIndex === index} aria-controls="team-biography" aria-hidden={hidden || undefined}
               tabIndex={hidden ? -1 : 0} onClick={() => {
                 if (ignoreClick.current) { ignoreClick.current = false; return; }
                 setSelected(index);
@@ -64,7 +96,7 @@ export default function TeamGallery({ members }) {
                 <span className="team-card-name">{member.nom}</span>
                 {member.role && <span className="team-card-role">{member.role}</span>}
               </span>
-              <span className="team-card-mark" aria-hidden="true">{selected === index ? "−" : "+"}</span>
+              <span className="team-card-mark" aria-hidden="true">{activeIndex === index ? "−" : "+"}</span>
             </button>
           );
         })}
@@ -72,11 +104,15 @@ export default function TeamGallery({ members }) {
 
       {carousel && <div className="team-controls">
         <button type="button" onClick={() => move(-1)} aria-label="Membre précédent">←</button>
-        <span className="tabular-nums" aria-label={`Membre ${selected + 1} sur ${members.length}`}>{String(selected + 1).padStart(2, "0")} <span aria-hidden="true">/</span> {String(members.length).padStart(2, "0")}</span>
+        <span className="tabular-nums" aria-label={`Membre ${activeIndex + 1} sur ${members.length}`}>{String(activeIndex + 1).padStart(2, "0")} <span aria-hidden="true">/</span> {String(members.length).padStart(2, "0")}</span>
         <button type="button" onClick={() => move(1)} aria-label="Membre suivant">→</button>
+        {!reducedMotion && <button type="button" className="team-play-toggle" onClick={() => setPlaying((value) => !value)}
+          aria-label={playing ? "Mettre en pause le défilement automatique" : "Reprendre le défilement automatique"}>
+          {playing ? "Pause" : "Reprendre"}
+        </button>}
       </div>}
 
-      <div id="team-biography" className="team-biography" role="region" aria-label="Biographie du membre sélectionné" aria-live="polite" aria-atomic="true">
+      <div id="team-biography" className="team-biography" role="region" aria-label="Biographie du membre sélectionné" aria-live={autoRunning ? "off" : "polite"} aria-atomic="true">
         <div key={active.id} className="team-biography-content">
           <div>
             <p className="team-bio-eyebrow">RENCONTRER NOTRE ÉQUIPE</p>

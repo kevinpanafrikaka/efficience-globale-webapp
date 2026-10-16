@@ -1,5 +1,5 @@
 .team-gallery { margin-top: 44px; }
-.team-grid { display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 28px; }
+.team-grid { display: flex; flex-wrap: nowrap; justify-content: center; align-items: stretch; gap: 28px; }
 .team-card { position: relative; display: block; flex: 0 1 360px; width: 100%; aspect-ratio: 4 / 5; overflow: hidden; border: 1px solid #ffffff26; border-radius: 18px; text-align: left; background: #334b3c; cursor: pointer; box-shadow: 0 18px 48px #00000026; transition: transform .65s cubic-bezier(.22,.68,0,1), border-color .3s, opacity .5s, box-shadow .3s; }
 .team-card.is-selected { border-color: var(--lime-2); box-shadow: 0 0 0 2px #9ccc6540, 0 22px 50px #00000033; }
 .team-portrait { object-fit: cover; object-position: center 25%; transition: transform .7s ease; }
@@ -49,3 +49,6 @@
 .team-gallery-body .team-controls { color: var(--ink-soft); }
 .team-gallery-body .team-controls button { border-color: var(--line); color: var(--dark); background: var(--cream); }
 .team-gallery-body .team-controls button:hover { background: #e7ece3; }
+
+.team-controls { flex-wrap: wrap; gap: 18px; }
+.team-controls .team-play-toggle { width: auto; padding: 0 18px; font-size: 13px; font-weight: 600; }
