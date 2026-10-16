@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Image from "@/components/SiteImage";
 import TeamGallery from "@/components/TeamGallery";
 import { getMembres } from "@/lib/db";
@@ -39,13 +38,6 @@ export default async function EquipePage() {
         <div className="max-w-6xl mx-auto px-5 md:px-8 pt-12 md:pt-16 pb-8 md:pb-12">
           <TeamGallery members={membres} />
         </div>
-      </section>
-      <section className="max-w-6xl mx-auto px-5 md:px-8 py-12 md:py-16 grid md:grid-cols-[1fr_auto] gap-7 items-center">
-        <div className="max-w-xl">
-          <h2 className="text-[28px] md:text-[34px] leading-tight mb-3">Des compétences qui se complètent.</h2>
-          <p className="text-ink-soft text-base leading-relaxed">Gouvernance, suivi-évaluation, digitalisation et intelligence artificielle : notre collectif réunit les expertises nécessaires pour accompagner vos projets, de la réflexion à l’action.</p>
-        </div>
-        <Link href="/contact" className="inline-flex w-fit items-center justify-center rounded bg-dark px-6 py-3.5 text-white text-sm font-semibold hover:bg-dark-2">Échangeons sur votre projet <span aria-hidden="true" className="ml-4">↗</span></Link>
       </section>
     </>
   );
