@@ -1,0 +1,41 @@
+.team-gallery { margin-top: 44px; }
+.team-grid { display: flex; flex-wrap: wrap; justify-content: center; align-items: stretch; gap: 28px; }
+.team-card { position: relative; display: block; flex: 0 1 360px; width: 100%; aspect-ratio: 4 / 5; overflow: hidden; border: 1px solid #ffffff26; border-radius: 18px; text-align: left; background: #334b3c; cursor: pointer; box-shadow: 0 18px 48px #00000026; transition: transform .65s cubic-bezier(.22,.68,0,1), border-color .3s, opacity .5s, box-shadow .3s; }
+.team-card.is-selected { border-color: var(--lime-2); box-shadow: 0 0 0 2px #9ccc6540, 0 22px 50px #00000033; }
+.team-portrait { object-fit: cover; object-position: center 25%; transition: transform .7s ease; }
+.team-card-shade { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 40%, #0c1b1480 65%, #0c1b14f5 100%); }
+.team-card-caption { position: absolute; bottom: 28px; left: 25px; right: 48px; display: grid; gap: 7px; color: white; }
+.team-card-name { font-family: var(--font-head), Georgia, serif; font-size: clamp(22px, 2.2vw, 29px); font-weight: 600; line-height: 1.18; }
+.team-card-role { color: #d9edc4; font-size: 14px; line-height: 1.4; }
+.team-card-mark { position: absolute; top: 18px; right: 18px; width: 32px; height: 32px; display: grid; place-items: center; border: 1px solid #ffffff60; background: #16211a66; border-radius: 50%; color: white; font-size: 20px; }
+.team-initials { display: grid; place-items: center; height: 100%; color: #9ccc65; font-family: var(--font-head), Georgia, serif; font-size: 85px; background: radial-gradient(ellipse at top right, #57755a, #1b3024); }
+.team-stage { position: relative; height: 440px; perspective: 1100px; touch-action: pan-y; }
+.team-stage .team-card { position: absolute; left: 50%; top: 0; width: 330px; height: 412px; transform: translateX(calc(-50% + var(--offset) * 106%)) translateZ(calc(var(--depth) * -90px)) rotateY(calc(var(--offset) * -10deg)) scale(calc(1 - var(--depth) * .08)); opacity: calc(1 - var(--depth) * .25); }
+.team-stage .team-card[aria-hidden="true"] { visibility: hidden; opacity: 0; pointer-events: none; }
+.team-controls { display: flex; justify-content: center; align-items: center; gap: 24px; color: #d9edc4; font-size: 13px; }
+.team-controls button { width: 46px; height: 46px; border: 1px solid #ffffff45; border-radius: 50%; color: white; font-size: 23px; transition: background .2s; }
+.team-controls button:hover { background: #ffffff18; }
+.team-biography { max-width: 850px; margin: 42px auto 0; padding-top: 30px; border-top: 1px solid #ffffff26; min-height: 185px; }
+.team-biography-content { display: grid; grid-template-columns: 1fr 1.3fr; gap: 35px; animation: team-bio-in .35s ease-out; }
+.team-bio-eyebrow { font-size: 10px; letter-spacing: .14em; color: #9ccc65; margin-bottom: 12px; }
+.team-biography h2 { color: white; font-size: 27px; line-height: 1.2; margin-bottom: 8px; }
+.team-bio-role { color: #c6d8bb; font-size: 14px; }
+.team-bio-text { color: #d2dcd0; font-size: 16px; line-height: 1.8; white-space: pre-line; }
+@keyframes team-bio-in { from { opacity: .3; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@media (hover: hover) and (pointer: fine) {
+  .team-card:hover .team-portrait { transform: scale(1.035); }
+}
+@media (max-width: 767px) {
+  .team-gallery { margin-top: 30px; }
+  .team-grid { flex-wrap: nowrap; justify-content: flex-start; gap: 18px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 3px 18px; }
+  .team-grid .team-card { flex: 0 0 85%; max-width: 340px; scroll-snap-align: center; }
+  .team-grid:has(.team-card:only-child) { justify-content: center; }
+  .team-stage { height: min(107vw, 420px); }
+  .team-stage .team-card { width: min(72vw, 310px); height: auto; }
+  .team-biography-content { grid-template-columns: 1fr; gap: 18px; }
+  .team-biography { min-height: 0; margin-top: 30px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .team-card, .team-portrait, .team-controls button { transition: none; }
+  .team-biography-content { animation: none; }
+}
