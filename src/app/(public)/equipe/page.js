@@ -16,7 +16,7 @@ export default async function EquipePage() {
     <>
       <section className="relative overflow-hidden bg-darker">
         <div className="absolute inset-0">
-          <Image src="/img/hero-conakry.jpg" alt="" fill className="object-cover object-top" sizes="100vw" priority />
+          <Image src="/img/hero-equipe.webp" alt="" fill className="object-cover object-center" sizes="100vw" priority />
           <div
             className="absolute inset-0"
             style={{ background: "linear-gradient(90deg, rgba(13,19,14,0.88) 0%, rgba(13,19,14,0.55) 45%, rgba(13,19,14,0.3) 100%)" }}
