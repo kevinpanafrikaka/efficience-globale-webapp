@@ -36,7 +36,7 @@ export default async function HomePage() {
       {/* HERO — photo plein cadre en fond, stats intégrées en bas */}
       <section className="home-hero relative overflow-hidden">
         <div className="absolute inset-0">
-          <Image src="/img/hero-conakry.jpg" alt="" fill className="object-cover" priority />
+          <Image src="/img/hero-conakry.jpg" alt="" fill className="object-cover object-right" priority />
           <div
             className="absolute inset-0"
             style={{
