@@ -33,7 +33,7 @@ export default function ContactForm({ emailContact }) {
 
   if (status === "success") {
     return (
-      <div className="border border-lime bg-cream p-6">
+      <div role="status" className="border border-lime bg-cream p-6">
         <p className="text-[16px] text-dark mb-1.5">Message envoyé</p>
         <p className="text-[13.5px] text-ink-soft">Nous vous répondrons dès que possible.</p>
       </div>
@@ -41,7 +41,7 @@ export default function ContactForm({ emailContact }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form aria-busy={status === "sending"} onSubmit={handleSubmit} className="flex flex-col gap-4">
       {/* Champ piège anti-spam : invisible pour les humains, rempli par les robots. */}
       <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
         <label htmlFor="site_web">Ne pas remplir</label>
@@ -99,7 +99,7 @@ export default function ContactForm({ emailContact }) {
         />
       </div>
 
-      {status === "error" && <p className="text-[13.5px] text-red-600">{errorMsg}</p>}
+      {status === "error" && <p role="alert" className="text-[13.5px] text-red-600">{errorMsg}</p>}
 
       <button
         type="submit"

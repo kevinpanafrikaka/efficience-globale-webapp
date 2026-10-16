@@ -34,14 +34,14 @@ export default async function HomePage() {
   return (
     <>
       {/* HERO — photo plein cadre en fond, stats intégrées en bas */}
-      <section className="relative overflow-hidden">
+      <section className="home-hero relative overflow-hidden">
         <div className="absolute inset-0">
           <Image src="/img/hero-conakry.jpg" alt="" fill className="object-cover" priority />
           <div
             className="absolute inset-0"
             style={{
               background:
-                "linear-gradient(90deg, rgba(13,19,14,0.65) 0%, rgba(13,19,14,0.3) 42%, rgba(13,19,14,0.1) 100%)",
+                "linear-gradient(90deg, rgba(13,19,14,0.9) 0%, rgba(13,19,14,0.65) 55%, rgba(13,19,14,0.25) 100%)",
             }}
           />
           <div
@@ -51,9 +51,10 @@ export default async function HomePage() {
         </div>
 
         <div className="relative max-w-6xl mx-auto px-5 md:px-8 pt-16 pb-14 md:pt-28 md:pb-0">
-          <div className="max-w-xl">
-            <h1 className="text-[40px] leading-[1.02] md:text-[60px] md:leading-[1.0] tracking-[-0.02em] text-white mb-7">
-              Des solutions <span className="text-lime italic">stratégiques</span> pour un impact durable en Afrique de l&apos;Ouest
+          <div className="max-w-2xl">
+            <p className="hero-eyebrow"><span aria-hidden="true" />CONAKRY · AFRIQUE DE L’OUEST</p>
+            <h1 className="text-[40px] leading-[1.08] md:text-[64px] md:leading-[1.06] tracking-[-0.02em] text-white mb-7">
+              Des solutions <span className="text-lime-2 italic">stratégiques</span> pour un impact durable en Afrique de l&apos;Ouest
             </h1>
             <p className="text-[16px] md:text-[17.5px] leading-relaxed text-[#d3ddce] mb-9 max-w-md">
               Nous accompagnons institutions publiques, bailleurs internationaux et entreprises en Guinée et dans la
@@ -65,7 +66,7 @@ export default async function HomePage() {
                 href="/realisations"
                 className="inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
               >
-                Découvrir nos réalisations
+                Découvrir nos réalisations <span aria-hidden="true" className="ml-3">↗</span>
               </Link>
               <Link
                 href="/contact"
@@ -99,6 +100,19 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      <nav aria-label="Explorer notre expertise" className="expertise-strip">
+        <div className="max-w-6xl mx-auto px-5 md:px-8 flex flex-wrap items-center gap-x-8 gap-y-3 py-5">
+          <span className="text-xs font-semibold tracking-widest text-ink-soft">VOTRE BESOIN</span>
+          {[
+            ["Gouvernance & stratégie", "/services"],
+            ["Digitalisation & IA", "/domaines"],
+            ["Renforcement des capacités", "/services"],
+          ].map(([label, href]) => (
+            <Link key={label} href={href} className="text-sm font-semibold text-dark hover:underline underline-offset-4">{label} <span aria-hidden="true">↗</span></Link>
+          ))}
+        </div>
+      </nav>
 
       {/* A PROPOS (résumé) */}
       <section className="bg-white max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
