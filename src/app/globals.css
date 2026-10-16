@@ -308,9 +308,6 @@
 }
 .skip-link { position: fixed; top: 8px; left: 16px; z-index: 100; padding: 12px 20px; background: white; color: var(--dark); border: 2px solid var(--teal); transform: translateY(-160%); }
 .skip-link:focus { transform: translateY(0); }
-.hero-eyebrow { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; color: #e2edda; font-size: 11px; font-weight: 600; letter-spacing: .16em; }
-.hero-eyebrow span { width: 28px; height: 2px; background: var(--lime-2); }
-.expertise-strip { background: var(--cream); border-bottom: 1px solid var(--line); }
 .home-hero { background: var(--darker); }
 @media (max-width: 640px) {
   .home-hero h1 { font-size: clamp(34px, 9vw, 44px); }

@@ -52,7 +52,6 @@ export default async function HomePage() {
 
         <div className="relative max-w-6xl mx-auto px-5 md:px-8 pt-16 pb-14 md:pt-28 md:pb-0">
           <div className="max-w-2xl">
-            <p className="hero-eyebrow"><span aria-hidden="true" />CONAKRY · AFRIQUE DE L’OUEST</p>
             <h1 className="text-[40px] leading-[1.08] md:text-[64px] md:leading-[1.06] tracking-[-0.02em] text-white mb-7">
               Des solutions <span className="text-lime-2 italic">stratégiques</span> pour un impact durable en Afrique de l&apos;Ouest
             </h1>
@@ -100,19 +99,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      <nav aria-label="Explorer notre expertise" className="expertise-strip">
-        <div className="max-w-6xl mx-auto px-5 md:px-8 flex flex-wrap items-center gap-x-8 gap-y-3 py-5">
-          <span className="text-xs font-semibold tracking-widest text-ink-soft">VOTRE BESOIN</span>
-          {[
-            ["Gouvernance & stratégie", "/services"],
-            ["Digitalisation & IA", "/domaines"],
-            ["Renforcement des capacités", "/services"],
-          ].map(([label, href]) => (
-            <Link key={label} href={href} className="text-sm font-semibold text-dark hover:underline underline-offset-4">{label} <span aria-hidden="true">↗</span></Link>
-          ))}
-        </div>
-      </nav>
 
       {/* A PROPOS (résumé) */}
       <section className="bg-white max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
