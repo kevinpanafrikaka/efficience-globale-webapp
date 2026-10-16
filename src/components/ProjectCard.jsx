@@ -27,6 +27,7 @@ export default function ProjectCard({ projet }) {
           {projet.titre}
         </h3>
         <p className="text-[13.5px] text-ink-soft leading-relaxed flex-1">{projet.resume}</p>
+        <span className="text-sm font-semibold text-dark mt-2">Découvrir le projet <span aria-hidden="true">↗</span></span>
       </div>
     </Link>
   );

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const NAV_LINKS = [
   { href: "/", label: "Accueil" },
@@ -20,21 +20,58 @@ const NAV_LINKS = [
 export default function Header() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const toggleRef = useRef(null);
+  const panelRef = useRef(null);
+  const isActive = (href) => href === "/" ? pathname === "/" : pathname === href || pathname?.startsWith(`${href}/`);
+
+  useEffect(() => {
+    if (!open) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    panelRef.current?.querySelector("a")?.focus();
+    function closeMenu() {
+      setOpen(false);
+      toggleRef.current?.focus();
+    }
+    function handleKey(event) {
+      if (event.key === "Escape") closeMenu();
+      if (event.key !== "Tab") return;
+      const links = [...panelRef.current.querySelectorAll("a"), toggleRef.current];
+      const index = links.indexOf(document.activeElement);
+      if (event.shiftKey && index <= 0) {
+        event.preventDefault();
+        links.at(-1).focus();
+      } else if (!event.shiftKey && index === links.length - 1) {
+        event.preventDefault();
+        links[0].focus();
+      }
+    }
+    const desktop = window.matchMedia("(min-width: 1280px)");
+    const handleResize = () => { if (desktop.matches) closeMenu(); };
+    document.addEventListener("keydown", handleKey);
+    desktop.addEventListener("change", handleResize);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKey);
+      desktop.removeEventListener("change", handleResize);
+    };
+  }, [open]);
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-line safe-top">
-      <div className="max-w-7xl mx-auto px-5 md:px-8 h-[72px] flex items-center gap-8">
+      <div className="max-w-7xl mx-auto px-5 md:px-8 h-[72px] flex items-center gap-5 justify-between">
         <Link href="/" className="flex items-center shrink-0" aria-label="Efficience Globale — Accueil">
           <Image src="/img/logo-eg.png" alt="Efficience Globale" width={160} height={52} className="h-9 w-auto" priority />
         </Link>
 
-        <nav className="hidden xl:flex flex-1 items-center justify-end gap-6 2xl:gap-8 text-[15px] font-semibold">
+        <nav aria-label="Navigation principale" className="hidden xl:flex flex-1 items-center justify-end gap-6 2xl:gap-8 text-[15px] font-semibold">
           {NAV_LINKS.map((l) => {
-            const active = l.href === "/" ? pathname === "/" : pathname === l.href || pathname?.startsWith(`${l.href}/`);
+            const active = isActive(l.href);
             return (
               <Link
                 key={l.href}
                 href={l.href}
+                aria-current={active ? "page" : undefined}
                 className={`whitespace-nowrap border-b-2 pb-1 transition-colors ${
                   active ? "border-lime text-dark" : "border-transparent text-ink-soft hoverable"
                 }`}
@@ -47,7 +84,9 @@ export default function Header() {
 
         <button
           type="button"
-          aria-label="Ouvrir le menu"
+          ref={toggleRef}
+          aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-controls="mobile-navigation"
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
           className="xl:hidden p-2 -mr-2"
@@ -64,12 +103,13 @@ export default function Header() {
       </div>
 
       {open && (
-        <div className="xl:hidden fixed inset-x-0 top-[72px] bottom-0 bg-white overflow-y-auto safe-bottom">
-          <nav className="flex flex-col px-5">
+        <div ref={panelRef} id="mobile-navigation" className="xl:hidden fixed inset-x-0 top-[calc(72px+env(safe-area-inset-top,0px))] bottom-0 bg-white overflow-y-auto safe-bottom">
+          <nav aria-label="Navigation mobile" className="flex flex-col px-5">
             {NAV_LINKS.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
+                aria-current={isActive(l.href) ? "page" : undefined}
                 onClick={() => setOpen(false)}
                 className="py-4 text-[17px] font-semibold text-dark border-b border-line active:bg-cream"
               >
