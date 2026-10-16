@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "@/components/SiteImage";
+import { expertiseTags } from "@/lib/member-expertises.mjs";
 import { memberOffset, wrapMember } from "@/lib/team-carousel.mjs";
 import "./team-gallery.css";
 
@@ -110,12 +111,21 @@ export default function TeamGallery({ members }) {
         </button>}
       </div>}
 
+      {carousel && <div className={`team-progress ${autoRunning ? "is-running" : ""}`} aria-hidden="true">
+        <span key={`${active.id}-${autoRunning}`} />
+      </div>}
+
       <div id="team-biography" className="team-biography" role="region" aria-label="Biographie du membre sélectionné" aria-live={autoRunning ? "off" : "polite"} aria-atomic="true">
         <div key={active.id} className="team-biography-content">
           <div>
             <p className="team-bio-eyebrow">RENCONTRER NOTRE ÉQUIPE</p>
             <h2>{active.nom}</h2>
             {active.role && <p className="team-bio-role">{active.role}</p>}
+            {expertiseTags(active.expertises).length > 0 && (
+              <ul className="team-expertises" aria-label="Domaines d’expertise">
+                {expertiseTags(active.expertises).map((tag) => <li key={tag}>{tag}</li>)}
+              </ul>
+            )}
           </div>
           <p className="team-bio-text">{active.bio || "Découvrez prochainement le parcours de ce membre de notre équipe."}</p>
         </div>

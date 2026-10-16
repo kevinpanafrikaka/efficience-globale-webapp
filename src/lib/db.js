@@ -1,3 +1,4 @@
+import { expertiseTags } from "@/lib/member-expertises.mjs";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { equipeStats as equipeStatsParDefaut } from "@/data/team";
 
@@ -192,10 +193,10 @@ export async function createMembre(data) {
   const id = await uniqueId(db, "membres", slugify(data.nom));
   await db
     .prepare(
-      `INSERT INTO membres (id, nom, role, bio, photo_url, ordre_affichage, statut)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
+      `INSERT INTO membres (id, nom, role, bio, photo_url, ordre_affichage, statut, expertises)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
     )
-    .bind(id, data.nom, data.role || null, data.bio || null, data.photo_url || null, data.ordre_affichage ?? 0, data.statut || "brouillon")
+    .bind(id, data.nom, data.role || null, data.bio || null, data.photo_url || null, data.ordre_affichage ?? 0, data.statut || "brouillon", expertiseTags(data.expertises).join(", "))
     .run();
   return id;
 }
@@ -204,10 +205,10 @@ export async function updateMembre(id, data) {
   const db = await getDB();
   await db
     .prepare(
-      `UPDATE membres SET nom = ?, role = ?, bio = ?, photo_url = ?, ordre_affichage = ?, statut = ?, maj_le = datetime('now')
+      `UPDATE membres SET nom = ?, role = ?, bio = ?, photo_url = ?, ordre_affichage = ?, statut = ?, expertises = ?, maj_le = datetime('now')
        WHERE id = ?`
     )
-    .bind(data.nom, data.role || null, data.bio || null, data.photo_url || null, data.ordre_affichage ?? 0, data.statut || "brouillon", id)
+    .bind(data.nom, data.role || null, data.bio || null, data.photo_url || null, data.ordre_affichage ?? 0, data.statut || "brouillon", expertiseTags(data.expertises).join(", "), id)
     .run();
 }
 

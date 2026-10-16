@@ -45,3 +45,7 @@ npm run lint
 npm run preview    # build OpenNext + aperçu Workers
 npm run deploy
 ```
+
+## Expertises des membres
+Le formulaire des membres accepte jusqu’à trois expertises séparées par des virgules. Elles apparaissent sur la fiche publique lorsqu’elles sont renseignées.
+Pour une base existante, vérifier `PRAGMA table_info(membres)` puis appliquer une seule fois `migrations/003_member_expertises.sql` si la colonne `expertises` est absente. Une nouvelle base initialisée avec `schema.sql` possède déjà cette colonne.

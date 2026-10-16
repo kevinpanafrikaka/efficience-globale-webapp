@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS projets (
 
 CREATE TABLE IF NOT EXISTS membres (
   id TEXT PRIMARY KEY,
+  expertises TEXT NOT NULL DEFAULT '',
   nom TEXT NOT NULL,
   role TEXT,
   bio TEXT,

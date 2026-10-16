@@ -16,6 +16,7 @@ export default function MembreForm({ membre }) {
     nom: membre?.nom || "",
     role: membre?.role || "",
     bio: membre?.bio || "",
+    expertises: membre?.expertises || "",
     photo_url: membre?.photo_url || "",
     statut: membre?.statut || "brouillon",
     ordre_affichage: membre?.ordre_affichage ?? 0,
@@ -76,6 +77,13 @@ export default function MembreForm({ membre }) {
           rows={4}
           className={`${inputClass} resize-none`}
         />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="member-expertises" className={labelClass}>Expertises (facultatif)</label>
+        <input id="member-expertises" value={form.expertises} onChange={(event) => update("expertises", event.target.value)}
+          placeholder="Gouvernance, Suivi-évaluation, Gestion de projet" aria-describedby="expertises-help" className={inputClass} />
+        <p id="expertises-help" className="text-[12px] text-ink-soft">Jusqu’à 3 expertises séparées par des virgules, 50 caractères chacune.</p>
       </div>
 
       <fieldset className="flex flex-col gap-1.5">

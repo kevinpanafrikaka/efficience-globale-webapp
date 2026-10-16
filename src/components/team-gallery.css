@@ -52,3 +52,21 @@
 
 .team-controls { flex-wrap: wrap; gap: 18px; }
 .team-controls .team-play-toggle { width: auto; padding: 0 18px; font-size: 13px; font-weight: 600; }
+
+/* Fiche éditoriale du profil sélectionné. */
+.team-gallery-body .team-biography { max-width: 960px; border: 1px solid var(--line); background: var(--cream); border-radius: 18px; padding: 30px 34px; margin-top: 32px; min-height: 205px; }
+.team-biography-content { animation-duration: .65s; }
+.team-expertises { display: flex; flex-wrap: wrap; gap: 7px; padding: 0; list-style: none; margin-top: 18px; }
+.team-expertises li { border: 1px solid #d6e1cc; border-radius: 30px; padding: 5px 11px; color: var(--dark-2); background: #edf3e6; font-size: 12px; line-height: 1.4; }
+.team-progress { max-width: 180px; height: 2px; margin: 20px auto 0; background: var(--line); overflow: hidden; border-radius: 2px; visibility: hidden; }
+.team-progress.is-running { visibility: visible; }
+.team-progress span { display: block; width: 100%; height: 100%; background: var(--lime); transform: scaleX(0); transform-origin: left; }
+.team-progress.is-running span { animation: team-progress-fill 5s linear forwards; }
+@keyframes team-progress-fill { to { transform: scaleX(1); } }
+@media (max-width: 767px) {
+  .team-gallery-body .team-biography { padding: 24px 22px; margin-top: 26px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .team-progress { display: none; }
+  .team-progress.is-running span { animation: none; }
+}
