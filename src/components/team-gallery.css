@@ -39,3 +39,13 @@
   .team-card, .team-portrait, .team-controls button { transition: none; }
   .team-biography-content { animation: none; }
 }
+
+/* Galerie dans le corps de page sur fond clair. */
+.team-gallery-body .team-gallery { margin-top: 0; }
+.team-gallery-body .team-biography { border-color: var(--line); }
+.team-gallery-body .team-biography h2 { color: var(--dark); }
+.team-gallery-body .team-bio-eyebrow { color: var(--dark-2); }
+.team-gallery-body .team-bio-role, .team-gallery-body .team-bio-text { color: var(--ink-soft); }
+.team-gallery-body .team-controls { color: var(--ink-soft); }
+.team-gallery-body .team-controls button { border-color: var(--line); color: var(--dark); background: var(--cream); }
+.team-gallery-body .team-controls button:hover { background: #e7ece3; }

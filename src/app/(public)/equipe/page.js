@@ -1,6 +1,6 @@
 import Link from "next/link";
 import TeamGallery from "@/components/TeamGallery";
-import { getMembres, getEquipeStats } from "@/lib/db";
+import { getMembres } from "@/lib/db";
 
 export const metadata = {
   title: "Équipe",
@@ -10,7 +10,7 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function EquipePage() {
-  const [membres, equipeStats] = await Promise.all([getMembres(), getEquipeStats()]);
+  const membres = await getMembres();
   return (
     <>
       <section className="bg-darker overflow-hidden pt-12 md:pt-20 pb-12 md:pb-16">
@@ -24,17 +24,11 @@ export default async function EquipePage() {
               Des parcours complémentaires, une connaissance du terrain et une même ambition : faire avancer vos projets.
             </p>
           </div>
-          <TeamGallery members={membres} />
         </div>
       </section>
-      <section aria-label="Les expertises de notre collectif" className="bg-cream border-b border-line">
-        <div className="max-w-6xl mx-auto px-5 md:px-8 py-9 md:py-11 grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8">
-          {equipeStats.map((stat) => (
-            <div key={stat.label} className="border-l-2 border-lime pl-4">
-              <p className="text-[32px] md:text-[38px] leading-none font-head text-dark tabular-nums mb-2">{stat.nombre}</p>
-              <p className="text-sm text-ink-soft leading-relaxed max-w-[230px]">{stat.label}</p>
-            </div>
-          ))}
+      <section aria-label="Les membres du cabinet" className="team-gallery-body bg-white overflow-hidden">
+        <div className="max-w-6xl mx-auto px-5 md:px-8 pt-12 md:pt-16 pb-8 md:pb-12">
+          <TeamGallery members={membres} />
         </div>
       </section>
       <section className="max-w-6xl mx-auto px-5 md:px-8 py-12 md:py-16 grid md:grid-cols-[1fr_auto] gap-7 items-center">

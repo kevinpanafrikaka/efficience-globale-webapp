@@ -18,7 +18,7 @@ export default function TeamGallery({ members }) {
   const [selected, setSelected] = useState(0);
   const gesture = useRef(null);
   const ignoreClick = useRef(false);
-  if (!members.length) return <p className="text-white/80 py-12">Les portraits de notre équipe seront bientôt disponibles.</p>;
+  if (!members.length) return <p className="text-ink-soft py-12">Les portraits de notre équipe seront bientôt disponibles.</p>;
   const active = members[selected];
   const carousel = members.length >= 4;
   function move(direction) { setSelected((index) => wrapMember(index + direction, members.length)); }
