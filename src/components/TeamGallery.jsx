@@ -19,13 +19,11 @@ export default function TeamGallery({ members }) {
   const gesture = useRef(null);
   const ignoreClick = useRef(false);
   const [playing, setPlaying] = useState(true);
-  const [hovered, setHovered] = useState(false);
-  const [focused, setFocused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [pageVisible, setPageVisible] = useState(true);
   const carousel = members.length > 1;
   const activeIndex = wrapMember(selected, members.length);
-  const autoRunning = carousel && playing && !hovered && !focused && !reducedMotion && pageVisible;
+  const autoRunning = carousel && playing && !reducedMotion && pageVisible;
 
   useEffect(() => {
     const media = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -70,10 +68,10 @@ export default function TeamGallery({ members }) {
 
   return (
     <div className="team-gallery" onKeyDown={handleKey}
-      onPointerEnter={(event) => { if (event.pointerType === "mouse") setHovered(true); }}
-      onPointerLeave={() => setHovered(false)}
-      onFocusCapture={() => setFocused(true)}
-      onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
+      onFocusCapture={(event) => {
+        // Un clic souris ne suspend pas la rotation. Au clavier, on laisse le temps de lire.
+        if (event.target.matches(":focus-visible")) setPlaying(false);
+      }}>
       <div className={carousel ? "team-stage" : "team-grid"} role="group"
         aria-label={carousel ? "Portraits de l’équipe, utilisez les flèches pour naviguer" : "Choisir un membre de l’équipe"}
         onPointerDown={(event) => { ignoreClick.current = false; gesture.current = { x: event.clientX, y: event.clientY }; }}
