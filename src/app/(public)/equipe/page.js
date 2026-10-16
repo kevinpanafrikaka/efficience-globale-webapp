@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "@/components/SiteImage";
 import TeamGallery from "@/components/TeamGallery";
 import { getMembres } from "@/lib/db";
 
@@ -13,17 +14,25 @@ export default async function EquipePage() {
   const membres = await getMembres();
   return (
     <>
-      <section className="bg-darker overflow-hidden pt-12 md:pt-20 pb-12 md:pb-16">
-        <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <div className="max-w-2xl mx-auto text-center">
-            <p className="text-[11px] font-semibold tracking-[0.18em] text-lime-2 mb-5">NOTRE ÉQUIPE</p>
-            <h1 className="text-white text-[38px] md:text-[58px] leading-[1.08] tracking-[-0.02em]">
-              Les visages de notre <span className="text-lime-2 italic">impact</span>
-            </h1>
-            <p className="text-[#d2dcd0] text-base md:text-lg leading-relaxed mt-5">
-              Des parcours complémentaires, une connaissance du terrain et une même ambition : faire avancer vos projets.
-            </p>
-          </div>
+      <section className="relative overflow-hidden bg-darker">
+        <div className="absolute inset-0">
+          <Image src="/img/hero-conakry.jpg" alt="" fill className="object-cover object-top" sizes="100vw" priority />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(90deg, rgba(13,19,14,0.88) 0%, rgba(13,19,14,0.55) 45%, rgba(13,19,14,0.3) 100%)" }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(0deg, rgba(10,15,11,0.55) 0%, rgba(10,15,11,0.1) 40%)" }}
+          />
+        </div>
+        <div className="relative max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-28">
+          <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] mb-5 max-w-2xl">
+            Les visages de notre <span className="text-lime italic">impact</span>
+          </h1>
+          <p className="text-[#d3ddce] text-[16px] md:text-[17px] leading-relaxed max-w-xl">
+            Des parcours complémentaires, une connaissance du terrain et une même ambition : faire avancer vos projets.
+          </p>
         </div>
       </section>
       <section aria-label="Les membres du cabinet" className="team-gallery-body bg-white overflow-hidden">
