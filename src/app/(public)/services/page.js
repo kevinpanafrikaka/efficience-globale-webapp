@@ -125,8 +125,8 @@ export default function ServicesPage() {
             <p className="text-ink-soft text-base leading-relaxed">L’intégration de l’IA générative commence par les besoins de vos équipes. Notre démarche en quatre phases associe solutions techniques, formation et accompagnement du changement.</p>
           </div>
           <ol className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
-            {PHASES_IA.map((phase, index) => <li key={phase.titre} className="rounded-xl border border-line bg-white p-6">
-              <div className="flex items-center justify-between mb-6 text-dark-2"><phase.Icon width="23" height="23" stroke="currentColor" /><span className="text-xs tracking-widest" aria-hidden="true">0{index + 1}</span></div>
+            {PHASES_IA.map((phase) => <li key={phase.titre} className="rounded-xl border border-line bg-white p-6">
+              <div className="flex items-center justify-between mb-6 text-dark-2"><phase.Icon width="23" height="23" stroke="currentColor" /></div>
               <h3 className="text-dark text-xl leading-tight mb-3">{phase.titre}</h3>
               <p className="text-ink-soft text-sm leading-relaxed mb-5">{phase.desc}</p>
               <ul className="space-y-3 border-t border-line pt-5">
