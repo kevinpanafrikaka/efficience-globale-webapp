@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "@/components/SiteImage";
+import Image from "@/components/PublicImage";
 
 export default function RealisationTeaser({ projet }) {
   return (

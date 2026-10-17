@@ -1,3 +1,4 @@
+import PageHero from "@/components/PageHero";
 import Image from "next/image";
 import Link from "next/link";
 import { getProjets } from "@/lib/db";
@@ -84,29 +85,9 @@ export default async function DomainesPage() {
 
   return (
     <>
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <Image src="/img/hero-domaines.jpg" alt="" fill className="object-cover" priority />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(90deg, rgba(13,19,14,0.88) 0%, rgba(13,19,14,0.55) 45%, rgba(13,19,14,0.3) 100%)",
-            }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{ background: "linear-gradient(0deg, rgba(10,15,11,0.55) 0%, rgba(10,15,11,0.1) 40%)" }}
-          />
-        </div>
-        <div className="relative max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
-          <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] mb-5 max-w-2xl">
-            Où nous créons de la <span className="text-lime italic">valeur</span>
-          </h1>
-          <p className="text-[#d3ddce] text-[16px] md:text-[17px] leading-relaxed max-w-xl mb-8">
-            Quatre domaines, une même approche : diagnostic rigoureux, co-construction avec les acteurs locaux, et
-            transfert de compétences pour ancrer les résultats dans la durée.
-          </p>
+      <PageHero image="/img/hero-domaines.jpg"
+        title={<>Où nous créons de la <span className="text-lime-2 italic">valeur</span></>}
+        description="Quatre domaines, une même approche : diagnostic rigoureux, co-construction avec les acteurs locaux, et transfert de compétences pour ancrer les résultats dans la durée.">
           <div className="flex flex-wrap gap-2.5">
             {DOMAINES.map((d) => (
               <a
@@ -118,8 +99,7 @@ export default async function DomainesPage() {
               </a>
             ))}
           </div>
-        </div>
-      </section>
+      </PageHero>
 
       <section className="max-w-6xl mx-auto px-5 md:px-8">
         {DOMAINES.map((d, i) => (
@@ -129,7 +109,7 @@ export default async function DomainesPage() {
             className={`grid md:grid-cols-2 gap-8 md:gap-14 items-start py-14 md:py-20 scroll-mt-24 ${i > 0 ? "border-t border-line" : ""}`}
           >
             <div className={i % 2 === 1 ? "md:order-2" : ""}>
-              <div className="relative h-64 md:h-80 overflow-hidden mb-6 md:mb-0">
+              <div className="relative h-64 md:h-80 overflow-hidden rounded-xl mb-6 md:mb-0">
                 <Image src={d.photo} alt="" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
                 <div className="absolute inset-0" style={{ backgroundColor: d.tint, mixBlendMode: "multiply" }} />
               </div>
@@ -139,7 +119,7 @@ export default async function DomainesPage() {
               <p className="text-[15.5px] text-ink-soft leading-relaxed mb-7">{d.description}</p>
 
               <div className="text-[12px] font-bold text-lime tracking-[0.1em] mb-3.5">INTERVENTIONS TYPES</div>
-              <ul className="grid grid-cols-2 gap-x-4 gap-y-2.5 mb-7">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2.5 mb-7">
                 {d.interventions.map((it) => (
                   <li key={it} className="text-[13.5px] text-ink-soft leading-relaxed flex items-start gap-2">
                     <svg

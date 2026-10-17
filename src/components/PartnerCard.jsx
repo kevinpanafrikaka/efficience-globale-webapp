@@ -1,4 +1,4 @@
-import Image from "@/components/SiteImage";
+import Image from "@/components/PublicImage";
 
 // Carte partenaire (logo + nom au survol). `className` règle la taille selon le contexte.
 export default function PartnerCard({ partenaire, className = "" }) {

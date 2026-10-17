@@ -38,16 +38,11 @@ export default function Header() {
       if (event.key !== "Tab") return;
       const links = [...panelRef.current.querySelectorAll("a"), toggleRef.current];
       const index = links.indexOf(document.activeElement);
-      if (event.shiftKey && index <= 0) {
-        event.preventDefault();
-        links.at(-1).focus();
-      } else if (!event.shiftKey && index === links.length - 1) {
-        event.preventDefault();
-        links[0].focus();
-      }
+      event.preventDefault();
+      links[(index + (event.shiftKey ? -1 : 1) + links.length) % links.length]?.focus();
     }
     const desktop = window.matchMedia("(min-width: 1280px)");
-    const handleResize = () => { if (desktop.matches) closeMenu(); };
+    const handleResize = () => { if (desktop.matches) setOpen(false); };
     document.addEventListener("keydown", handleKey);
     desktop.addEventListener("change", handleResize);
     return () => {
@@ -86,7 +81,7 @@ export default function Header() {
           type="button"
           ref={toggleRef}
           aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
-          aria-controls="mobile-navigation"
+          aria-controls={open ? "mobile-navigation" : undefined}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
           className="xl:hidden p-2 -mr-2"

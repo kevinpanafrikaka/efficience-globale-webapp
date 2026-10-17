@@ -1,4 +1,4 @@
-import Image from "@/components/SiteImage";
+import Image from "@/components/PublicImage";
 import Link from "next/link";
 import SectionHead from "@/components/SectionHead";
 import DomainCard from "@/components/DomainCard";
@@ -168,7 +168,7 @@ export default async function HomePage() {
             }
             dark
           />
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { titre: "Santé Globale", description: "Renforcer les systèmes de santé publique, de la vaccination à la nutrition, pour des services plus accessibles et mieux pilotés.", photo: "/img/domaines/sante-afrique.jpg", tint: "rgba(61,83,71,0.82)" },
               { titre: "Éducation", description: "Moderniser les pratiques pédagogiques et renforcer les compétences des enseignants comme des apprenants.", photo: "/img/domaines/education-afrique.jpg", tint: "rgba(124,179,66,0.82)" },
@@ -202,7 +202,7 @@ export default async function HomePage() {
               </>
             }
           />
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { titre: "Transparence", desc: "Une honnêteté et une ouverture qui renforcent la confiance de nos partenaires et clients.", icon: <IconEye /> },
               { titre: "Innovation", desc: "Nous cultivons la pensée innovante pour rester à l'avant-garde des solutions stratégiques.", icon: <IconSparkle /> },

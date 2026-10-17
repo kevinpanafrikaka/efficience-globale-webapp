@@ -1,4 +1,4 @@
-import Image from "next/image";
+import PageHero from "@/components/PageHero";
 import Link from "next/link";
 import { IconSearch, IconDocs, IconChart, IconTeam, IconSparkle, IconCheck } from "@/components/icons";
 
@@ -61,21 +61,9 @@ const PHASES_IA = [
 export default function ServicesPage() {
   return (
     <>
-      <section className="relative overflow-hidden bg-darker">
-        <div className="absolute inset-0">
-          <Image src="/img/hero-services.jpg" alt="" fill className="object-cover" sizes="100vw" priority />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(13,19,14,0.88) 0%, rgba(13,19,14,0.55) 45%, rgba(13,19,14,0.3) 100%)" }} />
-          <div className="absolute inset-0" style={{ background: "linear-gradient(0deg, rgba(10,15,11,0.55) 0%, rgba(10,15,11,0.1) 40%)" }} />
-        </div>
-        <div className="relative max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-28">
-          <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] mb-5 max-w-2xl">
-            Des expertises au service de votre <span className="text-lime italic">action</span>
-          </h1>
-          <p className="text-[#d3ddce] text-[16px] md:text-[17px] leading-relaxed max-w-xl">
-            Renforcer vos institutions, optimiser vos ressources et accompagner vos transformations : un appui sur mesure pour répondre à vos défis.
-          </p>
-        </div>
-      </section>
+      <PageHero image="/img/hero-services.jpg"
+        title={<>Des expertises au service de votre <span className="text-lime-2 italic">action</span></>}
+        description="Renforcer vos institutions, optimiser vos ressources et accompagner vos transformations : un appui sur mesure pour répondre à vos défis." />
 
       <section aria-labelledby="services-heading" className="max-w-6xl mx-auto px-5 md:px-8 py-14 md:py-20">
         <div className="mb-10 md:mb-14 max-w-2xl">

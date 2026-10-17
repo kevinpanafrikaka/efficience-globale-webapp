@@ -1,4 +1,4 @@
-import Image from "next/image";
+import PageHero from "@/components/PageHero";
 import { getProjets, getPartenaires } from "@/lib/db";
 import PartnerCard from "@/components/PartnerCard";
 
@@ -17,31 +17,9 @@ export default async function PartenairesPage() {
 
   return (
     <>
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <Image src="/img/hero-partenaires.jpg" alt="" fill className="object-cover" priority />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(90deg, rgba(13,19,14,0.88) 0%, rgba(13,19,14,0.55) 45%, rgba(13,19,14,0.3) 100%)",
-            }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{ background: "linear-gradient(0deg, rgba(10,15,11,0.55) 0%, rgba(10,15,11,0.1) 40%)" }}
-          />
-        </div>
-        <div className="relative max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-28">
-          <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] mb-5 max-w-2xl">
-            Ils nous font <span className="text-lime italic">confiance</span>
-          </h1>
-          <p className="text-[#d3ddce] text-[16px] md:text-[17px] leading-relaxed max-w-xl">
-            Bailleurs, institutions académiques et organisations de la société civile : des partenaires de premier
-            plan qui nous accordent leur confiance à travers l&apos;Afrique de l&apos;Ouest.
-          </p>
-        </div>
-      </section>
+      <PageHero image="/img/hero-partenaires.jpg"
+        title={<>Ils nous font <span className="text-lime-2 italic">confiance</span></>}
+        description="Bailleurs, institutions académiques et organisations de la société civile : des partenaires de premier plan qui nous accordent leur confiance à travers l’Afrique de l’Ouest." />
 
       <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
         <div className="flex items-baseline gap-3 mb-8">

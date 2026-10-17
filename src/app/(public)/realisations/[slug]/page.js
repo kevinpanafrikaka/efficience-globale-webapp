@@ -1,4 +1,4 @@
-import Image from "@/components/SiteImage";
+import Image from "@/components/PublicImage";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProjetBySlug, getProjets } from "@/lib/db";
@@ -18,7 +18,7 @@ function renderTitre(titre, accent) {
   return (
     <>
       {titre.slice(0, i)}
-      <span className="text-lime italic">{accent}</span>
+      <span className="text-lime-2 italic">{accent}</span>
       {titre.slice(i + accent.length)}
     </>
   );
@@ -40,8 +40,8 @@ export default async function ProjetDetailPage({ params }) {
 
   return (
     <article>
-      <section className="relative h-[380px] md:h-[480px] overflow-hidden">
-        <Image src={projet.photo_url} alt="" fill priority className="object-cover" />
+      <section className="relative min-h-[380px] md:min-h-[480px] overflow-hidden bg-darker">
+        <Image src={projet.photo_url} alt="" fill sizes="100vw" priority className="object-cover" />
         <div
           className="absolute inset-0"
           style={{
@@ -53,7 +53,7 @@ export default async function ProjetDetailPage({ params }) {
           className="absolute inset-0"
           style={{ background: "linear-gradient(0deg, rgba(10,15,11,0.8) 0%, rgba(10,15,11,0.15) 45%)" }}
         />
-        <div className="absolute inset-0 flex items-end">
+        <div className="relative flex items-end min-h-[380px] md:min-h-[480px] pt-12">
           <div className="max-w-4xl mx-auto px-5 md:px-8 pb-8 w-full">
             <Link
               href="/realisations"
@@ -66,11 +66,11 @@ export default async function ProjetDetailPage({ params }) {
             </h1>
             <div className="flex flex-wrap gap-x-8 gap-y-1.5 text-[13.5px] text-white/85">
               <div>
-                <span className="text-white/50">Client / bailleur : </span>
+                <span className="text-white/75">Client / bailleur : </span>
                 {projet.client}
               </div>
               <div>
-                <span className="text-white/50">Période : </span>
+                <span className="text-white/75">Période : </span>
                 {projet.periode}
               </div>
             </div>
@@ -80,7 +80,7 @@ export default async function ProjetDetailPage({ params }) {
 
       <section className="max-w-4xl mx-auto px-5 md:px-8 py-12 md:py-16">
         {projet.description && (
-          <p className="text-[17px] leading-relaxed text-ink-soft mb-12 max-w-xl">{projet.description}</p>
+          <p className="text-[17px] leading-relaxed text-ink-soft mb-12 max-w-2xl whitespace-pre-line">{projet.description}</p>
         )}
 
         {projet.resultats?.length > 0 && (

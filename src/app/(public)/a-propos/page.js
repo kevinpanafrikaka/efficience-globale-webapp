@@ -1,4 +1,5 @@
-import Image from "@/components/SiteImage";
+import PageHero from "@/components/PageHero";
+import Image from "@/components/PublicImage";
 import { getMembres } from "@/lib/db";
 import { IconEye, IconSparkle, IconDrop, IconTarget } from "@/components/icons";
 
@@ -15,31 +16,9 @@ export default async function AProposPage() {
 
   return (
     <>
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0">
-          <Image src="/img/hero-a-propos.jpg" alt="" fill className="object-cover" priority />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(90deg, rgba(13,19,14,0.88) 0%, rgba(13,19,14,0.55) 45%, rgba(13,19,14,0.3) 100%)",
-            }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{ background: "linear-gradient(0deg, rgba(10,15,11,0.55) 0%, rgba(10,15,11,0.1) 40%)" }}
-          />
-        </div>
-        <div className="relative max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-28">
-          <h1 className="text-white text-[36px] md:text-[56px] leading-[1.05] tracking-[-0.02em] max-w-2xl mb-6">
-            Pourquoi nous <span className="text-lime italic">existons</span> ?
-          </h1>
-          <p className="text-[#d3ddce] text-[16px] md:text-[17px] leading-relaxed max-w-lg">
-            Efficience Globale est née d&apos;une conviction simple : l&apos;Afrique de l&apos;Ouest a besoin d&apos;une
-            expertise qui comprend son contexte autant que ses standards internationaux.
-          </p>
-        </div>
-      </section>
+      <PageHero image="/img/hero-a-propos.jpg"
+        title={<>Pourquoi nous <span className="text-lime-2 italic">existons</span> ?</>}
+        description="Efficience Globale est née d’une conviction simple : l’Afrique de l’Ouest a besoin d’une expertise qui comprend son contexte autant que ses standards internationaux." />
 
       <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
         <div className="grid md:grid-cols-[1.3fr_1fr] gap-10 md:gap-14 mb-16 md:mb-20">

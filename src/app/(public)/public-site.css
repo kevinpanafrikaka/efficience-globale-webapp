@@ -1,0 +1,28 @@
+/* Règles isolées : aucune modification de la présentation de l’admin. */
+.public-site { --ink-faint: #63715e; min-width: 0; }
+.public-site main { min-width: 0; }
+.public-site .text-lime { color: #4b7728; }
+.public-site .public-page-hero .text-lime { color: var(--lime-2); }
+.public-site .public-page-hero h1 { text-wrap: balance; }
+.public-site :is(h1,h2,h3,h4,p,a,span) { overflow-wrap: anywhere; }
+.public-site :is(button, a) { -webkit-tap-highlight-color: transparent; }
+.public-site button { min-height: 44px; }
+.public-site :is(a,button):focus-visible { outline: 3px solid var(--teal); outline-offset: 4px; }
+.public-site footer :is(a,span) { overflow-wrap: anywhere; }
+.public-image-fallback { display: flex; align-items: center; justify-content: center; background: #e7ece3; color: #63715e; }
+.public-site .partner-card:focus-within .partner-card-name { transform: translateY(0); }
+.public-site .partner-marquee-wrap:focus-within .partner-marquee { animation-play-state: paused; }
+.public-site .domain-card, .public-site .realisation-teaser { border-radius: 12px; }
+.public-site .project-card > div:first-child { border-radius: 12px; }
+.public-site .partner-card { border-radius: 12px; background: white; }
+@media (max-width: 639px) {
+  .public-site .domain-card { height: auto; min-height: 275px; }
+  .public-site .home-hero h1 { text-wrap: balance; }
+}
+@media (hover: none) {
+  .public-site .partner-card-name { transform: none; }
+  .public-site .partner-card > div:first-child { padding-bottom: 26px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-site *, .public-site *::before, .public-site *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

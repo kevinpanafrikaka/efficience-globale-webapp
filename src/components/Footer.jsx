@@ -68,7 +68,7 @@ export default async function Footer() {
           <div className="grid grid-cols-2 gap-6">
             <div>
               <div className="text-[11.5px] font-bold tracking-wide text-white/50 mb-2.5">CABINET</div>
-              <nav className="flex flex-col gap-1.5 text-[13px]">
+              <nav aria-label="Liens du cabinet" className="flex flex-col gap-1.5 text-[13px]">
                 {NAV_CABINET.map((l) => (
                   <Link key={l.href} href={l.href} className="hover:text-white transition-colors">
                     {l.label}
@@ -78,7 +78,7 @@ export default async function Footer() {
             </div>
             <div>
               <div className="text-[11.5px] font-bold tracking-wide text-white/50 mb-2.5">ACTIVITÉ</div>
-              <nav className="flex flex-col gap-1.5 text-[13px]">
+              <nav aria-label="Liens des activités" className="flex flex-col gap-1.5 text-[13px]">
                 {NAV_ACTIVITE.map((l) => (
                   <Link key={l.href} href={l.href} className="hover:text-white transition-colors">
                     {l.label}

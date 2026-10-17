@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export default function ContactForm({ emailContact }) {
+  const submitting = useRef(false);
   const [status, setStatus] = useState("idle"); // idle | sending | success | error
   const [errorMsg, setErrorMsg] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true;
     setStatus("sending");
     setErrorMsg("");
 
@@ -28,12 +31,14 @@ export default function ContactForm({ emailContact }) {
     } catch {
       setErrorMsg("Impossible d'envoyer le message. Vérifiez votre connexion.");
       setStatus("error");
+    } finally {
+      submitting.current = false;
     }
   }
 
   if (status === "success") {
     return (
-      <div role="status" className="border border-lime bg-cream p-6">
+      <div role="status" className="rounded-xl border border-lime bg-cream p-6">
         <p className="text-[16px] text-dark mb-1.5">Message envoyé</p>
         <p className="text-[13.5px] text-ink-soft">Nous vous répondrons dès que possible.</p>
       </div>
@@ -55,6 +60,7 @@ export default function ContactForm({ emailContact }) {
           <input
             id="nom"
             name="nom"
+            maxLength={120}
             type="text"
             autoComplete="name"
             required
@@ -68,6 +74,7 @@ export default function ContactForm({ emailContact }) {
           <input
             id="email"
             name="email"
+            maxLength={200}
             type="email"
             autoComplete="email"
             required
@@ -82,6 +89,7 @@ export default function ContactForm({ emailContact }) {
         <input
           id="sujet"
           name="sujet"
+            maxLength={200}
           type="text"
           className="rounded-lg border border-line px-3.5 py-2.5 text-[15px] focus:outline-none focus:ring-2 focus:ring-lime"
         />
@@ -93,9 +101,10 @@ export default function ContactForm({ emailContact }) {
         <textarea
           id="message"
           name="message"
+            maxLength={5000}
           rows={5}
           required
-          className="rounded-lg border border-line px-3.5 py-2.5 text-[15px] resize-none focus:outline-none focus:ring-2 focus:ring-lime"
+          className="rounded-lg border border-line px-3.5 py-2.5 text-[15px] resize-y min-h-[140px] focus:outline-none focus:ring-2 focus:ring-lime"
         />
       </div>
 
