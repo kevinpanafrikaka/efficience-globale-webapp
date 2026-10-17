@@ -120,7 +120,6 @@ export default function ServicesPage() {
       <section id="accompagnement-ia" aria-labelledby="ia-heading" className="scroll-mt-24 bg-white border-t border-line py-14 md:py-20">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <div className="max-w-2xl mb-10">
-            <p className="text-[11px] font-semibold tracking-[0.14em] text-dark-2 mb-4">FOCUS · INTELLIGENCE ARTIFICIELLE</p>
             <h2 id="ia-heading" className="text-dark text-[30px] md:text-[40px] leading-[1.15] mb-5">De l’opportunité à l’<span className="italic text-dark-2">adoption</span>.</h2>
             <p className="text-ink-soft text-base leading-relaxed">L’intégration de l’IA générative commence par les besoins de vos équipes. Notre démarche en quatre phases associe solutions techniques, formation et accompagnement du changement.</p>
           </div>
