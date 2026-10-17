@@ -117,20 +117,20 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section id="accompagnement-ia" aria-labelledby="ia-heading" className="scroll-mt-24 bg-darker py-14 md:py-20">
+      <section id="accompagnement-ia" aria-labelledby="ia-heading" className="scroll-mt-24 bg-white border-t border-line py-14 md:py-20">
         <div className="max-w-6xl mx-auto px-5 md:px-8">
           <div className="max-w-2xl mb-10">
-            <p className="text-[11px] font-semibold tracking-[0.14em] text-lime-2 mb-4">FOCUS · INTELLIGENCE ARTIFICIELLE</p>
-            <h2 id="ia-heading" className="text-white text-[30px] md:text-[40px] leading-[1.15] mb-5">De l’opportunité à l’<span className="italic text-lime-2">adoption</span>.</h2>
-            <p className="text-[#d3ddce] text-base leading-relaxed">L’intégration de l’IA générative commence par les besoins de vos équipes. Notre démarche en quatre phases associe solutions techniques, formation et accompagnement du changement.</p>
+            <p className="text-[11px] font-semibold tracking-[0.14em] text-dark-2 mb-4">FOCUS · INTELLIGENCE ARTIFICIELLE</p>
+            <h2 id="ia-heading" className="text-dark text-[30px] md:text-[40px] leading-[1.15] mb-5">De l’opportunité à l’<span className="italic text-dark-2">adoption</span>.</h2>
+            <p className="text-ink-soft text-base leading-relaxed">L’intégration de l’IA générative commence par les besoins de vos équipes. Notre démarche en quatre phases associe solutions techniques, formation et accompagnement du changement.</p>
           </div>
           <ol className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
-            {PHASES_IA.map((phase, index) => <li key={phase.titre} className="rounded-xl border border-white/15 bg-white/[0.04] p-6">
-              <div className="flex items-center justify-between mb-6 text-lime-2"><phase.Icon width="23" height="23" stroke="currentColor" /><span className="text-xs tracking-widest" aria-hidden="true">0{index + 1}</span></div>
-              <h3 className="text-white text-xl leading-tight mb-3">{phase.titre}</h3>
-              <p className="text-[#d3ddce] text-sm leading-relaxed mb-5">{phase.desc}</p>
-              <ul className="space-y-3 border-t border-white/15 pt-5">
-                {phase.points.map((point) => <li key={point} className="flex gap-2 text-[13.5px] leading-relaxed text-[#d3ddce]"><span aria-hidden="true" className="text-lime-2">•</span><span>{point}</span></li>)}
+            {PHASES_IA.map((phase, index) => <li key={phase.titre} className="rounded-xl border border-line bg-white p-6">
+              <div className="flex items-center justify-between mb-6 text-dark-2"><phase.Icon width="23" height="23" stroke="currentColor" /><span className="text-xs tracking-widest" aria-hidden="true">0{index + 1}</span></div>
+              <h3 className="text-dark text-xl leading-tight mb-3">{phase.titre}</h3>
+              <p className="text-ink-soft text-sm leading-relaxed mb-5">{phase.desc}</p>
+              <ul className="space-y-3 border-t border-line pt-5">
+                {phase.points.map((point) => <li key={point} className="flex gap-2 text-[13.5px] leading-relaxed text-ink-soft"><span aria-hidden="true" className="text-dark-2">•</span><span>{point}</span></li>)}
               </ul>
             </li>)}
           </ol>
