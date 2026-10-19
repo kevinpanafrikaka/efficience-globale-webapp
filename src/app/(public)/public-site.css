@@ -17,6 +17,15 @@
 .public-site .domain-card, .public-site .realisation-teaser { border-radius: 12px; }
 .public-site .project-card > div:first-child { border-radius: 12px; }
 .public-site .partner-card { border-radius: 12px; background: white; }
+.public-site .domain-shortcuts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: 100%; max-width: 640px; }
+.public-site .domain-shortcut { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 52px; padding: 12px; border: 1px solid #ffffff55; border-radius: 12px; background: #16211a80; backdrop-filter: blur(8px); color: white; font-size: 14px; font-weight: 600; line-height: 1.35; text-align: center; transition: background-color .2s, border-color .2s; }
+.public-site .domain-shortcut:active { background: #ffffff26; border-color: var(--lime-2); }
+@media (hover: hover) and (pointer: fine) {
+  .public-site .domain-shortcut:hover { background: #ffffff26; border-color: var(--lime-2); }
+}
+@media (min-width: 768px) {
+  .public-site .domain-shortcuts { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+}
 @media (max-width: 639px) {
   .public-site .domain-card { height: auto; min-height: 275px; }
   .public-site .home-hero h1 { text-wrap: balance; }

@@ -88,17 +88,17 @@ export default async function DomainesPage() {
       <PageHero image="/img/hero-domaines.jpg"
         title={<>Où nous créons de la <span className="text-lime-2 italic">valeur</span></>}
         description="Quatre domaines, une même approche : diagnostic rigoureux, co-construction avec les acteurs locaux, et transfert de compétences pour ancrer les résultats dans la durée.">
-          <div className="flex flex-wrap gap-2.5">
+          <nav aria-label="Accéder à un domaine" className="domain-shortcuts">
             {DOMAINES.map((d) => (
               <a
                 key={d.secteur}
                 href={`#${d.secteur}`}
-                className="inline-flex items-center rounded border-[1.5px] border-white/40 px-5 py-2.5 text-[14px] font-semibold text-white backdrop-blur-sm transition-colors hover:border-white hover:bg-white/10"
+                className="domain-shortcut"
               >
                 {d.titre}
               </a>
             ))}
-          </div>
+          </nav>
       </PageHero>
 
       <section className="max-w-6xl mx-auto px-5 md:px-8">
