@@ -2,7 +2,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { isAdminRequest } from "@/lib/adminAuth";
 import { GMAIL_OWNER, GMAIL_SCOPE, OAUTH_COOKIE, base64url, configured, isGmailConnected, redirectUri, seal } from "@/lib/gmail.mjs";
 
-const HEADERS = { "Cache-Control": "no-store", "Referrer-Policy": "no-referrer", "Content-Type": "text/html; charset=utf-8", "Content-Security-Policy": "default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'" };
+const HEADERS = { "Cache-Control": "no-store", "Referrer-Policy": "same-origin", "Content-Type": "text/html; charset=utf-8", "Content-Security-Policy": "default-src 'none'; form-action 'self' https://accounts.google.com; frame-ancestors 'none'; base-uri 'none'" };
 
 export async function GET(request) {
   const { env } = await getCloudflareContext({ async: true });
