@@ -20,7 +20,7 @@ export default function RealisationsGrid({ projets }) {
 
   return (
     <div>
-      <div role="group" aria-label="Filtrer par domaine" className="flex flex-wrap gap-2.5 mb-6">
+      <div role="group" aria-label="Filtrer par domaine" className="project-filters">
         {FILTERS.map((f) => (
           <button
             key={f.key}
@@ -28,14 +28,11 @@ export default function RealisationsGrid({ projets }) {
             aria-pressed={filter === f.key}
             aria-controls="project-results"
             onClick={() => setFilter(f.key)}
-            className={`rounded text-[13.5px] font-semibold px-5 py-2.5 active:scale-[0.97] transition-transform ${
-              filter === f.key
-                ? "bg-lime text-ink"
-                : "border border-line bg-white text-ink-soft hover:border-lime hover:text-lime"
-            }`}
+            aria-label={`${f.label} : ${f.key === "all" ? projets.length : projets.filter((p) => p.secteur === f.key).length} projets`}
+            className="project-filter"
           >
-            {f.label}
-            {` (${f.key === "all" ? projets.length : projets.filter((p) => p.secteur === f.key).length})`}
+            <span className="project-filter-label">{f.label}</span>
+            <span className="project-filter-count" aria-hidden="true">{f.key === "all" ? projets.length : projets.filter((p) => p.secteur === f.key).length}</span>
           </button>
         ))}
       </div>

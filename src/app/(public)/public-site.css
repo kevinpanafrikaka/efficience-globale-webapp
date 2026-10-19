@@ -26,6 +26,23 @@
 @media (min-width: 768px) {
   .public-site .domain-shortcuts { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 }
+.public-site .project-filters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 32px; }
+.public-site .project-filter { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; min-height: 60px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--cream); color: var(--ink-soft); font-size: 13.5px; font-weight: 600; line-height: 1.3; text-align: left; transition: background-color .2s, border-color .2s; }
+.public-site .project-filter:first-child { grid-column: span 2; }
+.public-site .project-filter-label { min-width: 0; }
+.public-site .project-filter-count { flex-shrink: 0; display: grid; place-items: center; min-width: 26px; height: 26px; padding-inline: 6px; border-radius: 8px; background: #26362a0d; color: var(--ink-soft); font-size: 12px; font-variant-numeric: tabular-nums; }
+.public-site .project-filter[aria-pressed="true"] { background: var(--lime); border-color: var(--lime); color: var(--ink); }
+.public-site .project-filter[aria-pressed="true"] .project-filter-count { background: #ffffff59; color: var(--ink); }
+@media (hover: hover) and (pointer: fine) {
+  .public-site .project-filter:hover { border-color: var(--lime); }
+}
+@media (min-width: 640px) {
+  .public-site .project-filters { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .public-site .project-filters { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+  .public-site .project-filter:first-child { grid-column: auto; }
+}
 @media (max-width: 639px) {
   .public-site .domain-card { height: auto; min-height: 275px; }
   .public-site .home-hero h1 { text-wrap: balance; }
