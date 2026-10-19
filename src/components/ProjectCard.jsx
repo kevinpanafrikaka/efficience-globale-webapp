@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Image from "@/components/PublicImage";
 import { secteurs } from "@/lib/db";
 
@@ -6,14 +5,14 @@ export default function ProjectCard({ projet }) {
   const secteur = secteurs[projet.secteur] ?? { label: projet.secteur, color: "#3D5347" };
 
   return (
-    <Link href={`/realisations/${projet.slug}`} className="project-card group flex flex-col active:opacity-80">
-      <div className="relative h-48 bg-dark-2 overflow-hidden">
+    <a href={`/realisations/${projet.slug}`} className="project-card group relative flex h-full flex-col active:opacity-80">
+      <div className="relative h-48 shrink-0 bg-dark-2 overflow-hidden">
         <Image
           src={projet.photo_url}
           alt=""
           fill
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-          className="project-card-media object-cover"
+          className="project-card-media pointer-events-none object-cover"
         />
       </div>
       <div className="flex flex-col gap-2.5 pt-4 border-t-2 border-dark flex-1">
@@ -28,6 +27,6 @@ export default function ProjectCard({ projet }) {
         </h3>
         <p className="text-[13.5px] text-ink-soft leading-relaxed flex-1">{projet.resume}</p>
       </div>
-    </Link>
+    </a>
   );
 }
