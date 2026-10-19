@@ -2,6 +2,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createMessage, markMessageSent, getReglages } from "@/lib/db";
 
 import { isGmailConnected, sendGmail } from "@/lib/gmail.mjs";
+import { isBrevoConfigured, sendBrevo } from "@/lib/brevo.mjs";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX = { nom: 120, email: 200, sujet: 200, message: 5000 };
@@ -44,10 +45,14 @@ export async function POST(request) {
     return Response.json({ error: "Impossible d'enregistrer votre message. Réessayez plus tard." }, { status: 500 });
   }
 
-  // Gmail prend le relais seulement après l’autorisation réussie du propriétaire.
-  // Un échec Gmail laisse le message enregistré, sans envoi à un autre destinataire.
+  // Brevo prend le relais quand la clé et l'expéditeur sont configurés.
+  // Un échec du prestataire choisi laisse le message enregistré, sans bascule
+  // vers un autre destinataire et sans risque de double envoi.
   try {
-    if (await isGmailConnected(env)) {
+    if (isBrevoConfigured(env)) {
+      await sendBrevo(env, { nom, email, sujet, message });
+      await markMessageSent(id);
+    } else if (await isGmailConnected(env)) {
       await sendGmail(env, { nom, email, sujet, message });
       await markMessageSent(id);
     } else {
