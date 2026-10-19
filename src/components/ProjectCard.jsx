@@ -12,12 +12,12 @@ export default function ProjectCard({ projet }) {
           src={projet.photo_url}
           alt=""
           fill
-          sizes="(min-width: 768px) 33vw, 100vw"
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="project-card-media object-cover"
         />
       </div>
       <div className="flex flex-col gap-2.5 pt-4 border-t-2 border-dark flex-1">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
           <span className="text-[11px] font-bold tracking-[0.1em]" style={{ color: secteur.color }}>
             {secteur.label.toUpperCase()}
           </span>

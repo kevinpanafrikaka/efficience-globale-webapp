@@ -22,7 +22,7 @@ export default async function PartenairesPage() {
         description="Bailleurs, institutions académiques et organisations de la société civile : des partenaires de premier plan qui nous accordent leur confiance à travers l’Afrique de l’Ouest." />
 
       <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
-        <div className="flex items-baseline gap-3 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3 mb-8">
           <div className="text-[12px] font-bold tracking-[0.1em] text-lime">BAILLEURS &amp; INSTITUTIONS</div>
           <div className="text-[12px] text-ink-faint">{bailleurs.length} institutions partenaires actives</div>
         </div>

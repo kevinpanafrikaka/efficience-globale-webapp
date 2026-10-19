@@ -50,7 +50,7 @@ export default async function HomePage() {
           />
         </div>
 
-        <div className="relative max-w-6xl mx-auto px-5 md:px-8 pt-16 pb-14 md:pt-28 md:pb-0">
+        <div className="relative max-w-6xl mx-auto px-5 md:px-8 pt-12 pb-0 md:pt-28 md:pb-0">
           <div className="max-w-2xl">
             <h1 className="text-[40px] leading-[1.08] md:text-[64px] md:leading-[1.06] tracking-[-0.02em] text-white mb-7">
               Des solutions <span className="text-lime-2 italic">stratégiques</span> pour un impact durable en Afrique de l&apos;Ouest
@@ -63,13 +63,13 @@ export default async function HomePage() {
             <div className="flex flex-wrap items-center gap-4">
               <Link
                 href="/realisations"
-                className="inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+                className="public-cta inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
               >
                 Découvrir nos réalisations <span aria-hidden="true" className="ml-3">↗</span>
               </Link>
               <Link
                 href="/contact"
-                className="inline-flex items-center rounded border-[1.5px] border-white/40 px-7 py-3.5 text-[15px] font-semibold text-white backdrop-blur-sm active:scale-[0.97] transition-transform hover:border-white hover:bg-white/10"
+                className="public-cta inline-flex items-center rounded border-[1.5px] border-white/40 px-7 py-3.5 text-[15px] font-semibold text-white backdrop-blur-sm active:scale-[0.97] transition-transform hover:border-white hover:bg-white/10"
               >
                 Nous contacter
               </Link>
@@ -78,7 +78,7 @@ export default async function HomePage() {
         </div>
 
         {/* STATS */}
-        <div className="relative border-t border-white/15 mt-14 md:mt-16">
+        <div className="relative border-t border-white/15 mt-10 md:mt-16">
           <div className="max-w-6xl mx-auto px-5 md:px-8 grid grid-cols-2 md:grid-cols-4">
             {[
               [`${nbProjets.realises}+`, "Projets réalisés depuis 2022"],
@@ -175,7 +175,7 @@ export default async function HomePage() {
               { titre: "Industrie", description: "Structurer les chaînes de valeur locales et accompagner la mise aux normes des filières agro-industrielles.", photo: "/img/domaines/industrie-afrique.jpg", tint: "rgba(183,194,51,0.82)" },
               { titre: "TIC & IA", description: "Déployer des outils numériques et des agents IA au service d'une décision publique plus rapide et plus fiable.", photo: "/img/domaines/tic-afrique.jpg", tint: "rgba(0,137,123,0.82)" },
             ].map((d, i) => (
-              <Reveal key={d.titre} index={i} className={i % 2 === 1 ? "md:mt-10" : ""}>
+              <Reveal key={d.titre} index={i} className={i % 2 === 1 ? "lg:mt-10" : ""}>
                 <DomainCard {...d} />
               </Reveal>
             ))}
@@ -183,7 +183,7 @@ export default async function HomePage() {
           <div className="mt-8">
             <Link
               href="/domaines"
-              className="inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+              className="public-cta inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
             >
               En savoir plus sur nos domaines →
             </Link>
@@ -262,7 +262,7 @@ export default async function HomePage() {
           </div>
           <Link
             href="/services"
-            className="inline-flex items-center rounded bg-lime mt-8 px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+            className="public-cta inline-flex items-center rounded bg-lime mt-8 px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
           >
             Découvrir notre méthode en détail →
           </Link>
@@ -290,7 +290,7 @@ export default async function HomePage() {
         <div className="mt-12">
           <Link
             href="/realisations"
-            className="inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+            className="public-cta inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
           >
             Voir les {nbProjets.total} projets et partenariats →
           </Link>
@@ -311,7 +311,7 @@ export default async function HomePage() {
           />
           <div className="grid md:grid-cols-12 gap-10 md:gap-14 border-t border-white/10 pt-8">
             {fondateur && (
-              <Reveal className="md:col-span-6 flex gap-6 items-start">
+              <Reveal className="md:col-span-6 flex flex-col sm:flex-row gap-5 sm:gap-6 items-start">
                 <Image
                   src={fondateur.photo_url}
                   alt={fondateur.nom}
@@ -344,7 +344,7 @@ export default async function HomePage() {
           </div>
           <Link
             href="/equipe"
-            className="inline-flex items-center rounded bg-lime mt-8 px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+            className="public-cta inline-flex items-center rounded bg-lime mt-8 px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
           >
             Voir toute l&apos;équipe →
           </Link>
@@ -368,7 +368,7 @@ export default async function HomePage() {
         <div className="partner-marquee-wrap">
           <div className="partner-marquee flex items-stretch gap-4 px-5 md:px-8">
             {[...partenaires, ...partenaires].map((p, i) => (
-              <PartnerCard key={i} partenaire={p} className="flex-shrink-0 w-[190px]" />
+              <PartnerCard key={i} partenaire={p} duplicate={i >= partenaires.length} className="flex-shrink-0 w-[190px]" />
             ))}
           </div>
         </div>
@@ -376,7 +376,7 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-5 md:px-8 mt-10">
           <Link
             href="/partenaires"
-            className="inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+            className="public-cta inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
           >
             Voir tous nos partenaires →
           </Link>
@@ -399,7 +399,7 @@ export default async function HomePage() {
           <div className="flex flex-wrap items-center gap-x-8 gap-y-4 mt-9">
             <Link
               href="/contact"
-              className="inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+              className="public-cta inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
             >
               Nous contacter
             </Link>

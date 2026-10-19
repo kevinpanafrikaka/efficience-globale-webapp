@@ -1,6 +1,8 @@
 /* Règles isolées : aucune modification de la présentation de l’admin. */
 .public-site { --ink-faint: #63715e; min-width: 0; }
 .public-site main { min-width: 0; }
+.public-site :where(.grid, .flex) > * { min-width: 0; }
+.public-site .public-contact-form :is(input, textarea) { width: 100%; min-width: 0; font-size: 16px; scroll-margin-block: 100px 24px; }
 .public-site .text-lime { color: #4b7728; }
 .public-site .public-page-hero .text-lime { color: var(--lime-2); }
 .public-site .public-page-hero h1 { text-wrap: balance; }
@@ -18,10 +20,22 @@
 @media (max-width: 639px) {
   .public-site .domain-card { height: auto; min-height: 275px; }
   .public-site .home-hero h1 { text-wrap: balance; }
+  .public-site .public-page-hero > div:last-child { padding-block: 48px; }
+  .public-site .public-page-hero h1 { font-size: clamp(30px, 8.4vw, 36px); }
+  .public-site .public-cta { width: 100%; max-width: 100%; min-height: 48px; justify-content: center; text-align: center; }
+  .public-site .public-section-head > div { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .public-site .public-section-head h2 { font-size: 28px; }
+  .public-site footer nav { gap: 0; }
+  .public-site footer nav a { display: flex; align-items: center; min-height: 44px; }
+  .public-site footer a[href^="mailto:"], .public-site footer a[href^="tel:"] { min-height: 44px; align-items: center; }
+  .public-site .public-social-links a { display: grid; place-items: center; min-width: 44px; min-height: 44px; border: 1px solid #ffffff26; border-radius: 50%; }
 }
-@media (hover: none) {
-  .public-site .partner-card-name { transform: none; }
-  .public-site .partner-card > div:first-child { padding-bottom: 26px; }
+@media (max-width: 767px), (hover: none) {
+  .public-site .partner-card { display: flex; flex-direction: column; height: auto; min-height: 148px; }
+  .public-site .partner-card-logo { flex: none; height: 96px; padding: 12px; }
+  .public-site .partner-card-logo:only-child { height: auto; min-height: 148px; flex: 1; }
+  .public-site .partner-card-logo img { max-width: 100%; max-height: 72px; height: auto; }
+  .public-site .partner-card-name { position: static; flex: 1; height: auto; min-height: 52px; padding: 10px 8px; transform: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .public-site *, .public-site *::before, .public-site *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }

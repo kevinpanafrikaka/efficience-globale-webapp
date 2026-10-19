@@ -153,7 +153,7 @@ export default async function DomainesPage() {
                       <Link
                         key={p.slug}
                         href={`/realisations/${p.slug}`}
-                        className="text-[13px] font-medium text-dark-2 border-b border-line hoverable w-fit"
+                        className="inline-flex items-center min-h-11 py-2 text-[14px] font-medium text-dark-2 border-b border-line hoverable w-fit"
                       >
                         {p.titre}
                       </Link>

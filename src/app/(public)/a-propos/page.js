@@ -29,7 +29,7 @@ export default async function AProposPage() {
               parfaitement dans le contexte local de l&apos;Afrique de l&apos;Ouest, particulièrement en Guinée.
             </p>
             {fondateur && (
-              <div className="flex items-start gap-5 pt-2">
+              <div className="flex flex-col sm:flex-row items-start gap-5 pt-2">
                 <Image
                   src={fondateur.photo_url}
                   alt={fondateur.nom}
@@ -65,7 +65,7 @@ export default async function AProposPage() {
 
         <div className="border-t border-line pt-12 md:pt-16">
           <h2 className="text-[26px] md:text-[32px] tracking-[-0.01em] mb-10">Nos convictions</h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { titre: "Transparence", desc: "Une honnêteté et une ouverture qui renforcent la confiance de nos partenaires et clients.", icon: <IconEye /> },
               { titre: "Innovation", desc: "Nous cultivons la pensée innovante pour rester à l'avant-garde des solutions stratégiques.", icon: <IconSparkle /> },

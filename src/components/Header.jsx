@@ -84,7 +84,7 @@ export default function Header() {
           aria-controls={open ? "mobile-navigation" : undefined}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="xl:hidden p-2 -mr-2"
+          className="xl:hidden min-w-11 min-h-11 flex items-center justify-center p-2 -mr-2"
         >
           <span className="relative block w-6 h-4">
             <span
@@ -98,15 +98,15 @@ export default function Header() {
       </div>
 
       {open && (
-        <div ref={panelRef} id="mobile-navigation" className="xl:hidden fixed inset-x-0 top-[calc(72px+env(safe-area-inset-top,0px))] bottom-0 bg-white overflow-y-auto safe-bottom">
-          <nav aria-label="Navigation mobile" className="flex flex-col px-5">
+        <div ref={panelRef} id="mobile-navigation" className="xl:hidden fixed inset-x-0 top-[calc(72px+env(safe-area-inset-top,0px))] bottom-0 bg-white overflow-y-auto overscroll-contain safe-bottom">
+          <nav aria-label="Navigation mobile" className="flex flex-col px-5 py-2">
             {NAV_LINKS.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
                 aria-current={isActive(l.href) ? "page" : undefined}
                 onClick={() => setOpen(false)}
-                className="py-4 text-[17px] font-semibold text-dark border-b border-line active:bg-cream"
+                className={`py-4 px-3 min-h-12 text-[17px] font-semibold border-b border-line active:bg-cream ${isActive(l.href) ? "text-dark bg-cream border-l-2 border-l-lime" : "text-dark"}`}
               >
                 {l.label}
               </Link>

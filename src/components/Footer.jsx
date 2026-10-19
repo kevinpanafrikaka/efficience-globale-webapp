@@ -48,7 +48,7 @@ export default async function Footer() {
   return (
     <footer className="bg-darker text-[#8fa189] safe-bottom">
       <div className="max-w-6xl mx-auto px-5 md:px-8 py-10">
-        <div className="grid md:grid-cols-[1.2fr_1fr_1fr] gap-8 pb-8 border-b border-white/10">
+        <div className="public-footer-grid grid md:grid-cols-[1.2fr_1fr_1fr] gap-8 pb-8 border-b border-white/10">
           {/* Marque */}
           <div>
             <Image
@@ -118,7 +118,7 @@ export default async function Footer() {
 
         <div className="pt-5 flex flex-col-reverse sm:flex-row items-center justify-between gap-3 text-[12.5px]">
           <div>© {new Date().getFullYear()} Efficience Globale. Tous droits réservés.</div>
-          <div className="flex items-center gap-4">
+          <div className="public-social-links flex items-center gap-2">
             {reseaux.map((s) => (
               <a
                 key={s.nom}

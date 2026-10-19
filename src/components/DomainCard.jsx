@@ -2,12 +2,12 @@ import Image from "next/image";
 
 export default function DomainCard({ titre, description, photo, tint, className = "" }) {
   return (
-    <div className={`domain-card relative h-[260px] md:h-[320px] overflow-hidden flex flex-col justify-end p-6 ${className}`}>
+    <div className={`domain-card relative min-h-[275px] lg:min-h-[320px] overflow-hidden flex flex-col justify-end p-6 ${className}`}>
       <Image
         src={photo}
         alt=""
         fill
-        sizes="(min-width: 768px) 25vw, 50vw"
+        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
         className="domain-card-media object-cover"
       />
       <div className="absolute inset-0" style={{ backgroundColor: tint, mixBlendMode: "multiply" }} />

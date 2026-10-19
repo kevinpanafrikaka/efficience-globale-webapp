@@ -1,6 +1,6 @@
 export default function SectionHead({ eyebrow, title, lead, dark = false, className = "" }) {
   return (
-    <div className={`max-w-3xl mb-14 md:mb-16 ${className}`}>
+    <div className={`public-section-head max-w-3xl mb-10 md:mb-16 ${className}`}>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
         <span
           className={`shrink-0 inline-flex items-center border-[1.5px] text-[11px] font-bold tracking-[0.1em] px-3 py-1.5 ${

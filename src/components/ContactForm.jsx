@@ -46,7 +46,7 @@ export default function ContactForm({ emailContact }) {
   }
 
   return (
-    <form aria-busy={status === "sending"} onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form aria-busy={status === "sending"} onSubmit={handleSubmit} className="public-contact-form flex flex-col gap-4">
       {/* Champ piège anti-spam : invisible pour les humains, rempli par les robots. */}
       <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
         <label htmlFor="site_web">Ne pas remplir</label>
@@ -64,7 +64,7 @@ export default function ContactForm({ emailContact }) {
             type="text"
             autoComplete="name"
             required
-            className="rounded-lg border border-line px-3.5 py-2.5 text-[15px] focus:outline-none focus:ring-2 focus:ring-lime"
+            className="rounded-lg border border-line px-3.5 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-lime"
           />
         </div>
         <div className="flex flex-col gap-1.5 col-span-2 sm:col-span-1">
@@ -78,7 +78,7 @@ export default function ContactForm({ emailContact }) {
             type="email"
             autoComplete="email"
             required
-            className="rounded-lg border border-line px-3.5 py-2.5 text-[15px] focus:outline-none focus:ring-2 focus:ring-lime"
+            className="rounded-lg border border-line px-3.5 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-lime"
           />
         </div>
       </div>
@@ -89,9 +89,9 @@ export default function ContactForm({ emailContact }) {
         <input
           id="sujet"
           name="sujet"
-            maxLength={200}
+          maxLength={200}
           type="text"
-          className="rounded-lg border border-line px-3.5 py-2.5 text-[15px] focus:outline-none focus:ring-2 focus:ring-lime"
+          className="rounded-lg border border-line px-3.5 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-lime"
         />
       </div>
       <div className="flex flex-col gap-1.5">
@@ -101,10 +101,10 @@ export default function ContactForm({ emailContact }) {
         <textarea
           id="message"
           name="message"
-            maxLength={5000}
+          maxLength={5000}
           rows={5}
           required
-          className="rounded-lg border border-line px-3.5 py-2.5 text-[15px] resize-y min-h-[140px] focus:outline-none focus:ring-2 focus:ring-lime"
+          className="rounded-lg border border-line px-3.5 py-2.5 text-base resize-y min-h-[140px] focus:outline-none focus:ring-2 focus:ring-lime"
         />
       </div>
 
