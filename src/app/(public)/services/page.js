@@ -121,7 +121,7 @@ export default function ServicesPage() {
               </ul>
             </li>)}
           </ol>
-          <div className="mt-10"><Link href="/contact" className="inline-flex items-center gap-4 rounded bg-lime px-6 py-3.5 font-semibold text-sm text-ink hover:bg-lime-2 transition-colors">Discutons de vos besoins <span aria-hidden="true">↗</span></Link></div>
+          <div className="mt-10"><Link href="/contact" className="flex w-full items-center justify-center gap-4 rounded bg-lime px-6 py-3.5 text-center font-semibold text-sm text-ink hover:bg-lime-2 transition-colors">Discutons de vos besoins <span aria-hidden="true">↗</span></Link></div>
         </div>
       </section>
     </>
