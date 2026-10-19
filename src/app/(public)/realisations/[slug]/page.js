@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProjetBySlug, getProjets } from "@/lib/db";
 import ProjectCard from "@/components/ProjectCard";
+import ProjectPageEntry from "@/components/ProjectPageEntry";
 
 // Dynamique : le slug est résolu contre D1 à la requête, pas connu au
 // build — nécessaire puisque l'admin peut ajouter des projets sans
@@ -37,9 +38,11 @@ export default async function ProjetDetailPage({ params }) {
   if (!projet) notFound();
 
   const similaires = (await getProjets({ secteur: projet.secteur })).filter((p) => p.slug !== slug).slice(0, 3);
+  const presentation = projet.description?.trim() || projet.resume?.trim();
 
   return (
     <article>
+      <ProjectPageEntry slug={slug} />
       <section className="relative min-h-[380px] md:min-h-[480px] overflow-hidden bg-darker">
         <Image src={projet.photo_url} alt="" fill sizes="100vw" priority className="object-cover" />
         <div
@@ -78,10 +81,11 @@ export default async function ProjetDetailPage({ params }) {
         </div>
       </section>
 
-      <section className="max-w-4xl mx-auto px-5 md:px-8 py-12 md:py-16">
-        {projet.description && (
-          <p className="text-[17px] leading-relaxed text-ink-soft mb-12 max-w-2xl whitespace-pre-line">{projet.description}</p>
-        )}
+      <section aria-labelledby="project-presentation-heading" className="max-w-4xl mx-auto px-5 md:px-8 py-12 md:py-16">
+        <h2 id="project-presentation-heading" className="text-[24px] md:text-[28px] tracking-[-0.01em] mb-5">À propos du projet</h2>
+        <p className="text-[16px] md:text-[17px] leading-relaxed text-ink-soft mb-10 max-w-3xl whitespace-pre-line">
+          {presentation || "La présentation détaillée de ce projet sera bientôt disponible. Contactez-nous pour en savoir plus."}
+        </p>
 
         {projet.resultats?.length > 0 && (
           <>
@@ -111,7 +115,7 @@ export default async function ProjetDetailPage({ params }) {
 
         <Link
           href="/contact"
-          className="inline-flex items-center rounded bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+          className="flex w-full items-center justify-center rounded bg-lime px-6 py-3.5 text-center text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
         >
           Discuter d&apos;un projet similaire
         </Link>
