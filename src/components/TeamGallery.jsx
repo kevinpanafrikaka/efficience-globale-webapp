@@ -118,7 +118,6 @@ export default function TeamGallery({ members }) {
       <div id="team-biography" className="team-biography" role="region" aria-label="Biographie du membre sélectionné" aria-live={autoRunning ? "off" : "polite"} aria-atomic="true">
         <div key={active.id} className="team-biography-content">
           <div>
-            <p className="team-bio-eyebrow">RENCONTRER NOTRE ÉQUIPE</p>
             <h2>{active.nom}</h2>
             {active.role && <p className="team-bio-role">{active.role}</p>}
             {expertiseTags(active.expertises).length > 0 && (
