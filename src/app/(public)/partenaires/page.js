@@ -1,6 +1,8 @@
 import PageHero from "@/components/PageHero";
+import Image from "@/components/PublicImage";
+import PartnerDirectoryCard from "@/components/PartnerDirectoryCard";
 import { getProjets, getPartenaires } from "@/lib/db";
-import PartnerCard from "@/components/PartnerCard";
+import { projectsForPartner } from "@/lib/partner-projects.mjs";
 
 export const metadata = {
   title: "Partenaires",
@@ -10,10 +12,8 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function PartenairesPage() {
-  const [partenariats, bailleurs] = await Promise.all([
-    getProjets({ secteur: "partenariat" }),
-    getPartenaires(),
-  ]);
+  const [projets, bailleurs] = await Promise.all([getProjets(), getPartenaires()]);
+  const partenariats = projets.filter((project) => project.secteur === "partenariat");
 
   return (
     <>
@@ -21,36 +21,43 @@ export default async function PartenairesPage() {
         title={<>Ils nous font <span className="text-lime-2 italic">confiance</span></>}
         description="Bailleurs, institutions académiques et organisations de la société civile : des partenaires de premier plan qui nous accordent leur confiance à travers l’Afrique de l’Ouest." />
 
-      <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
-        <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-3 mb-8">
-          <div className="text-[12px] font-bold tracking-[0.1em] text-lime">BAILLEURS &amp; INSTITUTIONS</div>
-          <div className="text-[12px] text-ink-faint">{bailleurs.length} institutions partenaires actives</div>
+      <section aria-labelledby="institutions-heading" className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
+        <div className="max-w-2xl mb-9 md:mb-12">
+          <p className="text-[11px] font-semibold tracking-[0.12em] text-ink-soft mb-4">BAILLEURS &amp; INSTITUTIONS</p>
+          <h2 id="institutions-heading" className="text-[28px] md:text-[38px] leading-tight tracking-[-0.01em] mb-4">Des partenaires, des actions <span className="text-lime italic">concrètes</span></h2>
+          <p className="text-[15.5px] text-ink-soft leading-relaxed">Découvrez les réalisations menées avec les organisations qui nous font confiance.</p>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {bailleurs.map((p) => (
-            <PartnerCard key={p.id} partenaire={p} />
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
+          {bailleurs.map((partner) => (
+            <PartnerDirectoryCard key={partner.id} partner={partner} projectCount={projectsForPartner(partner, projets).length} />
           ))}
         </div>
       </section>
 
       {partenariats.length > 0 && (
-        <section className="bg-cream py-16 md:py-24">
+        <section aria-labelledby="partnerships-heading" className="bg-cream py-16 md:py-24">
           <div className="max-w-6xl mx-auto px-5 md:px-8">
-            <div className="text-[12px] font-bold tracking-[0.1em] text-lime mb-3.5">PARTENARIATS STRATÉGIQUES</div>
-            <h2 className="text-[28px] md:text-[38px] tracking-[-0.01em] mb-4">
-              Des <span className="text-lime italic">collaborations</span> de long terme
-            </h2>
-            <p className="text-[15.5px] text-ink-soft leading-relaxed max-w-2xl mb-12">
-              Des accords-cadres et protocoles d&apos;entente qui structurent notre collaboration avec des
-              institutions académiques, associatives et internationales sur plusieurs années.
-            </p>
-            <div className="grid md:grid-cols-2 gap-x-10 gap-y-10">
-              {partenariats.map((p) => (
-                <div key={p.slug} className="border-l-2 border-lime pl-6 flex flex-col gap-2">
-                  <div className="text-[12px] font-semibold text-dark-2 tracking-[0.05em]">{p.client.toUpperCase()}</div>
-                  <h3 className="text-[18px] tracking-[-0.01em]">{p.titre}</h3>
-                  <p className="text-[14px] text-ink-soft leading-relaxed">{p.resume}</p>
-                </div>
+            <div className="max-w-2xl mb-9 md:mb-12">
+              <p className="text-[11px] font-semibold tracking-[0.12em] text-ink-soft mb-4">PARTENARIATS STRATÉGIQUES</p>
+              <h2 id="partnerships-heading" className="text-[28px] md:text-[38px] leading-tight tracking-[-0.01em] mb-4">Des <span className="text-lime italic">collaborations</span> de long terme</h2>
+              <p className="text-[15.5px] text-ink-soft leading-relaxed">Des accords-cadres et protocoles d&apos;entente qui structurent notre collaboration avec des institutions académiques, associatives et internationales.</p>
+            </div>
+            <div className="grid md:grid-cols-2 gap-6">
+              {partenariats.map((project) => (
+                <a key={project.slug} href={`/realisations/${project.slug}`} className="strategic-partner-card group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-line bg-white">
+                  <div className="relative aspect-[16/9] overflow-hidden bg-line">
+                    <Image src={project.photo_url} alt="" fill sizes="(min-width: 768px) 50vw, 100vw" className="pointer-events-none object-cover transition-transform duration-500 group-hover:scale-[1.025]" />
+                  </div>
+                  <div className="flex flex-1 flex-col p-5 sm:p-7">
+                    <p className="text-[12px] font-semibold text-dark-2 mb-3">{project.client}</p>
+                    <h3 className="text-[21px] md:text-[24px] leading-tight mb-3">{project.titre}</h3>
+                    <p className="text-[14px] leading-relaxed text-ink-soft mb-6">{project.resume || project.description}</p>
+                    <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
+                      {project.periode && <span className="text-[12px] text-ink-faint">{project.periode}</span>}
+                      <span className="inline-flex min-h-11 items-center gap-3 text-[13px] font-semibold text-dark">Voir la fiche <span aria-hidden="true" className="grid h-9 w-9 place-items-center rounded-full bg-cream text-lg">↗</span></span>
+                    </div>
+                  </div>
+                </a>
               ))}
             </div>
           </div>
