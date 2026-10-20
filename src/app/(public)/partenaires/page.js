@@ -23,7 +23,6 @@ export default async function PartenairesPage() {
 
       <section aria-labelledby="institutions-heading" className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
         <div className="max-w-2xl mb-9 md:mb-12">
-          <p className="text-[11px] font-semibold tracking-[0.12em] text-ink-soft mb-4">BAILLEURS &amp; INSTITUTIONS</p>
           <h2 id="institutions-heading" className="text-[28px] md:text-[38px] leading-tight tracking-[-0.01em] mb-4">Des partenaires, des actions <span className="text-lime italic">concrètes</span></h2>
           <p className="text-[15.5px] text-ink-soft leading-relaxed">Découvrez les réalisations menées avec les organisations qui nous font confiance.</p>
         </div>
@@ -38,7 +37,6 @@ export default async function PartenairesPage() {
         <section aria-labelledby="partnerships-heading" className="bg-cream py-16 md:py-24">
           <div className="max-w-6xl mx-auto px-5 md:px-8">
             <div className="max-w-2xl mb-9 md:mb-12">
-              <p className="text-[11px] font-semibold tracking-[0.12em] text-ink-soft mb-4">PARTENARIATS STRATÉGIQUES</p>
               <h2 id="partnerships-heading" className="text-[28px] md:text-[38px] leading-tight tracking-[-0.01em] mb-4">Des <span className="text-lime italic">collaborations</span> de long terme</h2>
               <p className="text-[15.5px] text-ink-soft leading-relaxed">Des accords-cadres et protocoles d&apos;entente qui structurent notre collaboration avec des institutions académiques, associatives et internationales.</p>
             </div>
