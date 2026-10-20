@@ -2,7 +2,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { isGmailConnected, GMAIL_OWNER, GMAIL_RECIPIENT } from "@/lib/gmail.mjs";
 import { isBrevoConfigured } from "@/lib/brevo.mjs";
 import { adminPageAllowed } from "@/lib/admin-page";
-import { getReglages, parseStatsEquipe } from "@/lib/db";
+import { getReglages } from "@/lib/db";
 import ReglagesForm from "@/components/admin/ReglagesForm";
 
 export const dynamic = "force-dynamic";
@@ -21,9 +21,9 @@ export default async function AdminReglagesPage() {
     <div>
       <h1 className="text-[24px] mb-2">Réglages du site</h1>
       <p className="text-[14px] text-ink-soft mb-6">
-        Coordonnées, réseaux sociaux et chiffres affichés sur le site public.
+        Coordonnées et réseaux sociaux affichés sur le site public.
       </p>
-      <ReglagesForm reglages={reglages} stats={parseStatsEquipe(reglages)} notification={notification} />
+      <ReglagesForm reglages={reglages} notification={notification} />
     </div>
   );
 }

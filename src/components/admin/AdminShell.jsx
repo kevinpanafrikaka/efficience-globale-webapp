@@ -10,7 +10,6 @@ const NAV = [
   ["/admin/membres", "Équipe", "♧"], ["/admin/annonces", "Annonces", "◷"],
   ["/admin/partenaires", "Partenaires", "◇"], ["/admin/messages", "Messages", "✉"],
   ["/admin/medias", "Médiathèque", "▧"], ["/admin/reglages", "Réglages", "⚙"],
-  ["/admin/apercu", "Aperçu du site", "◉"],
 ];
 
 export default function AdminShell({ children, unread }) {

@@ -54,7 +54,7 @@ test("Settings display the actual Gmail sender and recipient without exposing se
     assert.ok(html.includes("Gmail connecté"));
     assert.ok(html.includes("oumar.camara@efficienceglobale.com"));
     assert.ok(html.includes("kevinkandet05@gmail.com"));
-    assert.doesNotMatch(html, /test-google-secret|encrypted-test-token/);
+    assert.doesNotMatch(html, /test-google-secret|encrypted-test-token|Destinataire Resend|Chiffres de l|Ajouter un chiffre/);
   } finally { runtime.close(); }
 });
 

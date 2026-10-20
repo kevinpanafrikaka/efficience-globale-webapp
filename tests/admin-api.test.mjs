@@ -118,3 +118,21 @@ test("Message status accepts booleans and reordering persists without losing ent
     assert.deepEqual(Array.from(db.parseStatsEquipe({ stats_equipe: "[]" })), []);
   } finally { runtime.close(); }
 });
+
+test("Saving visible settings preserves team figures and the legacy notification recipient", async () => {
+  const runtime = await adminRuntime();
+  try {
+    const db = await runtime.module("src/lib/db.js");
+    const stats = JSON.stringify([{ nombre: 8, label: "Consultants" }]);
+    await db.saveReglages({ stats_equipe: stats, email_destinataire: "fallback@example.org" });
+    const route = await runtime.module("src/app/api/admin/reglages/route.js");
+    const fields = { email: "contact@example.org", telephone: "+224 123", adresse: "Conakry", facebook: "", x: "", linkedin: "https://example.org" };
+    assert.equal((await route.PUT(request("/settings", "PUT", fields))).status, 200);
+    const saved = await db.getReglages();
+    assert.equal(saved.email, fields.email);
+    assert.equal(saved.linkedin, fields.linkedin);
+    assert.equal(saved.stats_equipe, stats);
+    assert.equal(saved.email_destinataire, "fallback@example.org");
+    assert.equal((await route.PUT(request("/settings", "PUT", { ...fields, email: "invalid" }))).status, 400);
+  } finally { runtime.close(); }
+});

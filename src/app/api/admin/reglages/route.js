@@ -24,13 +24,11 @@ export async function PUT(request) {
   if (!data || typeof data !== "object" || Array.isArray(data)) return Response.json({ error: "Réglages invalides." }, { status: 400 });
   const values = {};
 
-  for (const cle of ["email", "email_destinataire"]) {
-    const v = (data[cle] ?? "").toString().trim();
-    if (!EMAIL_RE.test(v)) {
-      return Response.json({ error: `Adresse email invalide : ${cle === "email" ? "email de contact" : "destinataire du formulaire"}.` }, { status: 400 });
-    }
-    values[cle] = v;
+  const email = (data.email ?? "").toString().trim();
+  if (!EMAIL_RE.test(email)) {
+    return Response.json({ error: "Adresse email de contact invalide." }, { status: 400 });
   }
+  values.email = email;
 
   values.telephone = (data.telephone ?? "").toString().trim();
   values.adresse = (data.adresse ?? "").toString().trim();
@@ -43,16 +41,8 @@ export async function PUT(request) {
     values[cle] = v;
   }
 
-  if (!Array.isArray(data.stats_equipe)) {
-    return Response.json({ error: "Statistiques invalides." }, { status: 400 });
-  }
-  if (data.stats_equipe.length > 12 || data.stats_equipe.some(s => !s || typeof s !== "object" || !String(s.label ?? "").trim() || !String(s.nombre ?? "").trim() || !Number.isFinite(Number(s.nombre)) || Number(s.nombre) < 0)) {
-    return Response.json({ error: "Renseignez un libellé et un nombre positif ou nul pour chaque chiffre, ou retirez la ligne vide (12 lignes maximum)." }, { status: 400 });
-  }
-  const stats = data.stats_equipe
-    .map((s) => ({ nombre: Number(s.nombre), label: (s.label ?? "").toString().trim() }))
-    .filter((s) => s.label && Number.isFinite(s.nombre));
-  values.stats_equipe = JSON.stringify(stats);
+  // Only update editable contact fields; preserve existing team figures and
+  // the legacy fallback recipient used by the notification backend.
 
   try {
     await saveReglages(values);

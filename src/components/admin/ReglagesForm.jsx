@@ -18,30 +18,23 @@ function Field({ label, hint, children }) {
   );
 }
 
-export default function ReglagesForm({ reglages, stats, notification }) {
+export default function ReglagesForm({ reglages, notification }) {
   const router = useRouter();
   const saving = useRef(false);
   const [form, setForm] = useState({
     email: reglages.email,
     telephone: reglages.telephone,
     adresse: reglages.adresse,
-    email_destinataire: reglages.email_destinataire,
     facebook: reglages.facebook,
     x: reglages.x,
     linkedin: reglages.linkedin,
   });
-  const [statsList, setStatsList] = useState(stats.map((s) => ({ nombre: String(s.nombre), label: s.label })));
   const [error, setError] = useState("");
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(false);
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
-    setSaved(false);
-  }
-
-  function updateStat(i, field, value) {
-    setStatsList((list) => list.map((s, idx) => (idx === i ? { ...s, [field]: value } : s)));
     setSaved(false);
   }
 
@@ -57,7 +50,7 @@ export default function ReglagesForm({ reglages, stats, notification }) {
       const res = await fetch("/api/admin/reglages", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, stats_equipe: statsList }),
+        body: JSON.stringify(form),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -89,18 +82,6 @@ export default function ReglagesForm({ reglages, stats, notification }) {
             <input value={form.adresse} onChange={(e) => update("adresse", e.target.value)} className={inputClass} />
           </Field>
         </div>
-        <Field
-          label="Destinataire Resend (solution de repli)"
-          hint="Ce réglage concerne uniquement Resend. Avec Gmail ou Brevo, les notifications sont adressées à M. Oumar selon la configuration affichée ci-dessus."
-        >
-          <input
-            type="email"
-            value={form.email_destinataire}
-            onChange={(e) => update("email_destinataire", e.target.value)}
-            required
-            className={inputClass}
-          />
-        </Field>
       </section>
 
       <section className="flex flex-col gap-4">
@@ -121,46 +102,6 @@ export default function ReglagesForm({ reglages, stats, notification }) {
             />
           </Field>
         ))}
-      </section>
-
-      <section className="flex flex-col gap-4">
-        <h2 className="text-[16px]">Chiffres de l&apos;équipe</h2>
-        <p className="text-[12.5px] text-ink-faint -mt-2">Affichés sur l&apos;accueil et la page Équipe.</p>
-        {statsList.map((s, i) => (
-          <div key={i} className="grid grid-cols-[90px_1fr_auto] gap-3 items-center">
-            <input
-              type="number"
-              min="0"
-              value={s.nombre}
-              onChange={(e) => updateStat(i, "nombre", e.target.value)}
-              aria-label="Nombre"
-              className={inputClass}
-            />
-            <input
-              value={s.label}
-              onChange={(e) => updateStat(i, "label", e.target.value)}
-              aria-label="Libellé"
-              className={inputClass}
-            />
-            <button
-              type="button"
-              onClick={() => {
-                setStatsList((list) => list.filter((_, idx) => idx !== i));
-                setSaved(false);
-              }}
-              className="text-[12.5px] font-semibold text-red-600 hover:text-red-700"
-            >
-              Retirer
-            </button>
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={() => { setStatsList((list) => [...list, { nombre: "", label: "" }]); setSaved(false); }}
-          className="text-[13px] font-semibold text-dark-2 hover:text-lime transition-colors w-fit"
-        >
-          + Ajouter un chiffre
-        </button>
       </section>
 
       {error && <p role="alert" className="text-[13.5px] text-red-600">{error}</p>}
