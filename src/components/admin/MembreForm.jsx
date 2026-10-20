@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/admin/ImageUpload";
 
@@ -23,6 +23,7 @@ export default function MembreForm({ membre }) {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const saving = useRef(false);
   const [uploading, setUploading] = useState(false);
 
   function update(field, value) {
@@ -31,7 +32,9 @@ export default function MembreForm({ membre }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (saving.current || uploading) return;
     if (uploading || loading) return;
+    saving.current = true;
     setLoading(true);
     setError("");
 
@@ -54,24 +57,26 @@ export default function MembreForm({ membre }) {
     } catch {
       setError("Impossible d'enregistrer. Vérifiez votre connexion.");
       setLoading(false);
+    } finally {
+      saving.current = false;
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-xl">
       <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>Nom</label>
-        <input value={form.nom} onChange={(e) => update("nom", e.target.value)} required className={inputClass} />
+        <label htmlFor="membreform-1" className={labelClass}>Nom</label>
+        <input id="membreform-1" value={form.nom} onChange={(e) => update("nom", e.target.value)} required className={inputClass} />
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>Rôle</label>
-        <input value={form.role} onChange={(e) => update("role", e.target.value)} className={inputClass} />
+        <label htmlFor="membreform-2" className={labelClass}>Rôle</label>
+        <input id="membreform-2" value={form.role} onChange={(e) => update("role", e.target.value)} className={inputClass} />
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>Bio</label>
-        <textarea
+        <label htmlFor="membreform-3" className={labelClass}>Bio</label>
+        <textarea id="membreform-3"
           value={form.bio}
           onChange={(e) => update("bio", e.target.value)}
           rows={4}
@@ -92,7 +97,8 @@ export default function MembreForm({ membre }) {
           value={form.photo_url}
           onChange={(url) => update("photo_url", url)}
           onUploadingChange={setUploading}
-          disabled={loading}
+          allowRemove
+          disabled={loading || uploading}
         />
         <p className="text-[12px] text-ink-soft mt-1">
           Sélectionnez un portrait depuis votre ordinateur, puis enregistrez le membre pour conserver la photo.
@@ -101,15 +107,15 @@ export default function MembreForm({ membre }) {
 
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Statut</label>
-          <select value={form.statut} onChange={(e) => update("statut", e.target.value)} className={inputClass}>
+          <label htmlFor="membreform-4" className={labelClass}>Statut</label>
+          <select id="membreform-4" value={form.statut} onChange={(e) => update("statut", e.target.value)} className={inputClass}>
             <option value="brouillon">Brouillon</option>
             <option value="publie">Publié</option>
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Ordre d&apos;affichage</label>
-          <input
+          <label htmlFor="membreform-5" className={labelClass}>Ordre d&apos;affichage</label>
+          <input id="membreform-5"
             type="number"
             value={form.ordre_affichage}
             onChange={(e) => update("ordre_affichage", e.target.value)}
@@ -118,7 +124,7 @@ export default function MembreForm({ membre }) {
         </div>
       </div>
 
-      {error && <p className="text-[13.5px] text-red-600">{error}</p>}
+      {error && <p role="alert" className="text-[13.5px] text-red-600">{error}</p>}
 
       <button
         type="submit"

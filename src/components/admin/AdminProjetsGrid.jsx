@@ -1,4 +1,5 @@
 "use client";
+import AdminImage from "@/components/admin/AdminImage";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -23,7 +24,8 @@ function FilterRow({ options, active, onChange }) {
           key={o.key}
           type="button"
           onClick={() => onChange(o.key)}
-          className={`rounded-full border text-[13px] font-semibold px-3.5 py-1.5 transition-colors active:scale-[0.97] ${
+          aria-pressed={active === o.key}
+          className={`admin-filter-button rounded-full border text-[13px] font-semibold px-3.5 py-1.5 transition-colors active:scale-[0.97] ${
             active === o.key
               ? "bg-dark-2 border-dark-2 text-white"
               : "bg-white border-line text-ink-soft hover:border-lime hover:text-lime"
@@ -56,7 +58,7 @@ export default function AdminProjetsGrid({ projets, secteurs }) {
               <div className="relative h-36 bg-cream">
                 {p.photo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.photo_url} alt="" className="w-full h-full object-cover" />
+                  <AdminImage src={p.photo_url} alt="" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-[12px] text-ink-faint">
                     Aucune image

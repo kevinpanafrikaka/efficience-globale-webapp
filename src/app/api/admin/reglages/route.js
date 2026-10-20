@@ -19,7 +19,9 @@ export async function PUT(request) {
     return Response.json({ error: "Non autorisé." }, { status: 401 });
   }
 
-  const data = await request.json();
+  let data;
+  try { data = await request.json(); } catch { return Response.json({ error: "Demande JSON invalide." }, { status: 400 }); }
+  if (!data || typeof data !== "object" || Array.isArray(data)) return Response.json({ error: "Réglages invalides." }, { status: 400 });
   const values = {};
 
   for (const cle of ["email", "email_destinataire"]) {
@@ -43,6 +45,9 @@ export async function PUT(request) {
 
   if (!Array.isArray(data.stats_equipe)) {
     return Response.json({ error: "Statistiques invalides." }, { status: 400 });
+  }
+  if (data.stats_equipe.length > 12 || data.stats_equipe.some(s => !s || typeof s !== "object" || !String(s.label ?? "").trim() || !String(s.nombre ?? "").trim() || !Number.isFinite(Number(s.nombre)) || Number(s.nombre) < 0)) {
+    return Response.json({ error: "Renseignez un libellé et un nombre positif ou nul pour chaque chiffre, ou retirez la ligne vide (12 lignes maximum)." }, { status: 400 });
   }
   const stats = data.stats_equipe
     .map((s) => ({ nombre: Number(s.nombre), label: (s.label ?? "").toString().trim() }))

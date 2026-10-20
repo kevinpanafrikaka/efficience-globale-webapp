@@ -1,3 +1,4 @@
+import { adminPageAllowed } from "@/lib/admin-page";
 import Link from "next/link";
 import { getAllMessages } from "@/lib/db";
 import { formatDate } from "@/lib/format";
@@ -6,6 +7,7 @@ import MessageActions from "@/components/admin/MessageActions";
 export const dynamic = "force-dynamic";
 
 export default async function AdminMessagesPage() {
+  if (!(await adminPageAllowed())) return null;
   let messages = [];
   let migrationManquante = false;
   try {
@@ -34,7 +36,7 @@ export default async function AdminMessagesPage() {
           {messages.map((m, i) => (
             <div
               key={m.id}
-              className={`flex items-center justify-between gap-4 px-4 py-3 ${i > 0 ? "border-t border-line" : ""} ${
+              className={`admin-list-row flex items-center justify-between gap-4 px-4 py-3 ${i > 0 ? "border-t border-line" : ""} ${
                 m.lu ? "" : "bg-cream"
               }`}
             >

@@ -1,9 +1,12 @@
+import AdminImage from "@/components/admin/AdminImage";
+import { adminPageAllowed } from "@/lib/admin-page";
 import Link from "next/link";
 import { getAllPartenaires } from "@/lib/db";
 import DeleteButton from "@/components/admin/DeleteButton";
 import ReorderButtons from "@/components/admin/ReorderButtons";
 
 export default async function AdminPartenairesPage() {
+  if (!(await adminPageAllowed())) return null;
   let partenaires = [];
   let migrationManquante = false;
   try {
@@ -38,7 +41,7 @@ export default async function AdminPartenairesPage() {
               <div className="relative h-32 bg-cream flex items-center justify-center px-6">
                 {p.logo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.logo_url} alt={p.nom} className="max-h-20 max-w-full object-contain" />
+                  <AdminImage src={p.logo_url} alt={p.nom} className="max-h-20 max-w-full object-contain" />
                 ) : (
                   <span className="text-[14px] font-bold text-dark-2 text-center">{p.nom}</span>
                 )}

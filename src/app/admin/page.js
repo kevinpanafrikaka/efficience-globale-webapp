@@ -1,3 +1,4 @@
+import { adminPageAllowed } from "@/lib/admin-page";
 import Link from "next/link";
 import { getDashboardStats } from "@/lib/db";
 import { formatDate } from "@/lib/format";
@@ -25,11 +26,12 @@ const SHORTCUTS = [
 ];
 
 export default async function AdminHomePage() {
+  if (!(await adminPageAllowed())) return null;
   const s = await getDashboardStats();
 
   return (
     <div className="max-w-4xl">
-      <h1 className="text-[24px] mb-6">Tableau de bord</h1>
+      <div className="admin-dashboard-heading"><p className="admin-dashboard-eyebrow">EFFICIENCE GLOBALE · ADMINISTRATION</p><h1 className="text-[24px] mb-3">Votre site, en un regard.</h1><p className="text-[15px] text-ink-soft mb-8">Retrouvez vos contenus, préparez vos prochaines publications et suivez les demandes reçues.</p></div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard href="/admin/projets" label="PROJETS" {...s.projets} />
@@ -68,7 +70,7 @@ export default async function AdminHomePage() {
             </Link>
           </div>
           {s.derniersMessages.length === 0 ? (
-            <p className="text-[14px] text-ink-soft">Aucun message reçu pour le moment.</p>
+            <p className="admin-empty text-[14px] text-ink-soft">Aucun message reçu pour le moment. Les demandes envoyées depuis Contact apparaîtront ici.</p>
           ) : (
             <div className="border border-line rounded-lg overflow-hidden bg-white">
               {s.derniersMessages.map((m, i) => (

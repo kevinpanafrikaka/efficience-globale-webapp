@@ -1,9 +1,12 @@
+import AdminImage from "@/components/admin/AdminImage";
+import { adminPageAllowed } from "@/lib/admin-page";
 import Link from "next/link";
 import { getAllMembres } from "@/lib/db";
 import DeleteButton from "@/components/admin/DeleteButton";
 import ReorderButtons from "@/components/admin/ReorderButtons";
 
 export default async function AdminMembresPage() {
+  if (!(await adminPageAllowed())) return null;
   const membres = await getAllMembres();
 
   return (
@@ -27,7 +30,7 @@ export default async function AdminMembresPage() {
               <div className="relative h-44 bg-cream">
                 {m.photo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={m.photo_url} alt="" className="w-full h-full object-cover" />
+                  <AdminImage src={m.photo_url} alt="" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-[12px] text-ink-faint">
                     Aucune image

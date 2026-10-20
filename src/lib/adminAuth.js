@@ -40,12 +40,12 @@ export async function createSessionCookieValue(env) {
 }
 
 async function verifyToken(token, env) {
-  if (!token) return false;
+  if (!token || !env.ADMIN_PASSWORD) return false;
   const parts = token.split(".");
   if (parts.length !== 3) return false;
   const [role, expires, sig] = parts;
   if (role !== "admin") return false;
-  if (Date.now() > Number(expires)) return false;
+  if (!Number.isFinite(Number(expires)) || Date.now() > Number(expires)) return false;
   const expectedSig = await sign(`${role}.${expires}`, env.ADMIN_PASSWORD);
   return safeEqual(sig, expectedSig);
 }
@@ -59,7 +59,8 @@ export async function isAdminAuthenticated(env) {
 export async function isAdminRequest(request, env) {
   const cookieHeader = request.headers.get("cookie") || "";
   const match = cookieHeader.match(new RegExp(`${COOKIE_NAME}=([^;]+)`));
-  const token = match ? decodeURIComponent(match[1]) : null;
+  let token = null;
+  try { token = match ? decodeURIComponent(match[1]) : null; } catch { return false; }
   return verifyToken(token, env);
 }
 

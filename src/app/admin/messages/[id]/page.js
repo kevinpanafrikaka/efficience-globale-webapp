@@ -1,19 +1,18 @@
+import { adminPageAllowed } from "@/lib/admin-page";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getMessageById, setMessageLu } from "@/lib/db";
+import { getMessageById } from "@/lib/db";
 import MessageActions from "@/components/admin/MessageActions";
 import { formatDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminMessagePage({ params }) {
+  if (!(await adminPageAllowed())) return null;
   const { id } = await params;
   const message = await getMessageById(id);
   if (!message) notFound();
 
-  // Ouvrir un message le marque comme lu.
-  const etaitNonLu = !message.lu;
-  if (etaitNonLu) await setMessageLu(id, true);
 
   const sujetReponse = encodeURIComponent(`Re: ${message.sujet || "Votre message"}`);
 
@@ -38,7 +37,7 @@ export default async function AdminMessagePage({ params }) {
         >
           Répondre par email
         </a>
-        <MessageActions id={message.id} lu={true} redirectAfterDelete="/admin/messages" />
+        <MessageActions id={message.id} lu={!!message.lu} markOnOpen redirectAfterDelete="/admin/messages" />
       </div>
     </div>
   );

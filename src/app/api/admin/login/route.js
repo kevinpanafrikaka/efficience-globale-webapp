@@ -13,9 +13,11 @@ export async function POST(request) {
     );
   }
 
-  const { password } = await request.json();
+  let data;
+  try { data = await request.json(); } catch { return Response.json({ error: "Demande de connexion invalide." }, { status: 400 }); }
+  const password = data?.password;
 
-  if (!password || !env.ADMIN_PASSWORD || !safeEqual(password, env.ADMIN_PASSWORD)) {
+  if (typeof password !== "string" || !password || !env.ADMIN_PASSWORD || !safeEqual(password, env.ADMIN_PASSWORD)) {
     await recordFailedLogin(ip);
     return Response.json({ error: "Mot de passe incorrect." }, { status: 401 });
   }

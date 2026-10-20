@@ -1,35 +1,21 @@
 "use client";
-
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import DeleteButton from "@/components/admin/DeleteButton";
-
-export default function MessageActions({ id, lu, redirectAfterDelete }) {
+import DeleteButton from "./DeleteButton";
+import useAdminAction from "./useAdminAction";
+export default function MessageActions({ id, lu, markOnOpen = false, redirectAfterDelete }) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-
-  async function toggle() {
-    setLoading(true);
-    await fetch(`/api/admin/messages/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ lu: !lu }),
-    });
-    router.refresh();
-    setLoading(false);
+  const { run, loading, error } = useAdminAction();
+  const attempted = useRef(false);
+  async function setRead(value) {
+    return run(`/api/admin/messages/${id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lu: value }) }, () => router.refresh());
   }
-
-  return (
-    <div className="flex items-center gap-4">
-      <button
-        type="button"
-        onClick={toggle}
-        disabled={loading}
-        className="text-[12.5px] font-semibold text-dark-2 hover:text-lime transition-colors disabled:opacity-60"
-      >
-        {lu ? "Marquer non lu" : "Marquer lu"}
-      </button>
-      <DeleteButton endpoint={`/api/admin/messages/${id}`} confirmMessage="Supprimer ce message ?" redirectTo={redirectAfterDelete} />
-    </div>
-  );
+  useEffect(() => {
+    if (markOnOpen && !lu && !attempted.current) { attempted.current = true; setRead(true); }
+  }, [id, lu, markOnOpen]);
+  return <div className="admin-action-group">
+    <button type="button" onClick={() => setRead(!lu)} disabled={loading} className="text-[12.5px] font-semibold text-dark-2 hover:text-lime disabled:opacity-60">{loading ? "Mise à jour…" : lu ? "Marquer non lu" : "Marquer lu"}</button>
+    <DeleteButton endpoint={`/api/admin/messages/${id}`} confirmMessage="Supprimer ce message ?" redirectTo={redirectAfterDelete} />
+    {error && <span role="alert" className="admin-action-error">{error}</span>}
+  </div>;
 }

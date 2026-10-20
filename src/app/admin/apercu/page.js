@@ -11,7 +11,7 @@ export default function AdminApercuPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
+    <div className="admin-preview flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-[20px] mb-1">Aperçu du site</h1>

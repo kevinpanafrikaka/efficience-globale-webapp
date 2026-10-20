@@ -412,7 +412,7 @@ export async function getReglages() {
 export function parseStatsEquipe(reglages) {
   try {
     const stats = JSON.parse(reglages.stats_equipe);
-    if (Array.isArray(stats) && stats.length) return stats;
+    if (Array.isArray(stats)) return stats;
   } catch {}
   return equipeStatsParDefaut;
 }
@@ -483,7 +483,7 @@ export async function getDashboardStats() {
 }
 
 // Ensemble des URLs d'images référencées en base (pour repérer les médias inutilisés).
-export async function getUsedMediaUrls() {
+export async function getUsedMediaUrls({ strict = false } = {}) {
   const db = await getDB();
   const queries = [
     "SELECT photo_url AS u FROM projets",
@@ -496,7 +496,7 @@ export async function getUsedMediaUrls() {
     try {
       const { results } = await db.prepare(q).all();
       for (const r of results) if (r.u) used.add(r.u);
-    } catch {}
+    } catch (error) { if (strict) throw error; }
   }
   return used;
 }

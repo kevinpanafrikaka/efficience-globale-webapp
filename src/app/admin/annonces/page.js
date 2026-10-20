@@ -1,8 +1,10 @@
+import { adminPageAllowed } from "@/lib/admin-page";
 import Link from "next/link";
 import { getAllAnnonces } from "@/lib/db";
 import DeleteButton from "@/components/admin/DeleteButton";
 
 export default async function AdminAnnoncesPage() {
+  if (!(await adminPageAllowed())) return null;
   const annonces = await getAllAnnonces();
 
   return (
@@ -24,7 +26,7 @@ export default async function AdminAnnoncesPage() {
           {annonces.map((a, i) => (
             <div
               key={a.id}
-              className={`flex items-center justify-between gap-4 px-4 py-3 ${i > 0 ? "border-t border-line" : ""}`}
+              className={`admin-list-row flex items-center justify-between gap-4 px-4 py-3 ${i > 0 ? "border-t border-line" : ""}`}
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2 mb-0.5">
@@ -39,7 +41,7 @@ export default async function AdminAnnoncesPage() {
                 </div>
                 <div className="text-[12.5px] text-ink-faint">{a.date}</div>
               </div>
-              <div className="flex items-center gap-4 shrink-0">
+              <div className="admin-action-group">
                 <Link
                   href={`/admin/annonces/${a.id}/modifier`}
                   className="text-[12.5px] font-semibold text-dark-2 hover:text-lime transition-colors"

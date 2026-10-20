@@ -3,8 +3,8 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
 import { countMessagesNonLus } from "@/lib/db";
 import LoginForm from "@/components/admin/LoginForm";
-import LogoutButton from "@/components/admin/LogoutButton";
-import AdminNavLink from "@/components/admin/AdminNavLink";
+import AdminShell from "@/components/admin/AdminShell";
+import "./admin.css";
 
 export const metadata = {
   title: "Admin",
@@ -13,57 +13,22 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-const NAV = [
-  { href: "/admin", label: "Tableau de bord" },
-  { href: "/admin/projets", label: "Projets" },
-  { href: "/admin/membres", label: "Membres" },
-  { href: "/admin/annonces", label: "Annonces" },
-  { href: "/admin/partenaires", label: "Partenaires" },
-  { href: "/admin/messages", label: "Messages" },
-  { href: "/admin/medias", label: "Médias" },
-  { href: "/admin/reglages", label: "Réglages" },
-  { href: "/admin/apercu", label: "Aperçu du site" },
-];
-
 export default async function AdminLayout({ children }) {
   const { env } = await getCloudflareContext({ async: true });
   const authenticated = await isAdminAuthenticated(env);
 
   if (!authenticated) {
     return (
-      <div className="max-w-md mx-auto px-5 py-24">
-        <h1 className="text-[22px] mb-6 text-center">Espace admin</h1>
-        <LoginForm />
-      </div>
+      <div className="admin-space admin-login-page"><div className="admin-login-card">
+        <Image src="/img/logo-eg.png" alt="Efficience Globale" width={200} height={65} className="admin-login-logo" />
+        <p className="admin-login-eyebrow">VOTRE ESPACE DE GESTION</p>
+        <h1>Bienvenue au cabinet.</h1><p className="admin-login-description">Connectez-vous pour gérer les contenus et les messages du site.</p>
+        <LoginForm /><a className="admin-login-back" href="/">← Retour au site public</a>
+      </div></div>
     );
   }
 
   const messagesNonLus = await countMessagesNonLus();
 
-  return (
-    <div className="flex min-h-screen">
-      <aside className="w-[220px] shrink-0 bg-darker px-3 py-6 flex flex-col justify-between">
-        <div>
-          <Image
-            src="/img/logo-eg.png"
-            alt="Efficience Globale"
-            width={160}
-            height={52}
-            className="h-8 w-auto brightness-0 invert opacity-95 mb-6 ml-3.5"
-          />
-          <nav className="flex flex-col gap-1">
-            {NAV.map((item) => (
-              <AdminNavLink key={item.href} href={item.href} badge={item.href === "/admin/messages" ? messagesNonLus : 0}>
-                {item.label}
-              </AdminNavLink>
-            ))}
-          </nav>
-        </div>
-        <div className="px-3.5">
-          <LogoutButton />
-        </div>
-      </aside>
-      <main className="flex-1 px-6 md:px-10 py-8">{children}</main>
-    </div>
-  );
+  return <AdminShell unread={messagesNonLus}>{children}</AdminShell>;
 }

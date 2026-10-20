@@ -9,12 +9,17 @@ export async function DELETE(request) {
     return Response.json({ error: "Non autorisé." }, { status: 401 });
   }
 
-  const { key } = await request.json();
-  if (!key || typeof key !== "string") {
+  let data;
+  try { data = await request.json(); } catch { return Response.json({ error: "Demande JSON invalide." }, { status: 400 }); }
+  const key = data?.key;
+  if (!key || typeof key !== "string" || !/^[a-zA-Z0-9_-]+\.(jpg|jpeg|png|gif|webp)$/.test(key)) {
     return Response.json({ error: "Clé manquante." }, { status: 400 });
   }
 
-  const used = await getUsedMediaUrls();
+  if (!env.UPLOADS) return Response.json({ error: "Stockage des images indisponible." }, { status: 503 });
+  let used;
+  try { used = await getUsedMediaUrls({ strict: true }); }
+  catch { return Response.json({ error: "Impossible de vérifier où cette image est utilisée. Aucune suppression effectuée." }, { status: 503 }); }
   if (used.has(`/uploads/${key}`)) {
     return Response.json({ error: "Cette image est encore utilisée sur le site." }, { status: 409 });
   }

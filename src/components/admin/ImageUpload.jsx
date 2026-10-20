@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
+import AdminImage from "./AdminImage";
 
-export default function ImageUpload({ value, onChange, required, disabled = false, onUploadingChange }) {
+export default function ImageUpload({ value, onChange, required, disabled = false, onUploadingChange, allowRemove = false }) {
   const inputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -45,7 +46,7 @@ export default function ImageUpload({ value, onChange, required, disabled = fals
       {value ? (
         <div className="relative w-full h-40 rounded-lg overflow-hidden border border-line bg-cream">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={value} alt="Aperçu de l’image sélectionnée" className="w-full h-full object-contain" />
+          <AdminImage src={value} alt="Aperçu de l’image sélectionnée" className="w-full h-full object-contain" />
         </div>
       ) : (
         <div
@@ -57,7 +58,7 @@ export default function ImageUpload({ value, onChange, required, disabled = fals
         </div>
       )}
 
-      <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" disabled={disabled || uploading} onChange={handleFileChange} className="hidden" />
+      <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" disabled={disabled || uploading} onChange={handleFileChange} aria-label="Choisir un fichier image" className="admin-upload-input" />
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
@@ -66,6 +67,7 @@ export default function ImageUpload({ value, onChange, required, disabled = fals
       >
         {uploading ? "Envoi…" : value ? "Changer l'image" : "Choisir une image sur l’ordinateur"}
       </button>
+      {allowRemove && value && !required && <button type="button" disabled={disabled || uploading} className="admin-upload-clear" onClick={() => onChange("")}>Retirer cette image du contenu</button>}
 
       <p className="text-[12px] text-ink-soft">JPG, PNG, WebP ou GIF · 8 Mo maximum.</p>
       <p role="status" className="sr-only">{uploading ? "Envoi de l’image en cours." : ""}</p>

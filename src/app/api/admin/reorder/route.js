@@ -10,8 +10,10 @@ export async function POST(request) {
     return Response.json({ error: "Non autorisé." }, { status: 401 });
   }
 
-  const { table, id, targetId } = await request.json();
-  if (!TABLES.includes(table) || !id || !targetId) {
+  let data;
+  try { data = await request.json(); } catch { return Response.json({ error: "Demande JSON invalide." }, { status: 400 }); }
+  const { table, id, targetId } = data || {};
+  if (!TABLES.includes(table) || typeof id !== "string" || typeof targetId !== "string" || !id || !targetId) {
     return Response.json({ error: "Requête invalide." }, { status: 400 });
   }
 

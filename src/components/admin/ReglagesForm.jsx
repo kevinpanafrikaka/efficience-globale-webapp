@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { cloneElement, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const inputClass =
@@ -8,17 +8,19 @@ const inputClass =
 const labelClass = "text-[13px] font-semibold text-dark";
 
 function Field({ label, hint, children }) {
+  const id = useId();
   return (
     <div className="flex flex-col gap-1.5">
-      <label className={labelClass}>{label}</label>
-      {children}
+      <label htmlFor={id} className={labelClass}>{label}</label>
+      {cloneElement(children, { id })}
       {hint && <p className="text-[12px] text-ink-faint">{hint}</p>}
     </div>
   );
 }
 
-export default function ReglagesForm({ reglages, stats }) {
+export default function ReglagesForm({ reglages, stats, notification }) {
   const router = useRouter();
+  const saving = useRef(false);
   const [form, setForm] = useState({
     email: reglages.email,
     telephone: reglages.telephone,
@@ -45,6 +47,8 @@ export default function ReglagesForm({ reglages, stats }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (saving.current) return;
+    saving.current = true;
     setLoading(true);
     setError("");
     setSaved(false);
@@ -65,12 +69,14 @@ export default function ReglagesForm({ reglages, stats }) {
     } catch {
       setError("Impossible d'enregistrer. Vérifiez votre connexion.");
     }
+    saving.current = false;
     setLoading(false);
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-8 max-w-2xl">
       <section className="flex flex-col gap-4">
+        <div className="admin-note"><strong>Notifications du formulaire · {notification?.provider || "Non configurées"}</strong><p>Destinataire actif : {notification?.recipient || "À configurer"}</p>{notification?.sender && <p>Expéditeur : {notification.sender}</p>}<a href="/api/email/google" className="inline-flex items-center min-h-11 font-semibold underline">Gérer la connexion Gmail ↗</a></div>
         <h2 className="text-[16px]">Coordonnées</h2>
         <Field label="Email de contact (affiché sur le site)">
           <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} required className={inputClass} />
@@ -84,8 +90,8 @@ export default function ReglagesForm({ reglages, stats }) {
           </Field>
         </div>
         <Field
-          label="Destinataire du formulaire de contact"
-          hint="Adresse qui reçoit la notification pour chaque message. Tant que le domaine n'est pas vérifié dans Resend, ce doit être l'adresse du compte Resend."
+          label="Destinataire Resend (solution de repli)"
+          hint="Ce réglage concerne uniquement Resend. Avec Gmail ou Brevo, les notifications sont adressées à M. Oumar selon la configuration affichée ci-dessus."
         >
           <input
             type="email"
@@ -124,6 +130,7 @@ export default function ReglagesForm({ reglages, stats }) {
           <div key={i} className="grid grid-cols-[90px_1fr_auto] gap-3 items-center">
             <input
               type="number"
+              min="0"
               value={s.nombre}
               onChange={(e) => updateStat(i, "nombre", e.target.value)}
               aria-label="Nombre"
@@ -149,15 +156,15 @@ export default function ReglagesForm({ reglages, stats }) {
         ))}
         <button
           type="button"
-          onClick={() => setStatsList((list) => [...list, { nombre: "", label: "" }])}
+          onClick={() => { setStatsList((list) => [...list, { nombre: "", label: "" }]); setSaved(false); }}
           className="text-[13px] font-semibold text-dark-2 hover:text-lime transition-colors w-fit"
         >
           + Ajouter un chiffre
         </button>
       </section>
 
-      {error && <p className="text-[13.5px] text-red-600">{error}</p>}
-      {saved && <p className="text-[13.5px] text-lime font-semibold">Réglages enregistrés.</p>}
+      {error && <p role="alert" className="text-[13.5px] text-red-600">{error}</p>}
+      {saved && <p role="status" className="text-[13.5px] text-lime font-semibold">Réglages enregistrés.</p>}
 
       <button
         type="submit"

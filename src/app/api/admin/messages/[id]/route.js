@@ -9,8 +9,10 @@ export async function PUT(request, { params }) {
   }
 
   const { id } = await params;
-  const { lu } = await request.json();
-  await setMessageLu(id, !!lu);
+  let data;
+  try { data = await request.json(); } catch { return Response.json({ error: "Demande JSON invalide." }, { status: 400 }); }
+  if (typeof data?.lu !== "boolean") return Response.json({ error: "Le statut lu doit être vrai ou faux." }, { status: 400 });
+  await setMessageLu(id, data.lu);
   return Response.json({ success: true });
 }
 

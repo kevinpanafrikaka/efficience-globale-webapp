@@ -1,6 +1,9 @@
+import AdminImage from "@/components/admin/AdminImage";
+import { adminPageAllowed } from "@/lib/admin-page";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getUsedMediaUrls } from "@/lib/db";
 import MediaDeleteButton from "@/components/admin/MediaDeleteButton";
+import MediaUpload from "@/components/admin/MediaUpload";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +13,7 @@ function formatSize(bytes) {
 }
 
 export default async function AdminMediasPage() {
+  if (!(await adminPageAllowed())) return null;
   const { env } = await getCloudflareContext({ async: true });
 
   const objects = [];
@@ -33,6 +37,7 @@ export default async function AdminMediasPage() {
         dossier du projet (logos, héros) ne sont pas listées ici.
       </p>
 
+      <MediaUpload />
       {objects.length === 0 ? (
         <p className="text-[14.5px] text-ink-soft">Aucune image envoyée pour le moment.</p>
       ) : (
@@ -43,7 +48,7 @@ export default async function AdminMediasPage() {
               <div key={o.key} className="border border-line rounded-lg overflow-hidden bg-white flex flex-col">
                 <div className="relative h-32 bg-cream">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={`/uploads/${o.key}`} alt="" loading="lazy" className="w-full h-full object-cover" />
+                  <AdminImage src={`/uploads/${o.key}`} alt="" className="w-full h-full object-cover" />
                   <span
                     className={`absolute top-2 left-2 text-[10.5px] font-bold tracking-wide px-1.5 py-0.5 rounded ${
                       isUsed ? "bg-lime text-ink" : "bg-white text-ink-faint"

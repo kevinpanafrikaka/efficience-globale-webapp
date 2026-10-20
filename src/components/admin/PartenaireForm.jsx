@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/admin/ImageUpload";
 
@@ -21,6 +21,8 @@ export default function PartenaireForm({ partenaire }) {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const saving = useRef(false);
+  const [uploading, setUploading] = useState(false);
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -28,6 +30,8 @@ export default function PartenaireForm({ partenaire }) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    if (saving.current || uploading) return;
+    saving.current = true;
     setLoading(true);
     setError("");
 
@@ -50,19 +54,21 @@ export default function PartenaireForm({ partenaire }) {
     } catch {
       setError("Impossible d'enregistrer. Vérifiez votre connexion.");
       setLoading(false);
+    } finally {
+      saving.current = false;
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-xl">
       <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>Nom</label>
-        <input value={form.nom} onChange={(e) => update("nom", e.target.value)} required className={inputClass} />
+        <label htmlFor="partenaireform-1" className={labelClass}>Nom</label>
+        <input id="partenaireform-1" value={form.nom} onChange={(e) => update("nom", e.target.value)} required className={inputClass} />
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>Logo (optionnel)</label>
-        <ImageUpload value={form.logo_url} onChange={(url) => update("logo_url", url)} />
+        <p className={labelClass}>Logo (optionnel)</p>
+        <ImageUpload value={form.logo_url} onChange={(url) => update("logo_url", url)} onUploadingChange={setUploading} disabled={loading} />
         {form.logo_url && (
           <button
             type="button"
@@ -75,8 +81,8 @@ export default function PartenaireForm({ partenaire }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className={labelClass}>Site web (optionnel)</label>
-        <input
+        <label htmlFor="partenaireform-2" className={labelClass}>Site web (optionnel)</label>
+        <input id="partenaireform-2"
           type="url"
           value={form.site_web}
           onChange={(e) => update("site_web", e.target.value)}
@@ -87,15 +93,15 @@ export default function PartenaireForm({ partenaire }) {
 
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Statut</label>
-          <select value={form.statut} onChange={(e) => update("statut", e.target.value)} className={inputClass}>
+          <label htmlFor="partenaireform-3" className={labelClass}>Statut</label>
+          <select id="partenaireform-3" value={form.statut} onChange={(e) => update("statut", e.target.value)} className={inputClass}>
             <option value="brouillon">Brouillon</option>
             <option value="publie">Publié</option>
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className={labelClass}>Ordre d&apos;affichage</label>
-          <input
+          <label htmlFor="partenaireform-4" className={labelClass}>Ordre d&apos;affichage</label>
+          <input id="partenaireform-4"
             type="number"
             value={form.ordre_affichage}
             onChange={(e) => update("ordre_affichage", e.target.value)}
@@ -104,11 +110,11 @@ export default function PartenaireForm({ partenaire }) {
         </div>
       </div>
 
-      {error && <p className="text-[13.5px] text-red-600">{error}</p>}
+      {error && <p role="alert" className="text-[13.5px] text-red-600">{error}</p>}
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || uploading}
         className="mt-1 inline-flex items-center justify-center rounded bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2 disabled:opacity-60 disabled:pointer-events-none w-fit"
       >
         {loading ? "Enregistrement…" : isEdit ? "Enregistrer les modifications" : "Créer le partenaire"}
