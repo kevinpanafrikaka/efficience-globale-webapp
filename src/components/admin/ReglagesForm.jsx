@@ -69,7 +69,7 @@ export default function ReglagesForm({ reglages, notification }) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-8 max-w-2xl">
       <section className="flex flex-col gap-4">
-        <div className="admin-note"><strong>Notifications du formulaire · {notification?.provider || "Non configurées"}</strong><p>Destinataire actif : {notification?.recipient || "À configurer"}</p>{notification?.sender && <p>Expéditeur : {notification.sender}</p>}<a href="/api/email/google" className="inline-flex items-center min-h-11 font-semibold underline">Gérer la connexion Gmail ↗</a></div>
+        <div className="admin-note"><strong>Notifications du formulaire · {notification?.provider || "Non configurées"}</strong><p>Destinataire actif : {notification?.recipient || "À configurer"}</p>{notification?.sender && <p>Expéditeur : {notification.sender}</p>}<a href="/api/email/google" className="eg-button eg-button--secondary eg-button--compact mt-3">Gérer la connexion Gmail ↗</a></div>
         <h2 className="text-[16px]">Coordonnées</h2>
         <Field label="Email de contact (affiché sur le site)">
           <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} required className={inputClass} />
@@ -109,8 +109,8 @@ export default function ReglagesForm({ reglages, notification }) {
 
       <button
         type="submit"
-        disabled={loading}
-        className="inline-flex items-center justify-center rounded bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2 disabled:opacity-60 disabled:pointer-events-none w-fit"
+        disabled={loading} aria-busy={loading}
+        className="eg-button eg-button--primary"
       >
         {loading ? "Enregistrement…" : "Enregistrer les réglages"}
       </button>

@@ -18,18 +18,14 @@ const SECTEUR_FILTERS = [
 
 function FilterRow({ options, active, onChange }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="admin-filters flex flex-wrap gap-2">
       {options.map((o) => (
         <button
           key={o.key}
           type="button"
           onClick={() => onChange(o.key)}
           aria-pressed={active === o.key}
-          className={`admin-filter-button rounded-full border text-[13px] font-semibold px-3.5 py-1.5 transition-colors active:scale-[0.97] ${
-            active === o.key
-              ? "bg-dark-2 border-dark-2 text-white"
-              : "bg-white border-line text-ink-soft hover:border-lime hover:text-lime"
-          }`}
+          className="eg-button eg-button--filter eg-button--compact admin-filter-button"
         >
           {o.label}
         </button>
@@ -83,7 +79,7 @@ export default function AdminProjetsGrid({ projets, secteurs }) {
                   <div className="flex items-center gap-4">
                     <Link
                       href={`/admin/projets/${p.id}/modifier`}
-                      className="text-[12.5px] font-semibold text-dark-2 hover:text-lime transition-colors"
+                      className="eg-button eg-button--secondary eg-button--compact"
                     >
                       Modifier
                     </Link>

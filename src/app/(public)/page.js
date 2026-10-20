@@ -63,13 +63,13 @@ export default async function HomePage() {
             <div className="flex flex-wrap items-center gap-4">
               <Link
                 href="/realisations"
-                className="public-cta inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+                className="public-cta eg-button eg-button--primary"
               >
-                Découvrir nos réalisations <span aria-hidden="true" className="ml-3">↗</span>
+                Découvrir nos réalisations <span aria-hidden="true" className="eg-button__arrow">↗</span>
               </Link>
               <Link
                 href="/contact"
-                className="public-cta inline-flex items-center rounded border-[1.5px] border-white/40 px-7 py-3.5 text-[15px] font-semibold text-white backdrop-blur-sm active:scale-[0.97] transition-transform hover:border-white hover:bg-white/10"
+                className="public-cta eg-button eg-button--inverse"
               >
                 Nous contacter
               </Link>
@@ -183,9 +183,9 @@ export default async function HomePage() {
           <div className="mt-8">
             <Link
               href="/domaines"
-              className="public-cta inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+              className="public-cta eg-button eg-button--primary"
             >
-              En savoir plus sur nos domaines →
+              En savoir plus sur nos domaines <span aria-hidden="true" className="eg-button__arrow">↗</span>
             </Link>
           </div>
         </div>
@@ -262,9 +262,9 @@ export default async function HomePage() {
           </div>
           <Link
             href="/services"
-            className="public-cta inline-flex items-center rounded bg-lime mt-8 px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+            className="public-cta eg-button eg-button--primary mt-8"
           >
-            Découvrir notre méthode en détail →
+            Découvrir notre méthode en détail <span aria-hidden="true" className="eg-button__arrow">↗</span>
           </Link>
         </div>
       </section>
@@ -290,9 +290,9 @@ export default async function HomePage() {
         <div className="mt-12">
           <Link
             href="/realisations"
-            className="public-cta inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+            className="public-cta eg-button eg-button--primary"
           >
-            Voir les {nbProjets.total} projets et partenariats →
+            Voir les {nbProjets.total} projets et partenariats <span aria-hidden="true" className="eg-button__arrow">↗</span>
           </Link>
         </div>
       </section>
@@ -344,9 +344,9 @@ export default async function HomePage() {
           </div>
           <Link
             href="/equipe"
-            className="public-cta inline-flex items-center rounded bg-lime mt-8 px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+            className="public-cta eg-button eg-button--primary mt-8"
           >
-            Voir toute l&apos;équipe →
+            Voir toute l&apos;équipe <span aria-hidden="true" className="eg-button__arrow">↗</span>
           </Link>
         </div>
       </section>
@@ -376,9 +376,9 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-5 md:px-8 mt-10">
           <Link
             href="/partenaires"
-            className="public-cta inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+            className="public-cta eg-button eg-button--primary"
           >
-            Voir tous nos partenaires →
+            Voir tous nos partenaires <span aria-hidden="true" className="eg-button__arrow">↗</span>
           </Link>
         </div>
       </section>
@@ -399,13 +399,13 @@ export default async function HomePage() {
           <div className="flex flex-wrap items-center gap-x-8 gap-y-4 mt-9">
             <Link
               href="/contact"
-              className="public-cta inline-flex items-center rounded bg-lime px-7 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+              className="public-cta eg-button eg-button--primary"
             >
               Nous contacter
             </Link>
             <a
               href="tel:+224626852951"
-              className="text-[14.5px] font-semibold text-dark-2 border-b-2 border-lime pb-0.5"
+              className="public-cta eg-button eg-button--secondary"
             >
               ou appelez-nous : +224 626 852 951
             </a>

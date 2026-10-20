@@ -68,12 +68,12 @@ export default function PartenaireForm({ partenaire }) {
 
       <div className="flex flex-col gap-1.5">
         <p className={labelClass}>Logo (optionnel)</p>
-        <ImageUpload value={form.logo_url} onChange={(url) => update("logo_url", url)} onUploadingChange={setUploading} disabled={loading} />
+        <ImageUpload value={form.logo_url} onChange={(url) => update("logo_url", url)} onUploadingChange={setUploading} disabled={loading} aria-busy={loading} />
         {form.logo_url && (
           <button
             type="button"
             onClick={() => update("logo_url", "")}
-            className="text-[12.5px] text-ink-faint hover:text-red-600 w-fit"
+            className="eg-button eg-button--quiet eg-button--compact admin-upload-clear"
           >
             Retirer le logo (le nom sera affiché à la place)
           </button>
@@ -114,8 +114,8 @@ export default function PartenaireForm({ partenaire }) {
 
       <button
         type="submit"
-        disabled={loading || uploading}
-        className="mt-1 inline-flex items-center justify-center rounded bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2 disabled:opacity-60 disabled:pointer-events-none w-fit"
+        disabled={loading || uploading} aria-busy={loading || uploading}
+        className="eg-button eg-button--primary mt-1"
       >
         {loading ? "Enregistrement…" : isEdit ? "Enregistrer les modifications" : "Créer le partenaire"}
       </button>

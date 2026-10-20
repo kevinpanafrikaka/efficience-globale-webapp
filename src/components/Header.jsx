@@ -84,7 +84,7 @@ export default function Header() {
           aria-controls={open ? "mobile-navigation" : undefined}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="xl:hidden min-w-11 min-h-11 flex items-center justify-center p-2 -mr-2"
+          className="public-menu-toggle xl:hidden min-w-11 min-h-11 flex items-center justify-center p-2 -mr-2"
         >
           <span className="relative block w-6 h-4">
             <span
@@ -114,7 +114,7 @@ export default function Header() {
             <Link
               href="/contact"
               onClick={() => setOpen(false)}
-              className="mt-5 mb-6 inline-flex items-center justify-center rounded bg-lime px-5 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform"
+              className="eg-button eg-button--primary mt-5 mb-6"
             >
               Nous contacter
             </Link>

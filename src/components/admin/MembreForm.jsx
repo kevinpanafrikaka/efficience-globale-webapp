@@ -98,7 +98,7 @@ export default function MembreForm({ membre }) {
           onChange={(url) => update("photo_url", url)}
           onUploadingChange={setUploading}
           allowRemove
-          disabled={loading || uploading}
+          disabled={loading || uploading} aria-busy={loading || uploading}
         />
         <p className="text-[12px] text-ink-soft mt-1">
           Sélectionnez un portrait depuis votre ordinateur, puis enregistrez le membre pour conserver la photo.
@@ -128,8 +128,8 @@ export default function MembreForm({ membre }) {
 
       <button
         type="submit"
-        disabled={loading || uploading}
-        className="mt-1 inline-flex items-center justify-center rounded bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2 disabled:opacity-60 disabled:pointer-events-none w-fit"
+        disabled={loading || uploading} aria-busy={loading || uploading}
+        className="eg-button eg-button--primary mt-1"
       >
         {uploading ? "Envoi de la photo…" : loading ? "Enregistrement…" : isEdit ? "Enregistrer les modifications" : "Créer le membre"}
       </button>

@@ -14,7 +14,7 @@ export default function MessageActions({ id, lu, markOnOpen = false, redirectAft
     if (markOnOpen && !lu && !attempted.current) { attempted.current = true; setRead(true); }
   }, [id, lu, markOnOpen]);
   return <div className="admin-action-group">
-    <button type="button" onClick={() => setRead(!lu)} disabled={loading} className="text-[12.5px] font-semibold text-dark-2 hover:text-lime disabled:opacity-60">{loading ? "Mise à jour…" : lu ? "Marquer non lu" : "Marquer lu"}</button>
+    <button type="button" onClick={() => setRead(!lu)} disabled={loading} aria-busy={loading} className="eg-button eg-button--secondary eg-button--compact">{loading ? "Mise à jour…" : lu ? "Marquer non lu" : "Marquer lu"}</button>
     <DeleteButton endpoint={`/api/admin/messages/${id}`} confirmMessage="Supprimer ce message ?" redirectTo={redirectAfterDelete} />
     {error && <span role="alert" className="admin-action-error">{error}</span>}
   </div>;

@@ -1,0 +1,54 @@
+/* Shared action vocabulary for the public homepage and administration. */
+.eg-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 44px;
+  min-height: 48px;
+  max-width: 100%;
+  padding: 12px 24px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease;
+}
+.eg-button--primary { background: var(--lime); border-color: var(--lime); color: var(--ink); }
+.eg-button--secondary, .eg-button--filter { background: white; border-color: #71816a; color: var(--dark); }
+.eg-button--inverse { background: #16211a66; border-color: #ffffff99; color: white; }
+.eg-button--danger { background: #fff6f5; border-color: #ba655f; color: #a32929; }
+.eg-button--quiet { background: transparent; border-color: transparent; color: var(--dark-2); }
+.eg-button--compact { min-height: 44px; padding: 9px 12px; font-size: 13px; }
+.eg-button--icon { flex: 0 0 44px; width: 44px; min-height: 44px; padding: 8px; font-size: 18px; }
+.eg-button--filter[aria-pressed="true"] { background: var(--dark-2); border-color: var(--dark-2); color: white; }
+.eg-button__arrow { flex-shrink: 0; font-size: 18px; line-height: 1; }
+/* Dual ring stays visible against both white cards and dark hero/sidebar. */
+.eg-button:focus-visible { outline: 3px solid var(--dark); outline-offset: 4px; box-shadow: 0 0 0 4px white; }
+.eg-button:active:not(:disabled) { box-shadow: inset 0 0 0 2px currentColor; }
+.eg-button:disabled { cursor: not-allowed; opacity: .55; box-shadow: none; }
+.eg-button[aria-busy="true"]:disabled { cursor: wait; }
+@media (hover: hover) and (pointer: fine) {
+  .eg-button--primary:hover:not(:disabled) { background: var(--lime-2); border-color: var(--lime-2); }
+  .eg-button--secondary:hover:not(:disabled), .eg-button--filter:hover:not(:disabled) { background: #edf3e6; border-color: #4b7728; color: var(--dark); }
+  .eg-button--filter[aria-pressed="true"]:hover { background: var(--dark); border-color: var(--dark); color: white; }
+  .eg-button--inverse:hover:not(:disabled) { background: #ffffff1f; border-color: white; }
+  .eg-button--danger:hover:not(:disabled) { background: #fbe5e2; border-color: #a32929; }
+  .eg-button--quiet:hover:not(:disabled) { background: #edf3e6; color: var(--dark); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eg-button { transition: none; }
+}
+@media (forced-colors: active) {
+  .eg-button { border-color: ButtonText; }
+  .eg-button:focus-visible { outline-color: Highlight; }
+  .eg-button--filter[aria-pressed="true"] { outline: 2px solid Highlight; outline-offset: -4px; }
+}

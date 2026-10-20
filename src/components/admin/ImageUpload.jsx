@@ -62,12 +62,12 @@ export default function ImageUpload({ value, onChange, required, disabled = fals
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        disabled={uploading || disabled}
-        className="inline-flex items-center justify-center rounded border border-line px-4 py-2 text-[13px] font-semibold text-dark-2 hover:border-lime hover:text-lime transition-colors w-fit disabled:opacity-60"
+        disabled={uploading || disabled} aria-busy={uploading}
+        className="eg-button eg-button--secondary eg-button--compact"
       >
         {uploading ? "Envoi…" : value ? "Changer l'image" : "Choisir une image sur l’ordinateur"}
       </button>
-      {allowRemove && value && !required && <button type="button" disabled={disabled || uploading} className="admin-upload-clear" onClick={() => onChange("")}>Retirer cette image du contenu</button>}
+      {allowRemove && value && !required && <button type="button" disabled={disabled || uploading} className="eg-button eg-button--quiet eg-button--compact admin-upload-clear" onClick={() => onChange("")}>Retirer cette image du contenu</button>}
 
       <p className="text-[12px] text-ink-soft">JPG, PNG, WebP ou GIF · 8 Mo maximum.</p>
       <p role="status" className="sr-only">{uploading ? "Envoi de l’image en cours." : ""}</p>

@@ -51,7 +51,7 @@ export default async function AdminHomePage() {
           <Link
             key={l.href}
             href={l.href}
-            className="inline-flex items-center rounded border border-line px-4 py-2 text-[13px] font-semibold text-dark-2 hover:border-lime hover:text-lime transition-colors"
+            className="eg-button eg-button--secondary eg-button--compact"
           >
             {l.label}
           </Link>
@@ -65,7 +65,7 @@ export default async function AdminHomePage() {
               Derniers messages
               {s.messagesNonLus > 0 && <span className="ml-2 text-[13px] font-semibold text-lime">{s.messagesNonLus} non lu{s.messagesNonLus > 1 ? "s" : ""}</span>}
             </h2>
-            <Link href="/admin/messages" className="text-[13px] font-semibold text-dark-2 hover:text-lime transition-colors">
+            <Link href="/admin/messages" className="eg-button eg-button--quiet eg-button--compact">
               Tout voir →
             </Link>
           </div>

@@ -13,7 +13,7 @@ export default async function AdminAnnoncesPage() {
         <h1 className="text-[24px]">Annonces</h1>
         <Link
           href="/admin/annonces/nouveau"
-          className="inline-flex items-center rounded bg-lime px-5 py-2.5 text-[14px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+          className="eg-button eg-button--primary"
         >
           + Nouvelle annonce
         </Link>
@@ -44,7 +44,7 @@ export default async function AdminAnnoncesPage() {
               <div className="admin-action-group">
                 <Link
                   href={`/admin/annonces/${a.id}/modifier`}
-                  className="text-[12.5px] font-semibold text-dark-2 hover:text-lime transition-colors"
+                  className="eg-button eg-button--secondary eg-button--compact"
                 >
                   Modifier
                 </Link>

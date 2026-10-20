@@ -30,10 +30,10 @@ export default async function AdminMessagePage({ params }) {
         {message.message}
       </div>
 
-      <div className="flex items-center justify-between mt-5">
+      <div className="admin-message-actions flex flex-wrap items-center justify-between gap-3 mt-5">
         <a
           href={`mailto:${message.email}?subject=${sujetReponse}`}
-          className="inline-flex items-center rounded bg-lime px-5 py-2.5 text-[14px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+          className="eg-button eg-button--primary"
         >
           Répondre par email
         </a>

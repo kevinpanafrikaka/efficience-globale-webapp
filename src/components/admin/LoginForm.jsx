@@ -50,13 +50,13 @@ export default function LoginForm() {
           onChange={(e) => setPassword(e.target.value)}
           required
           className="rounded-lg border border-line px-3.5 py-2.5 text-[15px] focus:outline-none focus:ring-2 focus:ring-lime"
-        /><button type="button" onClick={() => setVisible(!visible)} aria-label={visible ? "Masquer le mot de passe" : "Afficher le mot de passe"}>{visible ? "Masquer" : "Afficher"}</button></div>
+        /><button type="button" onClick={() => setVisible(!visible)} aria-pressed={visible} aria-label={visible ? "Masquer le mot de passe" : "Afficher le mot de passe"}>{visible ? "Masquer" : "Afficher"}</button></div>
       </div>
       {error && <p role="alert" className="text-[13.5px] text-red-600">{error}</p>}
       <button
         type="submit"
-        disabled={loading}
-        className="inline-flex items-center justify-center rounded bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2 disabled:opacity-60 disabled:pointer-events-none"
+        disabled={loading} aria-busy={loading}
+        className="eg-button eg-button--primary"
       >
         {loading ? "Connexion…" : "Se connecter"}
       </button>

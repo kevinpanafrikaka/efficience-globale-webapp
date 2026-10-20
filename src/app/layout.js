@@ -1,5 +1,6 @@
 import { Fraunces, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
+import "./buttons.css";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",

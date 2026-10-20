@@ -23,7 +23,7 @@ export default function AdminApercuPage() {
           <button
             type="button"
             onClick={handleReload}
-            className="text-[13px] font-semibold text-ink-soft hover:text-dark transition-colors"
+            className="eg-button eg-button--secondary eg-button--compact"
           >
             Actualiser
           </button>
@@ -31,7 +31,7 @@ export default function AdminApercuPage() {
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center rounded border border-line px-3.5 py-2 text-[13px] font-semibold text-dark-2 hover:border-lime hover:text-lime transition-colors"
+            className="eg-button eg-button--secondary eg-button--compact"
           >
             Ouvrir dans un nouvel onglet ↗
           </a>

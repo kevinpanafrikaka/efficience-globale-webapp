@@ -5,7 +5,7 @@
 .admin-space :is(button,a) { -webkit-tap-highlight-color: transparent; }
 .admin-space :is(button,a[href]) { touch-action: manipulation; }
 .admin-space button { min-height: 44px; cursor: pointer; }
-.admin-space button:disabled { cursor: wait; opacity: .55; }
+.admin-space button:disabled { cursor: not-allowed; opacity: .55; }
 .admin-space :is(h1,h2,h3,p) { overflow-wrap: anywhere; }
 .admin-space .text-lime { color: var(--admin-green); }
 .admin-space .text-ink-faint { color: #657260; }
@@ -48,7 +48,7 @@
 .admin-main textarea { resize: vertical; }
 .admin-main form { width: 100%; padding: clamp(20px,4vw,34px); border: 1px solid var(--line); border-radius: 18px; background: white; box-shadow: 0 10px 32px -28px #26362a66; }
 .admin-main form section + section { border-top: 1px solid var(--line); padding-top: 28px; }
-.admin-main form > button[type=submit] { min-height: 48px; border-radius: 10px; }
+.admin-main form > button[type=submit] { align-self: flex-start; }
 .admin-main fieldset { min-width: 0; }
 .admin-main label { line-height: 1.5; }
 .admin-main [role=alert], .admin-space .admin-action-error { color: #a32929; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
@@ -80,7 +80,19 @@
 .admin-upload-input { display: none; }
 .admin-upload-clear { text-align: left; color: var(--ink-soft); font-size: 12px; }
 .admin-image-fallback { display: flex; align-items: center; justify-content: center; background: #eef2e9; color: #657260; font-size: 12px; padding: 12px; text-align: center; }
-.admin-filter-button[aria-pressed=true] { background: #3d5347; color: white; }
+/* Shared button geometry also overrides generic flex-child sizing. */
+.admin-space .eg-button { min-width: 44px; }
+.admin-space .eg-button:focus-visible { outline: 3px solid var(--dark); outline-offset: 4px; box-shadow: 0 0 0 4px white; }
+.admin-space .eg-button[aria-busy="true"]:disabled { cursor: wait; }
+.admin-main .admin-upload-clear { align-self: flex-start; text-align: left; }
+.admin-main .admin-action-group { gap: 8px; }
+.admin-main .grid > .border > .p-4 > .flex:last-child { flex-wrap: wrap; gap: 12px; }
+.admin-main .grid > .border > .p-4 > .flex:last-child > .flex:last-child { flex-wrap: wrap; gap: 8px; }
+.admin-main .admin-filters { gap: 8px; }
+.admin-main .admin-note .eg-button { text-decoration: none; }
+@media (hover: hover) and (pointer: fine) {
+  .admin-password-wrap button:hover { background: #edf3e6; border-radius: 6px; }
+}
 @media (min-width: 1024px) {
   .admin-shell { display: grid; grid-template-columns: 248px minmax(0,1fr); }
   .admin-sidebar { position: sticky; top: 0; height: 100dvh; overflow-y: auto; padding: 30px 16px 20px; display: flex; flex-direction: column; }
@@ -95,7 +107,11 @@
 }
 @media (max-width: 639px) {
   .admin-main form .grid-cols-2, .admin-main form .grid.grid-cols-\[90px_1fr_auto\] { grid-template-columns: minmax(0,1fr); }
-  .admin-main form > button[type=submit] { width: 100%; justify-content: center; }
+  .admin-main form > button[type=submit], .admin-main form .eg-button--secondary { width: 100%; justify-content: center; }
+  .admin-main > div > .flex:first-child > .eg-button--primary { width: 100%; }
+  .admin-main .admin-message-actions > .eg-button--primary { width: 100%; }
+  .admin-main .admin-filters { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .admin-main .admin-filters .eg-button { width: 100%; padding-inline: 10px; }
   .admin-main .grid > .border > .p-4 > .flex:last-child { flex-wrap: wrap; gap: 10px; }
   .admin-main .grid > .border > .p-4 > .flex:last-child > .flex:last-child { flex-wrap: wrap; gap: 12px; }
   .admin-main .admin-list-row > .admin-action-group { width: 100%; border-top: 1px solid var(--line); padding-top: 8px; }
