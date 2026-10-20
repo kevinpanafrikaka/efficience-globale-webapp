@@ -21,11 +21,10 @@ export default function AdminShell({ children, unread }) {
     <a href="#admin-main" className="admin-skip-link">Aller au contenu</a>
     <aside className="admin-sidebar">
       <div className="admin-brand-row">
-        <a href="/admin" className="admin-brand"><img src="/img/logo-eg.png" alt="Efficience Globale" width="160" height="52" /><span>ESPACE ADMINISTRATION</span></a>
+        <a href="/admin" className="admin-brand">Espace administration</a>
         <button type="button" className="eg-button eg-button--inverse eg-button--compact admin-menu-button" aria-expanded={open} aria-controls="admin-navigation" onClick={() => setOpen(!open)}>{open ? "Fermer ×" : "Menu ☰"}</button>
       </div>
       <div id="admin-navigation" className="admin-navigation" data-open={open}>
-        <p className="admin-nav-caption">VOTRE ESPACE DE GESTION</p>
         <nav aria-label="Administration" onClick={(event) => { if (event.target.closest("a")) setOpen(false); }}>
           {NAV.map(([href, label, icon]) => <AdminNavLink key={href} href={href} badge={href === "/admin/messages" ? unread : 0}><span className="admin-nav-label"><span aria-hidden="true" className="admin-nav-icon">{icon}</span>{label}</span></AdminNavLink>)}
         </nav>
