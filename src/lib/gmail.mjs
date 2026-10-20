@@ -43,7 +43,14 @@ export async function googleToken(params) {
     body: new URLSearchParams(params), signal: AbortSignal.timeout(15000),
   });
   const result = await response.json();
-  if (!response.ok || !result.access_token) throw new Error("Gmail authorization failed");
+  if (!response.ok || !result.access_token) {
+    const error = new Error("Gmail authorization failed");
+    // Conserver uniquement un code standard connu, jamais la réponse Google,
+    // ses descriptions, les identifiants, codes d'autorisation ou jetons.
+    const allowed = ["invalid_client", "invalid_grant", "invalid_request", "unauthorized_client", "deleted_client"];
+    if (allowed.includes(result.error)) error.oauthCode = result.error;
+    throw error;
+  }
   return result;
 }
 
@@ -95,3 +102,4 @@ export async function sendGmail(env, message) {
   const result = await response.json();
   if (!result.id) throw new Error("Gmail delivery not confirmed");
 }
+
