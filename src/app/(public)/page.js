@@ -22,9 +22,6 @@ const METHODE = [
   { titre: "Transmettre", detail: "Former les équipes et ancrer les compétences pour faire durer les résultats.", mot: "Autonomie" },
 ];
 
-function Arrow({ className = "" }) {
-  return <span aria-hidden="true" className={`home-arrow ${className}`}>↗</span>;
-}
 function Heading({ label, title, detail, children }) {
   return <div className="home-section-heading"><div><p className="home-eyebrow">{label}</p><h2>{title}</h2>{detail && <p className="home-section-lead">{detail}</p>}</div>{children}</div>;
 }
@@ -51,7 +48,7 @@ export default async function HomePage() {
         <div className="home-wrap home-hero-copy"><div>
           <h1 id="home-heading">Des solutions <em>stratégiques.</em><br />Un impact durable.</h1>
           <p>Depuis Conakry, nous accompagnons les institutions, les entreprises et les acteurs du développement en Guinée et en Afrique de l’Ouest.</p>
-          <div className="home-actions"><Link href="/realisations" className="public-cta eg-button eg-button--primary">Découvrir nos réalisations <Arrow /></Link><Link href="/contact" className="public-cta eg-button eg-button--inverse">Parlons de votre projet</Link></div>
+          <div className="home-actions"><Link href="/realisations" className="public-cta eg-button eg-button--primary">Découvrir nos réalisations</Link><Link href="/contact" className="public-cta eg-button eg-button--inverse">Parlons de votre projet</Link></div>
           <a href="#nos-domaines" className="home-explore">Explorer nos expertises </a>
         </div></div>
       </div>
@@ -85,7 +82,7 @@ export default async function HomePage() {
     <section className="home-method home-section" aria-label="Notre méthode"><div className="home-wrap">
       <Heading label="Comment nous avançons" title={<>De la première question<br /><em>à l’autonomie de vos équipes.</em></>} detail="Une démarche qui relie la réflexion stratégique, l’action et la transmission." />
       <ol className="home-method-steps">{METHODE.map((step) => <li key={step.titre}><span className="home-method-dot" aria-hidden="true" /><p className="home-method-word">{step.mot}</p><h3>{step.titre}</h3><p>{step.detail}</p></li>)}</ol>
-      <Link href="/services" className="eg-button eg-button--primary">Découvrir nos services <Arrow /></Link>
+      <Link href="/services" className="eg-button eg-button--primary">Découvrir nos services</Link>
     </div></section>
 
     <section className="home-wrap home-section home-team" aria-labelledby="home-team-heading">
@@ -103,7 +100,7 @@ export default async function HomePage() {
 
     <section className="home-wrap home-section" aria-labelledby="home-contact-heading"><div className="home-contact">
       <div><p className="home-eyebrow">Et si nous en parlions ?</p><h2 id="home-contact-heading">Votre prochain projet<br />commence <em>par un échange.</em></h2><p>Un besoin à clarifier, une stratégie à construire ou des équipes à former : partagez-nous votre défi.</p></div>
-      <div className="home-contact-actions"><Link href="/contact" className="eg-button eg-button--primary">Discutons de votre projet <Arrow /></Link>{telHref && <a href={telHref} className="home-text-link">{telephone}</a>}<span className="home-contact-location">Conakry, Guinée · Afrique de l’Ouest</span></div>
+      <div className="home-contact-actions"><Link href="/contact" className="eg-button eg-button--primary">Discutons de votre projet</Link>{telHref && <a href={telHref} className="home-text-link">{telephone}</a>}<span className="home-contact-location">Conakry, Guinée · Afrique de l’Ouest</span></div>
     </div></section>
   </div>;
 }

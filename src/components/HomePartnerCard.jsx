@@ -10,6 +10,6 @@ export default function HomePartnerCard({ partner, projectCount }) {
     aria-label={projectCount > 0 ? `${partner.nom} : ${projectCount} réalisation${projectCount > 1 ? "s" : ""}` : `${partner.nom}${external ? " : site officiel, nouvel onglet" : " : découvrir nos partenaires"}`}>
     <span className="home-partner-logo">{partner.logo_url ? <Image src={partner.logo_url} alt="" width={240} height={120} className="object-contain" /> : <span className="home-partner-initials" aria-hidden="true">{initials}</span>}</span>
     <strong>{partner.nom}</strong>
-    <span className="home-partner-foot"><span>{projectCount > 0 ? `${projectCount} réalisation${projectCount > 1 ? "s" : ""}` : external ? "Site officiel" : "Notre réseau"}</span></span>
+    <span className="home-partner-foot">{projectCount > 0 ? `${projectCount} réalisation${projectCount > 1 ? "s" : ""}` : external ? "Site officiel" : "Notre réseau"}</span>
   </a>;
 }
