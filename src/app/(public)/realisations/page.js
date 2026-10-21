@@ -23,7 +23,7 @@ export default async function RealisationsPage({ searchParams }) {
 
   return (
     <div className="eg-page eg-work">
-      <PageHero image="/img/hero-realisations.jpg" label="Nos réalisations"
+      <PageHero image="/img/hero-realisations.jpg"
         title={<>Nos projets et <span className="text-lime-2 italic">partenariats</span> stratégiques</>}
         description="Depuis 2022, Efficience Globale a conduit des interventions dans la santé publique, l’intelligence artificielle, l’éducation, la gouvernance et le développement local, aux côtés de bailleurs et institutions de référence." />
 

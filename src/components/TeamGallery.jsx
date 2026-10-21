@@ -101,9 +101,9 @@ export default function TeamGallery({ members, initialMemberId }) {
         })}
       </div>
 
-      {carousel && <div className="team-controls">
+      {carousel && <div className="team-controls" role="group" aria-label="Navigation des profils">
+        <span className="team-counter tabular-nums" aria-label={`Membre ${activeIndex + 1} sur ${members.length}`}>{`${String(activeIndex + 1).padStart(2, "0")} / ${String(members.length).padStart(2, "0")}`}</span>
         <button type="button" onClick={() => move(-1)} aria-label="Membre précédent">Précédent</button>
-        <span className="tabular-nums" aria-label={`Membre ${activeIndex + 1} sur ${members.length}`}>{String(activeIndex + 1).padStart(2, "0")} <span aria-hidden="true">/</span> {String(members.length).padStart(2, "0")}</span>
         <button type="button" onClick={() => move(1)} aria-label="Membre suivant">Suivant</button>
         {!reducedMotion && <button type="button" className="team-play-toggle" onClick={() => setPlaying((value) => !value)}
           aria-label={playing ? "Mettre en pause le défilement automatique" : "Reprendre le défilement automatique"}>

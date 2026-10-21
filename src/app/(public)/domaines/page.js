@@ -84,7 +84,7 @@ const DOMAINES = [
 export default async function DomainesPage() {
   const projetsParSecteur = await Promise.all(DOMAINES.map((d) => getProjets({ secteur: d.secteur })));
   return <div className="eg-page eg-domains">
-    <PageHero image="/img/hero-domaines.jpg" label="Nos domaines" title={<>Où nous créons de la <span className="text-lime-2 italic">valeur</span></>} description="Quatre domaines, une même approche : diagnostic rigoureux, co-construction avec les acteurs locaux, et transfert de compétences pour ancrer les résultats dans la durée.">
+    <PageHero image="/img/hero-domaines.jpg" title={<>Où nous créons de la <span className="text-lime-2 italic">valeur</span></>} description="Quatre domaines, une même approche : diagnostic rigoureux, co-construction avec les acteurs locaux, et transfert de compétences pour ancrer les résultats dans la durée.">
       <nav aria-label="Accéder à un domaine" className="domain-shortcuts">{DOMAINES.map((d) => <a key={d.secteur} href={`#${d.secteur}`} className="domain-shortcut">{d.titre}</a>)}</nav>
     </PageHero>
     <section className="eg-container eg-section">

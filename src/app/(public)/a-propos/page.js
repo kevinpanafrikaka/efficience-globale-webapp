@@ -16,7 +16,7 @@ export default async function AProposPage() {
   const membres = await getMembres();
   const fondateur = membres.find((m) => /\boumar\b/i.test(m.nom));
   return <div className="eg-page eg-about">
-    <PageHero image="/img/hero-a-propos.jpg" label="Le cabinet" title={<>Pourquoi nous <span className="text-lime-2 italic">existons</span> ?</>} description="Efficience Globale est née d’une conviction simple : l’Afrique de l’Ouest a besoin d’une expertise qui comprend son contexte autant que ses standards internationaux." />
+    <PageHero image="/img/hero-a-propos.jpg" title={<>Pourquoi nous <span className="text-lime-2 italic">existons</span> ?</>} description="Efficience Globale est née d’une conviction simple : l’Afrique de l’Ouest a besoin d’une expertise qui comprend son contexte autant que ses standards internationaux." />
     <section className="eg-container eg-section">
       <PageIntro label="Notre histoire" title={<>Ancrés ici.<br /><em>Ouverts sur le monde.</em></>} />
       <div className="eg-story-grid">

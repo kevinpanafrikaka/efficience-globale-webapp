@@ -16,6 +16,7 @@ async function renderPage(runtime, route, props = {}) {
 function assertStructure(html) {
   assert.equal((html.match(/<h1\b/g) || []).length, 1);
   assert.doesNotMatch(html, /[↗↘→←↓↑]/);
+  assert.doesNotMatch(html, /eg-hero-label/);
   const ids = [...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
   assert.equal(ids.length, new Set(ids).size, "IDs must be unique");
   for (const [, target] of html.matchAll(/href="#([^"]+)"/g)) assert.ok(ids.includes(target), `Missing anchor ${target}`);
@@ -81,6 +82,7 @@ test("Contact keeps required fields and submission affordance; service and profi
     runtime.sqlite.prepare("INSERT INTO membres (id,nom,statut) VALUES (?,?,?)").run("a", "Premier membre", "publie");
     runtime.sqlite.prepare("INSERT INTO membres (id,nom,statut) VALUES (?,?,?)").run("b", "Second membre", "publie");
     const team = await renderPage(runtime, "equipe");
+    assert.match(team, /class="team-counter tabular-nums" aria-label="Membre 1 sur 2">01 \/ 02<\/span>/);
     assert.match(team, /aria-label="Membre précédent">Précédent/);
     assert.match(team, /aria-label="Membre suivant">Suivant/);
     assert.match(team, /Mettre en pause le défilement automatique/);

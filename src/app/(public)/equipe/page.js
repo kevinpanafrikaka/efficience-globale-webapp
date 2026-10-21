@@ -16,7 +16,7 @@ export default async function EquipePage({ searchParams } = {}) {
   const membres = await getMembres();
   return (
     <div className="eg-page eg-team">
-      <PageHero image="/img/hero-equipe.webp" label="Notre équipe"
+      <PageHero image="/img/hero-equipe.webp"
         title={<>Les visages de notre <span className="text-lime-2 italic">impact</span></>}
         description="Des parcours complémentaires, une connaissance du terrain et une même ambition : faire avancer vos projets." />
       <section aria-label="Les membres du cabinet" className="team-gallery-body bg-white overflow-hidden">

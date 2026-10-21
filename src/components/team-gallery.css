@@ -66,9 +66,6 @@
 @media (max-width: 767px) {
   .team-gallery-body .team-biography { padding: 24px 22px; margin-top: 26px; }
   .team-gallery-body .team-stage { height: calc(min(90vw, 387.5px) + 20px); }
-  .team-gallery-body .team-controls { flex-wrap: nowrap; gap: 12px; }
-  .team-gallery-body .team-controls button { flex-shrink: 0; }
-  .team-gallery-body .team-controls .team-play-toggle { min-width: 80px; padding-inline: 12px; }
   .team-gallery-body .team-biography-content { min-width: 0; }
 }
 @media (prefers-reduced-motion: reduce) {

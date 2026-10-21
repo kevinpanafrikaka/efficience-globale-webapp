@@ -22,7 +22,7 @@ export default async function ContactPage() {
   const telHref = `tel:${(reglages.telephone || "").replace(/[^\d+]/g, "")}`;
   const mapHref = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(reglages.adresse || "Camayenne, Conakry, Guinée")}`;
   return <div className="eg-page eg-contact">
-    <PageHero image="/img/hero-contact.jpg" label="Faisons connaissance"
+    <PageHero image="/img/hero-contact.jpg"
       title={<>Discutons de votre prochain <span className="text-lime-2 italic">projet</span></>}
       description="Gouvernance, digitalisation, intelligence artificielle ou renforcement de capacités : parlons de vos objectifs." />
 

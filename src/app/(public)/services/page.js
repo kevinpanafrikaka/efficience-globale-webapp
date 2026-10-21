@@ -61,7 +61,7 @@ const PHASES_IA = [
 
 export default function ServicesPage() {
   return <div className="eg-page eg-services">
-    <PageHero image="/img/hero-services.jpg" label="Nos services" title={<>Des expertises au service de votre <span className="text-lime-2 italic">action</span></>} description="Renforcer vos institutions, optimiser vos ressources et accompagner vos transformations : un appui sur mesure pour répondre à vos défis." />
+    <PageHero image="/img/hero-services.jpg" title={<>Des expertises au service de votre <span className="text-lime-2 italic">action</span></>} description="Renforcer vos institutions, optimiser vos ressources et accompagner vos transformations : un appui sur mesure pour répondre à vos défis." />
     <section className="eg-container eg-section" aria-labelledby="services-heading">
       <PageIntro id="services-heading" label="L’accompagnement" title={<>Cinq leviers.<br /><em>Un cap : votre projet.</em></>} description="De la structuration institutionnelle à l’innovation digitale, nous relions les expertises dont votre organisation a besoin." />
       <div className="eg-services-layout"><nav className="eg-service-nav" aria-label="Explorer nos cinq axes de services"><p className="eg-eyebrow">Votre parcours</p>{SERVICES.map((service) => <a key={service.id} href={`#${service.id}`}><service.Icon width="20" height="20" /><span>{service.court}</span></a>)}<a href="#accompagnement-ia" className="eg-service-nav-focus">Notre démarche IA</a></nav>

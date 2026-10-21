@@ -18,7 +18,7 @@ export default async function PartenairesPage() {
 
   return (
     <div className="eg-page eg-partners">
-      <PageHero image="/img/hero-partenaires.jpg" label="Nos partenaires"
+      <PageHero image="/img/hero-partenaires.jpg"
         title={<>Ils nous font <span className="text-lime-2 italic">confiance</span></>}
         description="Bailleurs, institutions académiques et organisations de la société civile : des partenaires de premier plan qui nous accordent leur confiance à travers l’Afrique de l’Ouest." />
 
