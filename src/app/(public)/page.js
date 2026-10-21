@@ -92,7 +92,7 @@ export default async function HomePage() {
     </div></section>
 
     <section className={`home-wrap home-section home-team ${membre ? "" : "home-team-empty"}`} aria-labelledby="home-team-heading">
-      {membre && <Link href={`/equipe?membre=${encodeURIComponent(membre.id)}`} className="home-team-feature">
+      {membre && <Link href={`/equipe?membre=${encodeURIComponent(membre.id)}`} className={`home-team-feature ${membre.photo_url ? "has-photo" : ""}`}>
         <div className="home-team-feature-photo">{membre.photo_url ? <Image src={membre.photo_url} alt="" fill sizes="(min-width: 768px) 42vw, 100vw" className="home-team-photo object-cover" /> : <span className="home-team-feature-initials" aria-hidden="true">{membre.nom.trim().split(/\s+/).slice(0, 2).map((word) => word[0]).join("")}</span>}<Arrow /></div>
         <div className="home-team-caption"><strong>{membre.nom}</strong>{membre.role && <span>{membre.role}</span>}{membre.bio && <p>{membre.bio}</p>}{expertiseTags(membre.expertises).length > 0 && <ul className="home-team-tags">{expertiseTags(membre.expertises).map((tag) => <li key={tag}>{tag}</li>)}</ul>}</div>
       </Link>}

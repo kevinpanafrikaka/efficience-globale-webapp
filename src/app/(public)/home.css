@@ -74,12 +74,17 @@
 /* A real member portrait paired with the rest of the published collective. */
 .home-page .home-team { display: grid; align-items: start; gap: 36px; }
 .home-page .home-team > * { min-width: 0; }
-.home-page .home-team-feature { display: block; overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: #f1f5ec; color: var(--dark); }
-.home-page .home-team-feature-photo { position: relative; aspect-ratio: 4/4.3; max-height: 480px; overflow: hidden; background: #e3ecdc; }
+.home-page .home-team-feature { position: relative; display: flex; flex-direction: column; justify-content: flex-end; min-height: 590px; overflow: hidden; border: 1px solid var(--line); border-radius: 18px; background: #f1f5ec; color: var(--dark); }
+.home-page .home-team-feature-photo { position: absolute; inset: 0; overflow: hidden; background: #e3ecdc; }
+.home-page .home-team-feature.has-photo .home-team-feature-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg,#101d1700 12%,#101d17c7 45%,#101d17fa 100%); pointer-events: none; }
 .home-page .home-team-photo { object-position: center 24%; }
-.home-page .home-team-feature-photo > .home-arrow { position: absolute; right: 18px; top: 18px; width: 44px; height: 44px; border-radius: 50%; background: white; }
-.home-page .home-team-feature-initials { display: grid; height: 100%; place-items: center; color: var(--dark-2); font-family: var(--font-head),Georgia,serif; font-size: 110px; }
-.home-page .home-team-caption { display: flex; flex-direction: column; gap: 8px; padding: 24px; }
+.home-page .home-team-feature-photo > .home-arrow { z-index: 1; position: absolute; right: 18px; top: 18px; width: 44px; height: 44px; border-radius: 50%; background: white; }
+.home-page .home-team-feature-initials { display: grid; height: 62%; place-items: center; color: var(--dark-2); font-family: var(--font-head),Georgia,serif; font-size: 110px; }
+.home-page .home-team-caption { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 32px 24px; margin-top: 250px; background: #f1f5ecf2; }
+.home-page .home-team-feature.has-photo .home-team-caption { background: transparent; color: white; }
+.home-page .home-team-feature.has-photo .home-team-caption > span { color: var(--lime-2); }
+.home-page .home-team-feature.has-photo .home-team-caption p { color: #e0e7db; }
+.home-page .home-team-feature.has-photo .home-team-tags li { border-color: #ffffff66; }
 .home-page .home-team-caption strong { font-family: var(--font-head),Georgia,serif; font-size: 27px; line-height: 1.2; }
 .home-page .home-team-caption > span { color: var(--home-accent); font-size: 14px; font-weight: 600; }
 .home-page .home-team-caption p { margin-top: 8px; color: var(--ink-soft); font-size: 14px; line-height: 1.75; }
@@ -91,12 +96,18 @@
 .home-page .home-team-roster-heading > p { color: var(--dark); font-size: 14px; font-weight: 600; }
 .home-page .home-team-rail-controls { display: flex; gap: 8px; }
 .home-page .home-team-track { display: grid; grid-auto-flow: column; grid-auto-columns: 82%; gap: 14px; overflow-x: auto; overscroll-behavior-inline: contain; scroll-snap-type: x mandatory; scroll-padding-inline: 4px; scrollbar-width: thin; scrollbar-color: #9eb58f transparent; padding: 4px 4px 12px; }
-.home-page .home-member-card { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; min-height: 228px; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--cream); color: var(--dark); scroll-snap-align: start; }
-.home-page .home-member-avatar { position: relative; display: grid; flex-shrink: 0; place-items: center; width: 58px; height: 58px; overflow: hidden; border-radius: 50%; background: #e2ecda; color: #3d5347; font-family: var(--font-head),Georgia,serif; font-size: 22px; }
-.home-page .home-member-avatar img { object-position: center 25%; }
-.home-page .home-member-card > strong { margin-top: 18px; font-size: 16px; line-height: 1.4; }
+.home-page .home-member-card { position: relative; display: flex; flex-direction: column; justify-content: flex-end; min-width: 0; min-height: 330px; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: #e4ecdc; color: var(--dark); scroll-snap-align: start; }
+.home-page .home-member-card.has-photo { background: var(--darker); color: white; }
+.home-page .home-member-portrait { object-position: center 22%; }
+.home-page .home-member-initials { position: absolute; inset: 0 0 36%; display: grid; place-items: center; color: #69845a; font-family: var(--font-head),Georgia,serif; font-size: 72px; letter-spacing: -.04em; }
+.home-page .home-member-shade { position: absolute; inset: 0; background: linear-gradient(180deg,#e4ecdc00 30%,#e4ecdccc 58%,#e4ecdc 100%); pointer-events: none; }
+.home-page .home-member-card.has-photo .home-member-shade { background: linear-gradient(180deg,#101d1700 12%,#101d17c7 45%,#101d17fa 100%); }
+.home-page .home-member-copy { position: relative; display: flex; flex-direction: column; margin-top: 140px; padding: 24px 20px; }
+.home-page .home-member-copy > strong { font-size: 17px; line-height: 1.4; }
 .home-page .home-member-role { margin-top: 7px; color: var(--ink-soft); font-size: 13px; line-height: 1.5; }
-.home-page .home-member-open { display: flex; justify-content: space-between; gap: 12px; align-self: stretch; margin-top: auto; padding-top: 22px; color: var(--home-accent); font-size: 12px; font-weight: 600; }
+.home-page .home-member-open { display: flex; justify-content: space-between; gap: 12px; align-self: stretch; margin-top: 18px; padding-top: 14px; border-top: 1px solid #b8c9ab; color: var(--home-accent); font-size: 12px; font-weight: 600; }
+.home-page .home-member-card.has-photo .home-member-role { color: #d3ddce; }
+.home-page .home-member-card.has-photo .home-member-open { border-color: #ffffff40; color: white; }
 .home-page .home-team-all { margin-top: 24px; }
 .home-page .home-team-empty { grid-template-columns: 1fr; }
 .home-page .home-partners { border-block: 1px solid var(--line); background: var(--cream); }
