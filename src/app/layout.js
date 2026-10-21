@@ -16,6 +16,8 @@ const sourceSans = Source_Sans_3({
 });
 
 export const metadata = {
+  applicationName: "Efficience Globale",
+  appleWebApp: { title: "Efficience Globale" },
   title: {
     default: "Efficience Globale — Cabinet de conseil en stratégie, Conakry",
     template: "%s — Efficience Globale",
