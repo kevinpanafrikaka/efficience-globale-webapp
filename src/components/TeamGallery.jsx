@@ -15,8 +15,8 @@ function Portrait({ member, priority }) {
   ) : <span className="team-initials" aria-hidden="true">{initials}</span>;
 }
 
-export default function TeamGallery({ members }) {
-  const [selected, setSelected] = useState(0);
+export default function TeamGallery({ members, initialMemberId }) {
+  const [selected, setSelected] = useState(() => Math.max(0, members.findIndex((member) => member.id === initialMemberId)));
   const gesture = useRef(null);
   const ignoreClick = useRef(false);
   const [playing, setPlaying] = useState(true);

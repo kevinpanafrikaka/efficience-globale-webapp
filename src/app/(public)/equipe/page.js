@@ -9,7 +9,9 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function EquipePage() {
+export default async function EquipePage({ searchParams } = {}) {
+  const query = await searchParams;
+  const initialMemberId = typeof query?.membre === "string" ? query.membre : undefined;
   const membres = await getMembres();
   return (
     <>
@@ -18,7 +20,7 @@ export default async function EquipePage() {
         description="Des parcours complémentaires, une connaissance du terrain et une même ambition : faire avancer vos projets." />
       <section aria-label="Les membres du cabinet" className="team-gallery-body bg-white overflow-hidden">
         <div className="max-w-6xl mx-auto px-5 md:px-8 pt-12 md:pt-16 pb-8 md:pb-12">
-          <TeamGallery members={membres} />
+          <TeamGallery key={initialMemberId || "all"} members={membres} initialMemberId={initialMemberId} />
         </div>
       </section>
     </>

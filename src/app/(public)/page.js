@@ -1,8 +1,11 @@
 import Image from "@/components/PublicImage";
 import HeroImage from "@/components/HeroImage";
 import Link from "next/link";
-import PartnerCard from "@/components/PartnerCard";
-import { getProjetsRecents, countProjets, getMembres, getPartenaires, getReglages, parseStatsEquipe, secteurs } from "@/lib/db";
+import HomePartnerCard from "@/components/HomePartnerCard";
+import HomeTeamRail from "@/components/HomeTeamRail";
+import { projectsForPartner } from "@/lib/partner-projects.mjs";
+import { expertiseTags } from "@/lib/member-expertises.mjs";
+import { getProjetsRecents, countProjets, getMembres, getPartenaires, getReglages, getProjets, secteurs } from "@/lib/db";
 import "./home.css";
 
 export const dynamic = "force-dynamic";
@@ -35,11 +38,11 @@ function Project({ projet, featured = false }) {
 }
 
 export default async function HomePage() {
-  const [projets, nbProjets, membres, partenaires, reglages] = await Promise.all([
-    getProjetsRecents(4), countProjets(), getMembres(), getPartenaires(), getReglages(),
+  const [projets, nbProjets, membres, partenaires, reglages, tousProjets] = await Promise.all([
+    getProjetsRecents(4), countProjets(), getMembres(), getPartenaires(), getReglages(), getProjets(),
   ]);
-  const equipeStats = parseStatsEquipe(reglages);
-  const membre = membres.find((m) => /oumar/i.test(m.nom)) || membres[0];
+  const membre = membres.find((m) => /\boumar\b/i.test(m.nom)) || membres[0];
+  const collectif = membres.filter((m) => m.id !== membre?.id);
   const telephone = reglages.telephone?.trim();
   const telHref = telephone ? `tel:${telephone.replace(/[^\d+]/g, "")}` : null;
   const [featured, ...autres] = projets;
@@ -88,17 +91,21 @@ export default async function HomePage() {
       <Link href="/services" className="eg-button eg-button--primary">Découvrir nos services <Arrow /></Link>
     </div></section>
 
-    <section className="home-wrap home-section home-team" aria-label="Notre équipe">
-      <div className="home-team-visual">{membre?.photo_url ? <Image src={membre.photo_url} alt={membre.nom} fill sizes="(min-width: 768px) 42vw, 100vw" className="home-team-photo object-cover" /> : <Image src="/img/hero-equipe.webp" alt="" fill sizes="(min-width: 768px) 42vw, 100vw" className="home-team-photo object-cover" />}{membre?.photo_url && <div className="home-team-caption"><strong>{membre.nom}</strong>{membre.role && <span>{membre.role}</span>}</div>}</div>
-      <div><p className="home-eyebrow">Les personnes derrière les projets</p><h2>Des regards croisés.<br /><em>Une ambition commune.</em></h2><p className="home-section-lead">Consultants, analystes et spécialistes du numérique conjuguent leurs compétences pour accompagner vos équipes, de la stratégie à sa mise en œuvre.</p>
-        {equipeStats.length > 0 && <dl className="home-team-stats">{equipeStats.map((s) => <div key={s.label}><dt>{s.label}</dt><dd>{s.nombre}</dd></div>)}</dl>}
-        <Link href="/equipe" className="eg-button eg-button--secondary">Rencontrer notre équipe <Arrow /></Link>
+    <section className={`home-wrap home-section home-team ${membre ? "" : "home-team-empty"}`} aria-labelledby="home-team-heading">
+      {membre && <Link href={`/equipe?membre=${encodeURIComponent(membre.id)}`} className="home-team-feature">
+        <div className="home-team-feature-photo">{membre.photo_url ? <Image src={membre.photo_url} alt="" fill sizes="(min-width: 768px) 42vw, 100vw" className="home-team-photo object-cover" /> : <span className="home-team-feature-initials" aria-hidden="true">{membre.nom.trim().split(/\s+/).slice(0, 2).map((word) => word[0]).join("")}</span>}<Arrow /></div>
+        <div className="home-team-caption"><strong>{membre.nom}</strong>{membre.role && <span>{membre.role}</span>}{membre.bio && <p>{membre.bio}</p>}{expertiseTags(membre.expertises).length > 0 && <ul className="home-team-tags">{expertiseTags(membre.expertises).map((tag) => <li key={tag}>{tag}</li>)}</ul>}</div>
+      </Link>}
+      <div className="home-team-intro"><p className="home-eyebrow">Les personnes derrière les projets</p><h2 id="home-team-heading">Un cabinet.<br /><em>Tout un collectif.</em></h2><p className="home-section-lead">Des parcours complémentaires et un même engagement : accompagner vos équipes et faire avancer vos projets.</p>
+        {membres.length > 0 && <p className="home-team-count"><strong>{membres.length}</strong><span>membre{membres.length > 1 ? "s" : ""} du cabinet</span></p>}
+        <HomeTeamRail members={collectif} />
+        <Link href="/equipe" className="eg-button eg-button--secondary home-team-all">Découvrir toute l’équipe <Arrow /></Link>
       </div>
     </section>
 
     {partenaires.length > 0 && <section className="home-partners home-section" aria-label="Nos partenaires"><div className="home-wrap">
-      <Heading label="À nos côtés" title={<>Des collaborations qui<br /><em>font avancer les projets.</em></>}><Link href="/partenaires" className="home-text-link">Tous nos partenaires <Arrow /></Link></Heading>
-      <div className="home-partners-grid">{partenaires.slice(0, 8).map((p) => <PartnerCard key={p.id || p.nom} partenaire={p} />)}</div>
+      <Heading label="À nos côtés" title={<>La confiance se construit.<br /><em>Projet après projet.</em></>} detail="Découvrez les organisations qui nous accompagnent et les réalisations menées ensemble."><Link href="/partenaires" className="home-text-link">Tous nos partenaires <Arrow /></Link></Heading>
+      <div className="home-partners-grid">{partenaires.map((p) => <HomePartnerCard key={p.id || p.nom} partner={p} projectCount={projectsForPartner(p, tousProjets).length} />)}</div>
     </div></section>}
 
     <section className="home-wrap home-section" aria-labelledby="home-contact-heading"><div className="home-contact">
