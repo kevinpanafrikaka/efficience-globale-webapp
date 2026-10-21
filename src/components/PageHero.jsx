@@ -1,10 +1,10 @@
-import Image from "next/image";
+import HeroImage from "@/components/HeroImage";
 
 export default function PageHero({ image, title, description, imageClassName = "object-center", children }) {
   return (
     <section className="public-page-hero relative overflow-hidden bg-darker" aria-labelledby="page-heading">
       <div className="absolute inset-0">
-        <Image src={image} alt="" fill sizes="100vw" priority className={`object-cover ${imageClassName}`} />
+        <HeroImage src={image} className={imageClassName} />
         <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(13,19,14,0.9) 0%, rgba(13,19,14,0.62) 45%, rgba(13,19,14,0.3) 100%)" }} />
         <div className="absolute inset-0" style={{ background: "linear-gradient(0deg, rgba(10,15,11,0.55) 0%, rgba(10,15,11,0.1) 40%)" }} />
       </div>

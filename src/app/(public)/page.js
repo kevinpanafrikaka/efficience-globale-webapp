@@ -1,4 +1,5 @@
 import Image from "@/components/PublicImage";
+import HeroImage from "@/components/HeroImage";
 import Link from "next/link";
 import SectionHead from "@/components/SectionHead";
 import DomainCard from "@/components/DomainCard";
@@ -36,7 +37,7 @@ export default async function HomePage() {
       {/* HERO — photo plein cadre en fond, stats intégrées en bas */}
       <section className="home-hero relative overflow-hidden">
         <div className="absolute inset-0">
-          <Image src="/img/hero-conakry.jpg" alt="" fill className="object-cover object-right" priority />
+          <HeroImage src="/img/hero-conakry.jpg" className="object-right" />
           <div
             className="absolute inset-0"
             style={{
