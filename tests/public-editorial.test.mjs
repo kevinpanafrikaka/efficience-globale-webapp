@@ -88,3 +88,31 @@ test("Contact keeps required fields and submission affordance; service and profi
     assert.match(team, /Mettre en pause le défilement automatique/);
   } finally { runtime.close(); }
 });
+
+
+test("Compact announcement cards link to full published articles and never expose draft details", async () => {
+  const runtime = await runtimeForPages();
+  try {
+    const longText = "Une actualité du cabinet à découvrir. ".repeat(30) + "\nDernier paragraphe intégral.";
+    const insert = runtime.sqlite.prepare("INSERT INTO annonces (id,slug,titre,texte,image_url,date,statut) VALUES (?,?,?,?,?,?,?)");
+    insert.run("longue", "actualite-longue", "Actualité détaillée", longText, "/img/hero-annonces.jpg", "2026-10-21", "publie");
+    insert.run("sans-photo", "sans-photo", "Sans photographie", "Texte court", null, "2026-10-20", "publie");
+    insert.run("privee", "actualite-privee", "Annonce non publiée", "Contenu confidentiel", null, "2026-10-22", "brouillon");
+    const html = await renderPage(runtime, "annonces");
+    assert.equal((html.match(/class="project-card eg-news-card /g) || []).length, 2);
+    assert.match(html, /href="\/annonces\/actualite-longue"/);
+    assert.match(html, /href="\/annonces\/sans-photo"/);
+    assert.match(html, /eg-news-card-placeholder/);
+    assert.doesNotMatch(html, /is-featured|Dernier paragraphe intégral|Contenu confidentiel|actualite-privee/);
+    const { default: Detail, generateMetadata } = await runtime.module("src/app/(public)/annonces/[slug]/page.js");
+    const detail = renderToStaticMarkup(await Detail({ params: Promise.resolve({ slug: "actualite-longue" }) }));
+    assertStructure(detail);
+    assert.match(detail, /Dernier paragraphe intégral/);
+    assert.match(detail, /href="\/annonces"/);
+    assert.equal((await generateMetadata({ params: Promise.resolve({ slug: "actualite-longue" }) })).title, "Actualité détaillée");
+    for (const slug of ["actualite-privee", "inconnue"]) {
+      await assert.rejects(() => Detail({ params: Promise.resolve({ slug }) }), /NOT_FOUND/);
+      assert.equal(Object.keys(await generateMetadata({ params: Promise.resolve({ slug }) })).length, 0);
+    }
+  } finally { runtime.close(); }
+});

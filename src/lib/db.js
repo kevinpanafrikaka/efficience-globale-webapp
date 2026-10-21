@@ -227,6 +227,11 @@ export async function getAnnonces() {
   return results;
 }
 
+export async function getAnnonceBySlug(slug) {
+  const db = await getDB();
+  return db.prepare("SELECT * FROM annonces WHERE slug = ? AND statut = 'publie'").bind(slug).first();
+}
+
 // ===== Admin : annonces (tous statuts) =====
 
 export async function getAllAnnonces() {
