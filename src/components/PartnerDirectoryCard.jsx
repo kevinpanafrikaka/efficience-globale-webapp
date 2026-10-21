@@ -19,14 +19,14 @@ export default function PartnerDirectoryCard({ partner, projectCount }) {
         {projectCount > 0 ? (
           <>
             <p className="mb-3 text-center text-[12px] font-semibold text-dark-2">{projectCount} réalisation{projectCount > 1 ? "s" : ""}</p>
-            <a href={partnerProjectsHref(partner)} aria-label={`Voir les réalisations avec ${partner.nom}`} className="flex min-h-11 items-center justify-center gap-2 rounded-lg bg-cream px-2 py-2.5 text-center text-[13px] font-semibold text-dark transition-colors hover:bg-lime-2">
-              Voir les projets <span aria-hidden="true">↗</span>
+            <a href={partnerProjectsHref(partner)} aria-label={`Voir les réalisations avec ${partner.nom}`} className="eg-button eg-button--secondary eg-button--compact partner-project-link">
+              Voir les projets
             </a>
           </>
         ) : (
-          <p className="flex min-h-[72px] items-center justify-center text-center text-[12px] leading-relaxed text-ink-faint">Les réalisations associées seront publiées ici.</p>
+          <p className="flex min-h-[72px] items-center justify-center text-center text-[12px] leading-relaxed text-ink-faint">Membre de notre réseau</p>
         )}
-        {website && <a href={website} target="_blank" rel="noopener noreferrer" aria-label={`Site de ${partner.nom} (nouvel onglet)`} className="mt-2 flex min-h-11 items-center justify-center gap-2 text-[12px] font-semibold text-ink-soft">Site officiel <span aria-hidden="true">↗</span></a>}
+        {website && <a href={website} target="_blank" rel="noopener noreferrer" aria-label={`Site de ${partner.nom} (nouvel onglet)`} className="mt-2 flex min-h-11 items-center justify-center gap-2 text-[12px] font-semibold text-ink-soft">Site officiel</a>}
       </div>
     </article>
   );

@@ -21,12 +21,12 @@ export default async function ContactPage() {
   const reglages = await getReglages();
   const telHref = `tel:${(reglages.telephone || "").replace(/[^\d+]/g, "")}`;
   const mapHref = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(reglages.adresse || "Camayenne, Conakry, Guinée")}`;
-  return <>
-    <PageHero image="/img/hero-contact.jpg"
+  return <div className="eg-page eg-contact">
+    <PageHero image="/img/hero-contact.jpg" label="Faisons connaissance"
       title={<>Discutons de votre prochain <span className="text-lime-2 italic">projet</span></>}
       description="Gouvernance, digitalisation, intelligence artificielle ou renforcement de capacités : parlons de vos objectifs." />
 
-    <section aria-labelledby="contact-heading" className="contact-body max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
+    <section aria-labelledby="contact-heading" className="contact-body eg-container eg-section">
       <div className="contact-intro">
         <span className="contact-intro-line" aria-hidden="true" />
         <h2 id="contact-heading">Votre projet commence <em>ici.</em></h2>
@@ -58,8 +58,8 @@ export default async function ContactPage() {
             {reglages.telephone && <a href={telHref}><ContactIcon type="phone" /> Appeler</a>}
             {reglages.email && <a href={`mailto:${reglages.email}`}><ContactIcon type="mail" /> Écrire</a>}
           </div>
-          {reglages.adresse && <a href={mapHref} target="_blank" rel="noopener noreferrer" className="contact-directions" aria-label="Ouvrir l’itinéraire dans Google Maps (nouvel onglet)">Voir l’itinéraire <span aria-hidden="true">↗</span></a>}
-          <div className="contact-details-note"><span aria-hidden="true">↗</span><p>Des ambitions locales.<br /><strong>Un regard global.</strong></p></div>
+          {reglages.adresse && <a href={mapHref} target="_blank" rel="noopener noreferrer" className="contact-directions" aria-label="Ouvrir l’itinéraire dans Google Maps (nouvel onglet)">Voir l’itinéraire</a>}
+          <div className="contact-details-note"><p>Des ambitions locales.<br /><strong>Un regard global.</strong></p></div>
         </aside>
 
         <div className="contact-form-card">
@@ -67,5 +67,5 @@ export default async function ContactPage() {
         </div>
       </div>
     </section>
-  </>;
+  </div>;
 }

@@ -38,8 +38,8 @@ export default function HomeTeamRail({ members }) {
   if (!members.length) return null;
   return <div className="home-team-roster">
     <div className="home-team-roster-heading"><p>Le collectif</p><div className="home-team-rail-controls">
-      <button type="button" className="eg-button eg-button--secondary eg-button--icon" onClick={() => move(-1)} disabled={!bounds.back} aria-label="Voir les profils précédents" aria-controls="home-team-track">←</button>
-      <button type="button" className="eg-button eg-button--secondary eg-button--icon" onClick={() => move(1)} disabled={!bounds.next} aria-label="Voir les profils suivants" aria-controls="home-team-track">→</button>
+      <button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={() => move(-1)} disabled={!bounds.back} aria-label="Voir les profils précédents" aria-controls="home-team-track">Précédent</button>
+      <button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={() => move(1)} disabled={!bounds.next} aria-label="Voir les profils suivants" aria-controls="home-team-track">Suivant</button>
     </div></div>
     <div ref={track} id="home-team-track" className="home-team-track" role="region" aria-label="Les membres du collectif, faites défiler pour découvrir les profils" tabIndex={0}>
       {members.map((member) => <MemberCard key={member.id} member={member} />)}

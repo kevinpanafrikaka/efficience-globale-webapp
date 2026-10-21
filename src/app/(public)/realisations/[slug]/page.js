@@ -41,9 +41,9 @@ export default async function ProjetDetailPage({ params }) {
   const presentation = projet.description?.trim() || projet.resume?.trim();
 
   return (
-    <article>
+    <article className="eg-page eg-project-detail">
       <ProjectPageEntry slug={slug} />
-      <section className="relative min-h-[380px] md:min-h-[480px] overflow-hidden bg-darker">
+      <section className="eg-project-hero relative min-h-[380px] md:min-h-[480px] overflow-hidden bg-darker">
         <Image src={projet.photo_url} alt="" fill sizes="100vw" priority className="object-cover" />
         <div
           className="absolute inset-0"
@@ -62,7 +62,7 @@ export default async function ProjetDetailPage({ params }) {
               href="/realisations"
               className="inline-flex items-center rounded border-[1.5px] border-white/40 px-3.5 py-1.5 text-[12.5px] font-semibold text-white backdrop-blur-sm transition-colors hover:border-white hover:bg-white/10 mb-5 w-fit"
             >
-              ← Toutes les réalisations
+              Toutes les réalisations
             </Link>
             <h1 className="text-white text-[26px] md:text-[40px] leading-[1.05] tracking-[-0.01em] max-w-2xl mb-5">
               {renderTitre(projet.titre, projet.titre_accent)}
@@ -81,7 +81,7 @@ export default async function ProjetDetailPage({ params }) {
         </div>
       </section>
 
-      <section aria-labelledby="project-presentation-heading" className="max-w-4xl mx-auto px-5 md:px-8 py-12 md:py-16">
+      <section aria-labelledby="project-presentation-heading" className="eg-container eg-section eg-project-presentation">
         <h2 id="project-presentation-heading" className="text-[24px] md:text-[28px] tracking-[-0.01em] mb-5">À propos du projet</h2>
         <p className="text-[16px] md:text-[17px] leading-relaxed text-ink-soft mb-10 max-w-3xl whitespace-pre-line">
           {presentation || "La présentation détaillée de ce projet sera bientôt disponible. Contactez-nous pour en savoir plus."}
@@ -90,7 +90,7 @@ export default async function ProjetDetailPage({ params }) {
         {projet.resultats?.length > 0 && (
           <>
             <h2 className="text-[20px] tracking-[-0.01em] mb-5">Résultats obtenus</h2>
-            <ul className="space-y-2.5 mb-12">
+            <ul className="eg-project-results mb-12">
               {projet.resultats.map((r) => (
                 <li key={r} className="flex items-start gap-2.5 text-[14.5px] text-ink-soft leading-relaxed">
                   <svg
@@ -115,7 +115,7 @@ export default async function ProjetDetailPage({ params }) {
 
         <Link
           href="/contact"
-          className="flex w-full items-center justify-center rounded bg-lime px-6 py-3.5 text-center text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2"
+          className="eg-button eg-button--primary eg-project-contact"
         >
           Discuter d&apos;un projet similaire
         </Link>

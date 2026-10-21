@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 const TOPICS = [
-  { id: "projet", label: "Un projet", icon: "↗", subject: "Accompagnement d’un projet", hint: "Quel est votre objectif ? Précisez le contexte et, si vous le connaissez, le calendrier envisagé." },
+  { id: "projet", label: "Un projet", icon: "◫", subject: "Accompagnement d’un projet", hint: "Quel est votre objectif ? Précisez le contexte et, si vous le connaissez, le calendrier envisagé." },
   { id: "formation", label: "Une formation", icon: "✳", subject: "Demande de formation", hint: "Quel sujet souhaitez-vous explorer ? Parlez-nous de votre équipe et de ses besoins." },
   { id: "partenariat", label: "Un partenariat", icon: "◇", subject: "Proposition de partenariat", hint: "Présentez votre organisation et les pistes de collaboration que vous imaginez." },
 ];
@@ -56,7 +56,7 @@ export default function ContactForm({ emailContact }) {
         <span className="contact-success-icon" aria-hidden="true">✓</span>
         <h3>Votre message est bien reçu.</h3>
         <p>Merci de nous avoir présenté votre besoin. L’équipe Efficience Globale reviendra vers vous à l’adresse indiquée.</p>
-        <button type="button" onClick={() => { setTopic(""); setSubject(""); setErrorMsg(""); setStatus("idle"); }}>Écrire un autre message <span aria-hidden="true">↗</span></button>
+        <button type="button" onClick={() => { setTopic(""); setSubject(""); setErrorMsg(""); setStatus("idle"); }}>Écrire un autre message</button>
       </div>
     );
   }
@@ -151,9 +151,9 @@ export default function ContactForm({ emailContact }) {
       <button
         type="submit"
         disabled={status === "sending"}
-        className="contact-send mt-1 inline-flex items-center justify-center rounded bg-lime px-6 py-3.5 text-[15px] font-semibold text-ink active:scale-[0.97] transition-transform hover:bg-lime-2 disabled:opacity-60 disabled:pointer-events-none"
+        className="contact-send eg-button eg-button--primary mt-1"
       >
-        {status === "sending" ? "Envoi en cours…" : <>Envoyer mon message <span aria-hidden="true">↗</span></>}
+        {status === "sending" ? "Envoi en cours…" : <>Envoyer mon message</>}
       </button>
       {emailContact && (
         <p className="text-[12.5px] text-ink-faint">

@@ -1,4 +1,5 @@
 import PageHero from "@/components/PageHero";
+import { PageIntro, PageCTA } from "@/components/PublicEditorial";
 import Image from "@/components/PublicImage";
 import PartnerDirectoryCard from "@/components/PartnerDirectoryCard";
 import { getProjets, getPartenaires } from "@/lib/db";
@@ -16,17 +17,14 @@ export default async function PartenairesPage() {
   const partenariats = projets.filter((project) => project.secteur === "partenariat");
 
   return (
-    <>
-      <PageHero image="/img/hero-partenaires.jpg"
+    <div className="eg-page eg-partners">
+      <PageHero image="/img/hero-partenaires.jpg" label="Nos partenaires"
         title={<>Ils nous font <span className="text-lime-2 italic">confiance</span></>}
         description="Bailleurs, institutions académiques et organisations de la société civile : des partenaires de premier plan qui nous accordent leur confiance à travers l’Afrique de l’Ouest." />
 
-      <section aria-labelledby="institutions-heading" className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
-        <div className="max-w-2xl mb-9 md:mb-12">
-          <h2 id="institutions-heading" className="text-[28px] md:text-[38px] leading-tight tracking-[-0.01em] mb-4">Des partenaires, des actions <span className="text-lime italic">concrètes</span></h2>
-          <p className="text-[15.5px] text-ink-soft leading-relaxed">Découvrez les réalisations menées avec les organisations qui nous font confiance.</p>
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
+      <section aria-labelledby="institutions-heading" className="eg-container eg-section">
+        <PageIntro id="institutions-heading" title={<>La confiance se construit.<br /><em>L’action la fait grandir.</em></>} description="Institutions, organisations et acteurs du terrain : découvrez les collaborations qui donnent corps à nos interventions." />
+        <div className="eg-partner-directory">
           {bailleurs.map((partner) => (
             <PartnerDirectoryCard key={partner.id} partner={partner} projectCount={projectsForPartner(partner, projets).length} />
           ))}
@@ -34,12 +32,9 @@ export default async function PartenairesPage() {
       </section>
 
       {partenariats.length > 0 && (
-        <section aria-labelledby="partnerships-heading" className="bg-cream py-16 md:py-24">
-          <div className="max-w-6xl mx-auto px-5 md:px-8">
-            <div className="max-w-2xl mb-9 md:mb-12">
-              <h2 id="partnerships-heading" className="text-[28px] md:text-[38px] leading-tight tracking-[-0.01em] mb-4">Des <span className="text-lime italic">collaborations</span> de long terme</h2>
-              <p className="text-[15.5px] text-ink-soft leading-relaxed">Des accords-cadres et protocoles d&apos;entente qui structurent notre collaboration avec des institutions académiques, associatives et internationales.</p>
-            </div>
+        <section aria-labelledby="partnerships-heading" className="eg-soft-section eg-section">
+          <div className="eg-container">
+            <PageIntro id="partnerships-heading" title={<>Des collaborations<br /><em>qui s’inscrivent dans la durée.</em></>} description="Des accords-cadres et protocoles d’entente qui structurent notre travail avec les institutions académiques, associatives et internationales." />
             <div className="grid md:grid-cols-2 gap-6">
               {partenariats.map((project) => (
                 <a key={project.slug} href={`/realisations/${project.slug}`} className="strategic-partner-card group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-line bg-white">
@@ -52,7 +47,7 @@ export default async function PartenairesPage() {
                     <p className="text-[14px] leading-relaxed text-ink-soft mb-6">{project.resume || project.description}</p>
                     <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
                       {project.periode && <span className="text-[12px] text-ink-faint">{project.periode}</span>}
-                      <span className="inline-flex min-h-11 items-center gap-3 text-[13px] font-semibold text-dark">Voir la fiche <span aria-hidden="true" className="grid h-9 w-9 place-items-center rounded-full bg-cream text-lg">↗</span></span>
+                      <span className="inline-flex min-h-11 items-center gap-3 text-[13px] font-semibold text-dark">Voir la fiche</span>
                     </div>
                   </div>
                 </a>
@@ -61,6 +56,7 @@ export default async function PartenairesPage() {
           </div>
         </section>
       )}
-    </>
+      <PageCTA title={<>Et si nous faisions<br /><em>équipe ?</em></>} description="Partagez votre vision et explorons les projets que nous pourrions construire ensemble." label="Parlons partenariat" />
+    </div>
   );
 }

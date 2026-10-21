@@ -1,90 +1,37 @@
 import PageHero from "@/components/PageHero";
 import Image from "@/components/PublicImage";
+import { PageIntro, PageCTA } from "@/components/PublicEditorial";
 import { getMembres } from "@/lib/db";
 import { IconEye, IconSparkle, IconDrop, IconTarget } from "@/components/icons";
 
-export const metadata = {
-  title: "À propos",
-  description: "Vision, mission et positionnement d'Efficience Globale, cabinet de conseil en stratégie fondé en 2022 à Conakry.",
-};
-
+export const metadata = { title: "À propos", description: "Vision, mission et positionnement d'Efficience Globale, cabinet de conseil en stratégie fondé en 2022 à Conakry." };
 export const dynamic = "force-dynamic";
-
+const CONVICTIONS = [
+  { titre: "Transparence", desc: "Une honnêteté et une ouverture qui renforcent la confiance de nos partenaires et clients.", Icon: IconEye },
+  { titre: "Innovation", desc: "Des approches renouvelées pour apporter des réponses adaptées aux défis de nos partenaires.", Icon: IconSparkle },
+  { titre: "Durabilité", desc: "Des stratégies qui servent les intérêts actuels sans compromettre ceux des générations futures.", Icon: IconDrop },
+  { titre: "Efficience", desc: "Une optimisation constante pour offrir la meilleure valeur à nos clients.", Icon: IconTarget },
+];
 export default async function AProposPage() {
   const membres = await getMembres();
-  const fondateur = membres[0];
-
-  return (
-    <>
-      <PageHero image="/img/hero-a-propos.jpg"
-        title={<>Pourquoi nous <span className="text-lime-2 italic">existons</span> ?</>}
-        description="Efficience Globale est née d’une conviction simple : l’Afrique de l’Ouest a besoin d’une expertise qui comprend son contexte autant que ses standards internationaux." />
-
-      <section className="max-w-6xl mx-auto px-5 md:px-8 py-16 md:py-24">
-        <div className="grid md:grid-cols-[1.3fr_1fr] gap-10 md:gap-14 mb-16 md:mb-20">
-          <div className="flex flex-col gap-6">
-            <p className="text-[18px] md:text-[20px] leading-[1.5] tracking-[-0.01em] text-dark">
-              Efficience Globale (EG), fondée le 27 juillet 2022 à Conakry, est une société de conseil en stratégie
-              et gestion, qui a vocation à développer et implémenter des solutions sur mesure qui s&apos;inscrivent
-              parfaitement dans le contexte local de l&apos;Afrique de l&apos;Ouest, particulièrement en Guinée.
-            </p>
-            {fondateur && (
-              <div className="flex flex-col sm:flex-row items-start gap-5 pt-2">
-                <Image
-                  src={fondateur.photo_url}
-                  alt={fondateur.nom}
-                  width={110}
-                  height={110}
-                  className="object-cover h-[110px] w-[110px] flex-shrink-0"
-                />
-                <div>
-                  <p className="text-[15.5px] leading-relaxed text-ink-soft">
-                    Fondée par <span className="text-dark-2 font-bold">{fondateur.nom}</span>, fort d&apos;une
-                    décennie d&apos;expérience en gouvernance, finance, planification stratégique, engagement des
-                    parties prenantes et suivi-évaluation chez PwC, EY et Accenture à Paris, le cabinet allie
-                    expertise technique internationale et forte implication des acteurs locaux.
-                  </p>
-                  <div className="text-[13px] font-semibold text-lime mt-2">{fondateur.role}</div>
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="flex flex-col gap-7">
-            {[
-              ["Vision", "Devenir un acteur de référence en conseil stratégique et opérationnel en Afrique de l'Ouest."],
-              ["Mission", "Accompagner les organisations à adresser efficacement les défis de développement structurel."],
-              ["Positionnement", "Expertise locale, standards internationaux : le meilleur des deux mondes au service de nos partenaires."],
-            ].map(([titre, texte]) => (
-              <div key={titre} className="border-l-2 border-lime pl-5">
-                <h2 className="text-[13px] font-bold tracking-[0.1em] text-ink-faint mb-1.5">{titre.toUpperCase()}</h2>
-                <p className="text-[14.5px] leading-relaxed text-ink-soft">{texte}</p>
-              </div>
-            ))}
-          </div>
+  const fondateur = membres.find((m) => /\boumar\b/i.test(m.nom));
+  return <div className="eg-page eg-about">
+    <PageHero image="/img/hero-a-propos.jpg" label="Le cabinet" title={<>Pourquoi nous <span className="text-lime-2 italic">existons</span> ?</>} description="Efficience Globale est née d’une conviction simple : l’Afrique de l’Ouest a besoin d’une expertise qui comprend son contexte autant que ses standards internationaux." />
+    <section className="eg-container eg-section">
+      <PageIntro label="Notre histoire" title={<>Ancrés ici.<br /><em>Ouverts sur le monde.</em></>} />
+      <div className="eg-story-grid">
+        <div className="eg-story-origin"><span className="eg-origin-year">2022</span><span className="eg-origin-caption">27 juillet · Conakry, Guinée</span><p>Un cabinet né sur le terrain, tourné vers les défis de l’Afrique de l’Ouest.</p></div>
+        <div className="eg-story-copy"><p className="eg-lead">Efficience Globale est une société de conseil en stratégie et gestion. Nous développons et mettons en œuvre des solutions sur mesure, adaptées aux réalités locales et aux ambitions de nos partenaires.</p>
+          {fondateur && <div className="eg-founder">{fondateur.photo_url && <Image src={fondateur.photo_url} alt={fondateur.nom} width={110} height={110} className="eg-founder-photo" />}<div><h3>{fondateur.nom}</h3>{fondateur.role && <p className="eg-founder-role">{fondateur.role}</p>}<p>{fondateur.bio || "Une expertise mise au service du développement en Afrique de l’Ouest."}</p></div></div>}
         </div>
-
-        <div className="border-t border-line pt-12 md:pt-16">
-          <h2 className="text-[26px] md:text-[32px] tracking-[-0.01em] mb-10">Nos convictions</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { titre: "Transparence", desc: "Une honnêteté et une ouverture qui renforcent la confiance de nos partenaires et clients.", icon: <IconEye /> },
-              { titre: "Innovation", desc: "Nous cultivons la pensée innovante pour rester à l'avant-garde des solutions stratégiques.", icon: <IconSparkle /> },
-              { titre: "Durabilité", desc: "Des stratégies qui servent les intérêts actuels sans compromettre ceux des générations futures.", icon: <IconDrop /> },
-              { titre: "Efficience", desc: "Une optimisation constante pour offrir la meilleure valeur à nos clients.", icon: <IconTarget /> },
-            ].map((v) => (
-              <div key={v.titre} className="conviction-card bg-white rounded-xl p-4 sm:p-5 border border-line">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="conviction-icon w-9 h-9 rounded-lg bg-cream border border-line flex items-center justify-center text-lime shrink-0">
-                    {v.icon}
-                  </div>
-                  <h3 className="text-[16px] sm:text-[17px] tracking-[-0.01em] leading-tight">{v.titre}</h3>
-                </div>
-                <p className="text-[13.5px] text-ink-soft leading-relaxed">{v.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    </>
-  );
+      </div>
+      <div className="eg-direction-grid">{[
+        ["Vision", "Devenir un acteur de référence en conseil stratégique et opérationnel en Afrique de l’Ouest."],
+        ["Mission", "Accompagner les organisations pour répondre efficacement aux défis du développement structurel."],
+        ["Positionnement", "Une expertise locale et des standards internationaux au service de nos partenaires."],
+      ].map(([title, text]) => <article key={title}><span className="eg-section-dot" aria-hidden="true" /><h3>{title}</h3><p>{text}</p></article>)}</div>
+    </section>
+    <section className="eg-soft-section"><div className="eg-container eg-section"><PageIntro label="Nos convictions" title={<>Ce qui guide<br /><em>chaque intervention.</em></>} description="Des principes qui prennent leur sens dans notre manière de travailler, de décider et de transmettre." /><div className="eg-values-grid">{CONVICTIONS.map(({ titre, desc, Icon }) => <article className="eg-value" key={titre}><span className="eg-value-icon"><Icon /></span><h3>{titre}</h3><p>{desc}</p></article>)}</div></div></section>
+    <PageCTA />
+  </div>;
 }

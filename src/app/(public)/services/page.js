@@ -1,5 +1,6 @@
 import PageHero from "@/components/PageHero";
 import Link from "next/link";
+import { PageIntro } from "@/components/PublicEditorial";
 import { IconSearch, IconDocs, IconChart, IconTeam, IconSparkle, IconCheck } from "@/components/icons";
 
 export const metadata = {
@@ -59,71 +60,14 @@ const PHASES_IA = [
 ];
 
 export default function ServicesPage() {
-  return (
-    <>
-      <PageHero image="/img/hero-services.jpg"
-        title={<>Des expertises au service de votre <span className="text-lime-2 italic">action</span></>}
-        description="Renforcer vos institutions, optimiser vos ressources et accompagner vos transformations : un appui sur mesure pour répondre à vos défis." />
-
-      <section aria-labelledby="services-heading" className="max-w-6xl mx-auto px-5 md:px-8 py-14 md:py-20">
-        <div className="mb-10 md:mb-14 max-w-2xl">
-          <p className="text-[11px] font-semibold tracking-[0.14em] text-ink-soft mb-4">NOS SERVICES</p>
-          <h2 id="services-heading" className="text-[30px] md:text-[40px] leading-[1.15] mb-5">Cinq leviers pour faire avancer vos projets.</h2>
-          <p className="text-base leading-relaxed text-ink-soft">De la structuration institutionnelle à l’innovation digitale, notre accompagnement s’adapte à vos enjeux et à votre environnement.</p>
-        </div>
-        <div className="grid lg:grid-cols-[250px_1fr] gap-9 lg:gap-14 items-start">
-          <nav aria-label="Explorer nos cinq axes de services" className="lg:sticky lg:top-28 bg-cream rounded-xl border border-line p-5">
-            <p className="text-xs font-semibold text-dark mb-4">VOTRE ACCOMPAGNEMENT</p>
-            <ol className="space-y-1">
-              {SERVICES.map((service, index) => <li key={service.id}>
-                <a href={`#${service.id}`} className="flex items-start gap-3 rounded-lg px-2 py-3 text-sm text-ink-soft hover:bg-white hover:text-dark transition-colors">
-                  <span className="text-xs text-lime font-semibold pt-0.5" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-                  <span>{service.court}</span>
-                </a>
-              </li>)}
-            </ol>
-            <a href="#accompagnement-ia" className="flex items-center justify-between gap-3 mt-4 pt-4 border-t border-line text-sm font-semibold text-dark">Notre démarche IA <span aria-hidden="true">↓</span></a>
-          </nav>
-          <div>
-            {SERVICES.map((service, index) => <article id={service.id} key={service.id} aria-labelledby={`${service.id}-title`} className={`scroll-mt-28 ${index ? "mt-10 pt-10 border-t border-line" : ""}`}>
-              <div className="flex gap-4 items-start mb-5">
-                <span className="text-[40px] md:text-[48px] leading-none font-head text-[#c6d5bb] tabular-nums" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-                <div>
-                  <h3 id={`${service.id}-title`} className="text-[23px] md:text-[28px] leading-tight mb-3">{service.titre}</h3>
-                  <p className="text-[15px] leading-relaxed text-ink-soft">{service.description}</p>
-                </div>
-                <span className="hidden sm:grid shrink-0 place-items-center bg-cream rounded-xl w-11 h-11 text-dark-2"><service.Icon width="22" height="22" stroke="currentColor" /></span>
-              </div>
-              <ul className="rounded-xl bg-cream border border-line px-5 md:px-6 divide-y divide-line">
-                {service.prestations.map(([titre, detail]) => <li key={titre} className="py-5">
-                  <h4 className="font-body font-semibold text-[15px] text-dark mb-1.5">{titre}</h4>
-                  <p className="text-[14.5px] text-ink-soft leading-relaxed">{detail}</p>
-                </li>)}
-              </ul>
-            </article>)}
-          </div>
-        </div>
-      </section>
-
-      <section id="accompagnement-ia" aria-labelledby="ia-heading" className="scroll-mt-24 bg-white border-t border-line py-14 md:py-20">
-        <div className="max-w-6xl mx-auto px-5 md:px-8">
-          <div className="max-w-2xl mb-10">
-            <h2 id="ia-heading" className="text-dark text-[30px] md:text-[40px] leading-[1.15] mb-5">De l’opportunité à l’<span className="italic text-dark-2">adoption</span>.</h2>
-            <p className="text-ink-soft text-base leading-relaxed">L’intégration de l’IA générative commence par les besoins de vos équipes. Notre démarche en quatre phases associe solutions techniques, formation et accompagnement du changement.</p>
-          </div>
-          <ol className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
-            {PHASES_IA.map((phase) => <li key={phase.titre} className="rounded-xl border border-line bg-white p-6">
-              <div className="flex items-center justify-between mb-6 text-dark-2"><phase.Icon width="23" height="23" stroke="currentColor" /></div>
-              <h3 className="text-dark text-xl leading-tight mb-3">{phase.titre}</h3>
-              <p className="text-ink-soft text-sm leading-relaxed mb-5">{phase.desc}</p>
-              <ul className="space-y-3 border-t border-line pt-5">
-                {phase.points.map((point) => <li key={point} className="flex gap-2 text-[13.5px] leading-relaxed text-ink-soft"><span aria-hidden="true" className="text-dark-2">•</span><span>{point}</span></li>)}
-              </ul>
-            </li>)}
-          </ol>
-          <div className="mt-10"><Link href="/contact" className="flex w-full items-center justify-center gap-4 rounded bg-lime px-6 py-3.5 text-center font-semibold text-sm text-ink hover:bg-lime-2 transition-colors">Discutons de vos besoins <span aria-hidden="true">↗</span></Link></div>
-        </div>
-      </section>
-    </>
-  );
+  return <div className="eg-page eg-services">
+    <PageHero image="/img/hero-services.jpg" label="Nos services" title={<>Des expertises au service de votre <span className="text-lime-2 italic">action</span></>} description="Renforcer vos institutions, optimiser vos ressources et accompagner vos transformations : un appui sur mesure pour répondre à vos défis." />
+    <section className="eg-container eg-section" aria-labelledby="services-heading">
+      <PageIntro id="services-heading" label="L’accompagnement" title={<>Cinq leviers.<br /><em>Un cap : votre projet.</em></>} description="De la structuration institutionnelle à l’innovation digitale, nous relions les expertises dont votre organisation a besoin." />
+      <div className="eg-services-layout"><nav className="eg-service-nav" aria-label="Explorer nos cinq axes de services"><p className="eg-eyebrow">Votre parcours</p>{SERVICES.map((service) => <a key={service.id} href={`#${service.id}`}><service.Icon width="20" height="20" /><span>{service.court}</span></a>)}<a href="#accompagnement-ia" className="eg-service-nav-focus">Notre démarche IA</a></nav>
+        <div className="eg-service-dossiers">{SERVICES.map((service) => <article className="eg-service-dossier" key={service.id} id={service.id} aria-labelledby={`${service.id}-title`}><header><span className="eg-service-icon"><service.Icon width="26" height="26" /></span><div><h3 id={`${service.id}-title`}>{service.titre}</h3><p>{service.description}</p></div></header><ul className="eg-service-offers">{service.prestations.map(([title, detail]) => <li key={title}><h4>{title}</h4><p>{detail}</p></li>)}</ul></article>)}</div>
+      </div>
+    </section>
+    <section id="accompagnement-ia" className="eg-container eg-section eg-ai-section" aria-labelledby="ia-heading"><div className="eg-page-intro"><div><p className="eg-eyebrow">Des usages qui durent</p><h2 id="ia-heading">De l’opportunité<br />à l’<em>adoption.</em></h2><p className="eg-lead">L’intégration de l’IA générative commence par les besoins de vos équipes. Notre démarche associe solutions techniques, formation et accompagnement du changement.</p></div></div><ol className="eg-ai-phases">{PHASES_IA.map((phase) => <li key={phase.titre}><span className="eg-service-icon"><phase.Icon width="24" height="24" /></span><h3>{phase.titre}</h3><p>{phase.desc}</p><ul>{phase.points.map((point) => <li key={point}>{point}</li>)}</ul></li>)}</ol><div className="eg-services-contact"><div><h2>Quel sera votre<br /><em>prochain pas ?</em></h2><p className="eg-lead">Commençons par vos besoins et construisons un accompagnement qui vous ressemble.</p></div><Link href="/contact" className="eg-button eg-button--primary">Discutons de vos besoins</Link></div></section>
+  </div>;
 }

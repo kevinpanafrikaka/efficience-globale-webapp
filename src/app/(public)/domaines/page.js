@@ -1,5 +1,6 @@
 import PageHero from "@/components/PageHero";
-import Image from "next/image";
+import Image from "@/components/PublicImage";
+import { PageIntro, PageCTA } from "@/components/PublicEditorial";
 import Link from "next/link";
 import { getProjets } from "@/lib/db";
 import { IconHealth, IconEducation, IconIndustry, IconTic } from "@/components/icons";
@@ -82,89 +83,19 @@ const DOMAINES = [
 
 export default async function DomainesPage() {
   const projetsParSecteur = await Promise.all(DOMAINES.map((d) => getProjets({ secteur: d.secteur })));
-
-  return (
-    <>
-      <PageHero image="/img/hero-domaines.jpg"
-        title={<>Où nous créons de la <span className="text-lime-2 italic">valeur</span></>}
-        description="Quatre domaines, une même approche : diagnostic rigoureux, co-construction avec les acteurs locaux, et transfert de compétences pour ancrer les résultats dans la durée.">
-          <nav aria-label="Accéder à un domaine" className="domain-shortcuts">
-            {DOMAINES.map((d) => (
-              <a
-                key={d.secteur}
-                href={`#${d.secteur}`}
-                className="domain-shortcut"
-              >
-                {d.titre}
-              </a>
-            ))}
-          </nav>
-      </PageHero>
-
-      <section className="max-w-6xl mx-auto px-5 md:px-8">
-        {DOMAINES.map((d, i) => (
-          <div
-            key={d.titre}
-            id={d.secteur}
-            className={`grid md:grid-cols-2 gap-8 md:gap-14 items-start py-14 md:py-20 scroll-mt-24 ${i > 0 ? "border-t border-line" : ""}`}
-          >
-            <div className={i % 2 === 1 ? "md:order-2" : ""}>
-              <div className="relative h-64 md:h-80 overflow-hidden rounded-xl mb-6 md:mb-0">
-                <Image src={d.photo} alt="" fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover" />
-                <div className="absolute inset-0" style={{ backgroundColor: d.tint, mixBlendMode: "multiply" }} />
-              </div>
-            </div>
-            <div className={i % 2 === 1 ? "md:order-1" : ""}>
-              <h2 className="text-[24px] md:text-[28px] tracking-[-0.01em] mb-5">{d.titre}</h2>
-              <p className="text-[15.5px] text-ink-soft leading-relaxed mb-7">{d.description}</p>
-
-              <div className="text-[12px] font-bold text-lime tracking-[0.1em] mb-3.5">INTERVENTIONS TYPES</div>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2.5 mb-7">
-                {d.interventions.map((it) => (
-                  <li key={it} className="text-[13.5px] text-ink-soft leading-relaxed flex items-start gap-2">
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.4"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="text-lime mt-[3px] shrink-0"
-                    >
-                      <path d="M5 12.5l4.5 4.5L19 7" />
-                    </svg>
-                    {it}
-                  </li>
-                ))}
-              </ul>
-
-              <div className="border-l-2 border-lime pl-5 mb-7">
-                <div className="text-[12px] font-bold text-lime tracking-[0.1em] mb-1.5">EFFETS RECHERCHÉS</div>
-                <p className="text-[14.5px] text-ink-soft leading-relaxed">{d.effets}</p>
-              </div>
-
-              {projetsParSecteur[i].length > 0 && (
-                <div>
-                  <div className="text-[12px] font-bold text-lime tracking-[0.1em] mb-2">PROJETS RÉALISÉS</div>
-                  <div className="flex flex-col gap-1.5">
-                    {projetsParSecteur[i].slice(0, 3).map((p) => (
-                      <Link
-                        key={p.slug}
-                        href={`/realisations/${p.slug}`}
-                        className="inline-flex items-center min-h-11 py-2 text-[14px] font-medium text-dark-2 border-b border-line hoverable w-fit"
-                      >
-                        {p.titre}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-      </section>
-    </>
-  );
+  return <div className="eg-page eg-domains">
+    <PageHero image="/img/hero-domaines.jpg" label="Nos domaines" title={<>Où nous créons de la <span className="text-lime-2 italic">valeur</span></>} description="Quatre domaines, une même approche : diagnostic rigoureux, co-construction avec les acteurs locaux, et transfert de compétences pour ancrer les résultats dans la durée.">
+      <nav aria-label="Accéder à un domaine" className="domain-shortcuts">{DOMAINES.map((d) => <a key={d.secteur} href={`#${d.secteur}`} className="domain-shortcut">{d.titre}</a>)}</nav>
+    </PageHero>
+    <section className="eg-container eg-section">
+      <PageIntro label="Nos terrains d’action" title={<>Des enjeux différents.<br /><em>La même exigence d’impact.</em></>} description="Explorez les interventions concrètes que nous mobilisons dans chaque domaine." />
+      <div className="eg-domain-dossiers">{DOMAINES.map((d, i) => <article key={d.secteur} id={d.secteur} className="eg-domain-dossier" aria-labelledby={`domain-${d.secteur}`}>
+        <div className="eg-domain-cover"><Image src={d.photo} alt="" fill sizes="(min-width: 768px) 42vw, 100vw" className="object-cover" /><div className="eg-domain-cover-shade" /><div className="eg-domain-cover-copy"><span className="eg-domain-icon"><d.Icon /></span><h2 id={`domain-${d.secteur}`}>{d.titre}</h2><p>{d.description}</p></div></div>
+        <div className="eg-domain-detail"><h3 className="eg-eyebrow">Comment nous intervenons</h3><ul className="eg-intervention-list">{d.interventions.map((it) => <li key={it}>{it}</li>)}</ul><div className="eg-domain-outcome"><h3>Ce que nous cherchons à faire évoluer</h3><p>{d.effets}</p></div>
+          {projetsParSecteur[i].length > 0 && <div className="eg-domain-projects"><h3 className="eg-eyebrow">Sur le terrain</h3>{projetsParSecteur[i].slice(0, 3).map((p) => <Link key={p.slug} href={`/realisations/${p.slug}`}>{p.titre}</Link>)}</div>}
+        </div>
+      </article>)}</div>
+    </section>
+    <PageCTA title={<>Votre enjeu dépasse<br /><em>un seul domaine ?</em></>} description="Nos expertises se croisent pour construire un accompagnement adapté à votre contexte." />
+  </div>;
 }

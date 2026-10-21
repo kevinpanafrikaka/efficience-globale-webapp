@@ -6,7 +6,7 @@ export default function ProjectCard({ projet }) {
 
   return (
     <a href={`/realisations/${projet.slug}`} className="project-card group relative flex h-full flex-col active:opacity-80">
-      <div className="relative h-48 shrink-0 bg-dark-2 overflow-hidden">
+      <div className="project-card-photo relative h-48 shrink-0 bg-dark-2 overflow-hidden">
         <Image
           src={projet.photo_url}
           alt=""
@@ -15,7 +15,7 @@ export default function ProjectCard({ projet }) {
           className="project-card-media pointer-events-none object-cover"
         />
       </div>
-      <div className="flex flex-col gap-2.5 pt-4 border-t-2 border-dark flex-1">
+      <div className="project-card-copy flex flex-col gap-2.5 flex-1">
         <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
           <span className="text-[11px] font-bold tracking-[0.1em]" style={{ color: secteur.color }}>
             {secteur.label.toUpperCase()}

@@ -74,7 +74,7 @@ export default function TeamGallery({ members, initialMemberId }) {
         if (event.target.matches(":focus-visible")) setPlaying(false);
       }}>
       <div className={carousel ? "team-stage" : "team-grid"} role="group"
-        aria-label={carousel ? "Portraits de l’équipe, utilisez les flèches pour naviguer" : "Choisir un membre de l’équipe"}
+        aria-label={carousel ? "Portraits de l’équipe, choisissez un profil ou utilisez les commandes de navigation" : "Choisir un membre de l’équipe"}
         onPointerDown={(event) => { ignoreClick.current = false; gesture.current = { x: event.clientX, y: event.clientY }; }}
         onPointerUp={finishGesture} onPointerCancel={() => { gesture.current = null; }}>
         {members.map((member, index) => {
@@ -102,9 +102,9 @@ export default function TeamGallery({ members, initialMemberId }) {
       </div>
 
       {carousel && <div className="team-controls">
-        <button type="button" onClick={() => move(-1)} aria-label="Membre précédent">←</button>
+        <button type="button" onClick={() => move(-1)} aria-label="Membre précédent">Précédent</button>
         <span className="tabular-nums" aria-label={`Membre ${activeIndex + 1} sur ${members.length}`}>{String(activeIndex + 1).padStart(2, "0")} <span aria-hidden="true">/</span> {String(members.length).padStart(2, "0")}</span>
-        <button type="button" onClick={() => move(1)} aria-label="Membre suivant">→</button>
+        <button type="button" onClick={() => move(1)} aria-label="Membre suivant">Suivant</button>
         {!reducedMotion && <button type="button" className="team-play-toggle" onClick={() => setPlaying((value) => !value)}
           aria-label={playing ? "Mettre en pause le défilement automatique" : "Reprendre le défilement automatique"}>
           {playing ? "Pause" : "Reprendre"}

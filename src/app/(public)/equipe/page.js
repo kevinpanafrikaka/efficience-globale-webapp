@@ -1,4 +1,5 @@
 import PageHero from "@/components/PageHero";
+import { PageIntro } from "@/components/PublicEditorial";
 import TeamGallery from "@/components/TeamGallery";
 import { getMembres } from "@/lib/db";
 
@@ -14,15 +15,16 @@ export default async function EquipePage({ searchParams } = {}) {
   const initialMemberId = typeof query?.membre === "string" ? query.membre : undefined;
   const membres = await getMembres();
   return (
-    <>
-      <PageHero image="/img/hero-equipe.webp"
+    <div className="eg-page eg-team">
+      <PageHero image="/img/hero-equipe.webp" label="Notre équipe"
         title={<>Les visages de notre <span className="text-lime-2 italic">impact</span></>}
         description="Des parcours complémentaires, une connaissance du terrain et une même ambition : faire avancer vos projets." />
       <section aria-label="Les membres du cabinet" className="team-gallery-body bg-white overflow-hidden">
-        <div className="max-w-6xl mx-auto px-5 md:px-8 pt-12 md:pt-16 pb-8 md:pb-12">
+        <div className="eg-container eg-section">
+          <PageIntro label="Le collectif" title={<>Des personnalités.<br /><em>Une même exigence.</em></>} description="Explorez les profils et découvrez les parcours qui font la richesse du cabinet." />
           <TeamGallery key={initialMemberId || "all"} members={membres} initialMemberId={initialMemberId} />
         </div>
       </section>
-    </>
+    </div>
   );
 }
