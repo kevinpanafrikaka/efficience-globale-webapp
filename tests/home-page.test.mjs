@@ -35,7 +35,9 @@ test("Homepage uses published content, real project links and settings, and find
     for (let i = 0; i < 4; i++) assert.ok(html.includes(`href="/realisations/projet-${i}"`));
     assert.doesNotMatch(html, /Mission publique 4|Institution privée/);
     assert.match(html, /Institution publiée/);
-    assert.match(html, /home-team-caption[^>]*><strong>Oumar Camara/);
+    assert.doesNotMatch(html, /home-team-feature|home-team-caption/);
+    assert.equal((html.match(/class="home-member-card/g) || []).length, 3);
+    assert.equal((html.match(/href="\/equipe\?membre=m2"/g) || []).length, 1);
     assert.doesNotMatch(html, /Experts mobilisés|Profil privé/);
     assert.match(html, /href="\/equipe\?membre=m1"/);
     assert.match(html, /href="\/equipe\?membre=m2"/);
