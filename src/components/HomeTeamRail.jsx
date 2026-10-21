@@ -11,7 +11,7 @@ function MemberCard({ member }) {
   return <Link href={`/equipe?membre=${encodeURIComponent(member.id)}`} className={`home-member-card ${photo ? "has-photo" : ""}`}>
     {photo ? <Image src={member.photo_url} alt="" fill sizes="(min-width: 768px) 260px, 80vw" className="home-member-portrait object-cover" onError={() => setFailedSource(member.photo_url)} /> : <span className="home-member-initials" aria-hidden="true">{initials}</span>}
     <span className="home-member-shade" aria-hidden="true" />
-    <span className="home-member-copy"><strong>{member.nom}</strong>{member.role && <span className="home-member-role">{member.role}</span>}<span className="home-member-open">Voir le profil <span aria-hidden="true">↗</span></span></span>
+    <span className="home-member-copy"><strong>{member.nom}</strong>{member.role && <span className="home-member-role">{member.role}</span>}<span className="home-member-open">Voir le profil</span></span>
   </Link>;
 }
 
