@@ -1,14 +1,32 @@
 .member-editor .member-photo > .flex > .eg-button { width: 100%; }
 .member-editor .member-photo-help { margin-top: 12px; }
-.member-editor .member-publication .editor-status-help { margin-bottom: 18px; }
-.member-editor .member-publication input[type="number"] { max-width: 120px; }
-.member-editor .member-expertise-preview { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
-.member-editor .member-expertise-preview span { padding: 6px 10px; border-radius: 8px; background: #edf3e6; color: #36581d; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.member-editor .member-publication .editor-status-help { margin-bottom: 0; }
+.member-editor .member-expertises { border: 0; padding: 0; margin: 20px 0 0; min-width: 0; }
+.member-editor .member-expertises legend { margin-bottom: 10px; padding: 0; font-size: 13px; font-weight: 600; }
+.member-editor .member-expertise-count { margin-left: 8px; font-size: 11px; font-weight: 400; color: #657260; }
+.member-editor .member-expertise-fields { display: grid; gap: 8px; }
+.member-editor .member-expertise-row { display: grid; grid-template-columns: minmax(0,1fr) 44px; gap: 6px; align-items: start; }
+.admin-space .member-editor .member-expertise-row input { width: 100%; min-width: 0; border: 1px solid #dce4d7; border-radius: 10px; padding: 11px 13px; min-height: 46px; background: white; font-size: 15px; line-height: 1.5; }
+.member-editor .member-expertise-clear { display: grid; place-items: center; min-height: 46px; border-radius: 10px; color: #657260; font-size: 22px; }
+.member-editor .member-expertise-clear:hover:not(:disabled) { background: #edf3e6; color: #a32929; }
+.member-editor .member-expertises .editor-help { margin-top: 10px; }
 .member-editor .member-card-preview { margin-bottom: 16px; }
 .member-editor .member-card-preview .team-card h2 { margin-bottom: 0; font-size: 22px; }
 .member-editor .member-card-preview .team-photo-note { margin-top: 10px; margin-bottom: 0; }
 .member-editor .editor-panel { min-width: 0; }
 .member-editor .editor-error { position: static; }
+@media (min-width: 1200px) {
+  .member-editor .editor-layout { grid-template-areas: "identity photo" "biography photo" "publication publication"; align-items: stretch; }
+  .member-editor .editor-layout > .editor-main-column, .member-editor .editor-layout > .editor-side-column { display: contents; }
+  .member-editor .member-identity { grid-area: identity; }
+  .member-editor .member-biography { grid-area: biography; display: flex; flex-direction: column; }
+  .member-editor .member-biography > .editor-field { flex: 1; }
+  .member-editor .member-biography textarea { flex: 1; }
+  .member-editor .member-photo { grid-area: photo; }
+  .member-editor .member-publication { grid-area: publication; display: grid; grid-template-columns: minmax(0,1fr) minmax(200px,280px) minmax(0,1.5fr); gap: 24px; align-items: center; }
+  .member-editor .member-publication h2, .member-editor .member-publication .editor-status-help { margin: 0; }
+}
+@media (max-width: 719px) { .admin-space .member-editor .member-expertise-row input { font-size: 16px; } }
 @media (max-width: 1199px) {
   .member-editor .member-identity { order: 0; }
   .member-editor .member-photo { order: 1; }

@@ -119,6 +119,30 @@ test("Message status accepts booleans and reordering persists without losing ent
   } finally { runtime.close(); }
 });
 
+test("Members append after the current team and editing a profile preserves its manual position everywhere", async () => {
+  const runtime = await adminRuntime();
+  try {
+    const db = await runtime.module("src/lib/db.js");
+    const collection = await runtime.module("src/app/api/admin/membres/route.js");
+    const item = await runtime.module("src/app/api/admin/membres/[id]/route.js");
+    for (const [id, ordre] of [["direction", 10], ["consultant", 40]]) runtime.sqlite.prepare("INSERT INTO membres (id,nom,statut,ordre_affichage) VALUES (?,?,?,?)").run(id, id, "publie", ordre);
+    const response = await collection.POST(request("/create", "POST", { nom: "Nouveau membre", statut: "publie", ordre_affichage: 0 }));
+    assert.equal(response.status, 200);
+    const { id } = await response.json();
+    assert.deepEqual(Array.from(await db.getAllMembres(), m => m.id), ["direction", "consultant", id]);
+    assert.equal((await db.getMembreById(id)).ordre_affichage, 41);
+    await db.moveItem("membres", id, "consultant");
+    const before = Array.from(await db.getAllMembres(), m => m.id);
+    assert.deepEqual(before, ["direction", id, "consultant"]);
+    const updated = await item.PUT(request("/edit", "PUT", { nom: "Nom modifié", bio: "Parcours mis à jour", expertises: "Formation, Gouvernance", statut: "publie", ordre_affichage: 999 }), { params: Promise.resolve({ id }) });
+    assert.equal(updated.status, 200);
+    assert.deepEqual(Array.from(await db.getAllMembres(), m => m.id), before);
+    assert.deepEqual(Array.from(await db.getMembres(), m => m.id), before);
+    assert.equal((await db.getMembreById(id)).ordre_affichage, 1);
+    assert.equal((await db.getMembreById(id)).expertises, "Formation, Gouvernance");
+  } finally { runtime.close(); }
+});
+
 test("Saving visible settings preserves team figures and the legacy notification recipient", async () => {
   const runtime = await adminRuntime();
   try {

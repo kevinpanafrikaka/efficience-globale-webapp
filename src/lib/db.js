@@ -189,9 +189,9 @@ export async function createMembre(data) {
   await db
     .prepare(
       `INSERT INTO membres (id, nom, role, bio, photo_url, ordre_affichage, statut, expertises)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+       VALUES (?, ?, ?, ?, ?, (SELECT COALESCE(MAX(ordre_affichage), -1) + 1 FROM membres), ?, ?)`
     )
-    .bind(id, data.nom, data.role || null, data.bio || null, data.photo_url || null, data.ordre_affichage ?? 0, data.statut || "brouillon", expertiseTags(data.expertises).join(", "))
+    .bind(id, data.nom, data.role || null, data.bio || null, data.photo_url || null, data.statut || "brouillon", expertiseTags(data.expertises).join(", "))
     .run();
   return id;
 }
@@ -200,10 +200,10 @@ export async function updateMembre(id, data) {
   const db = await getDB();
   await db
     .prepare(
-      `UPDATE membres SET nom = ?, role = ?, bio = ?, photo_url = ?, ordre_affichage = ?, statut = ?, expertises = ?, maj_le = datetime('now')
+      `UPDATE membres SET nom = ?, role = ?, bio = ?, photo_url = ?, statut = ?, expertises = ?, maj_le = datetime('now')
        WHERE id = ?`
     )
-    .bind(data.nom, data.role || null, data.bio || null, data.photo_url || null, data.ordre_affichage ?? 0, data.statut || "brouillon", expertiseTags(data.expertises).join(", "), id)
+    .bind(data.nom, data.role || null, data.bio || null, data.photo_url || null, data.statut || "brouillon", expertiseTags(data.expertises).join(", "), id)
     .run();
 }
 

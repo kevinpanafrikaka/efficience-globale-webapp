@@ -268,7 +268,8 @@ test("Member editor keeps stored profile details and updates the shared card pre
   assert.equal(h.requests[0].url, "/api/admin/membres/malick");
   assert.equal(h.requests[0].options.method, "PUT");
   const data = JSON.parse(h.requests[0].options.body);
-  for (const key of ["bio", "expertises", "photo_url", "ordre_affichage"]) assert.equal(data[key], membre[key], key);
+  for (const key of ["bio", "expertises", "photo_url"]) assert.equal(data[key], membre[key], key);
+  assert.equal("ordre_affichage" in data, false);
   assert.equal(data.nom, "Malick D. Douet"); assert.equal(data.role, "Directeur des opérations"); assert.equal(data.statut, "brouillon");
   assert.deepEqual(h.navigations, ["/admin/membres"]);
 });
@@ -282,15 +283,28 @@ test("Member creation accepts a draft without a portrait and failed saves preser
   assert.equal(created.nom, "Nouveau membre"); assert.equal(created.photo_url, ""); assert.equal(created.statut, "brouillon");
   for (const options of [{ fail: true }, { network: true }]) {
     const h = await harness("src/components/admin/MembreForm.jsx", { membre: { id: "m", nom: "Membre existant", bio: "Parcours conservé", ordre_affichage: 4 } }, options);
-    find(h.render(), n => n.type === "input" && n.props?.id === "member-expertises").props.onChange({ target: { value: "Formation, Gouvernance" } });
+    find(h.render(), n => n.type === "input" && n.props?.id === "member-expertise-0").props.onChange({ target: { value: "Formation" } });
     await h.render().props.onSubmit({ preventDefault() {} });
     assert.ok(find(h.render(), n => n.props?.role === "alert"));
     assert.equal(h.navigations.length, 0);
-    assert.equal(find(h.render(), n => n.type === "input" && n.props?.id === "member-expertises").props.value, "Formation, Gouvernance");
+    assert.equal(find(h.render(), n => n.type === "input" && n.props?.id === "member-expertise-0").props.value, "Formation");
     await h.render().props.onSubmit({ preventDefault() {} });
     assert.equal(h.requests.length, 2);
     assert.equal(JSON.parse(h.requests[1].options.body).bio, "Parcours conservé");
   }
+});
+
+test("Separate expertise inputs load existing specialties, keep independent edits and save only filled values", async () => {
+  const h = await harness("src/components/admin/MembreForm.jsx", { membre: { id: "m", nom: "Membre", expertises: "Gouvernance, Formation, Évaluation", ordre_affichage: 9 } });
+  const field = i => find(h.render(), n => n.type === "input" && n.props?.id === `member-expertise-${i}`);
+  assert.equal(field(0).props.value, "Gouvernance"); assert.equal(field(1).props.value, "Formation"); assert.equal(field(2).props.value, "Évaluation");
+  field(1).props.onChange({ target: { value: " Santé publique " } });
+  find(h.render(), n => n.props?.["aria-label"] === "Effacer l’expertise 1").props.onClick();
+  assert.equal(field(0).props.value, ""); assert.equal(field(1).props.value, " Santé publique "); assert.equal(field(2).props.value, "Évaluation");
+  await h.render().props.onSubmit({ preventDefault() {} });
+  const payload = JSON.parse(h.requests[0].options.body);
+  assert.equal(payload.expertises, "Santé publique, Évaluation");
+  assert.equal("ordre_affichage" in payload, false);
 });
 
 

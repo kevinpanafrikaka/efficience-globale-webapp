@@ -22,10 +22,9 @@ export default function MembreForm({ membre }) {
     nom: membre?.nom || "",
     role: membre?.role || "",
     bio: membre?.bio || "",
-    expertises: membre?.expertises || "",
+    expertises: [...expertiseTags(membre?.expertises), "", "", ""].slice(0, 3),
     photo_url: membre?.photo_url || "",
     statut: membre?.statut || "brouillon",
-    ordre_affichage: membre?.ordre_affichage ?? 0,
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,12 +34,13 @@ export default function MembreForm({ membre }) {
     if (error) { errorRef.current?.focus(); errorRef.current?.scrollIntoView?.({ block: "center", behavior: "instant" }); }
   }, [error]);
   function update(field, value) { setForm(f => ({ ...f, [field]: value })); }
+  function updateExpertise(index, value) { setForm(f => ({ ...f, expertises: f.expertises.map((text, i) => i === index ? value : text) })); }
   async function handleSubmit(e) {
     e.preventDefault();
     if (saving.current || uploading || loading) return;
     saving.current = true;
     setLoading(true); setError("");
-    const payload = { ...form, ordre_affichage: Number(form.ordre_affichage) || 0 };
+    const payload = { ...form, expertises: expertiseTags(form.expertises).join(", ") };
     try {
       const res = await fetch(isEdit ? `/api/admin/membres/${membre.id}` : "/api/admin/membres", {
         method: isEdit ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
@@ -53,7 +53,7 @@ export default function MembreForm({ membre }) {
     } finally { saving.current = false; }
   }
   const busy = loading || uploading;
-  const tags = expertiseTags(form.expertises);
+  const expertiseCount = form.expertises.filter(text => text.trim()).length;
   const saveLabel = uploading ? "Envoi de la photo…" : loading ? "Enregistrement…" : isEdit ? "Enregistrer les modifications" : "Créer le membre";
   function Actions({ mobile = false }) {
     return <div className={mobile ? "editor-mobile-actions" : "editor-header-actions"}>
@@ -74,8 +74,15 @@ export default function MembreForm({ membre }) {
         <section className="editor-panel member-biography" aria-labelledby="member-biography-title">
           <h2 id="member-biography-title">Parcours et expertises</h2>
           <Field label="Biographie" id="membreform-3" hint="Présentez le parcours, l’expérience et la contribution du membre au cabinet."><textarea id="membreform-3" value={form.bio} onChange={e => update("bio", e.target.value)} maxLength={10000} disabled={loading} rows={6} placeholder="Quelques phrases pour présenter son parcours…" /></Field>
-          <Field label="Expertises" id="member-expertises" hint="Jusqu’à 3 expertises séparées par des virgules, 50 caractères chacune."><input id="member-expertises" value={form.expertises} onChange={e => update("expertises", e.target.value)} maxLength={500} disabled={loading} placeholder="Gouvernance, Suivi-évaluation, Gestion de projet" /></Field>
-          {tags.length > 0 && <div className="member-expertise-preview" aria-label="Expertises affichées sur le site">{tags.map(tag => <span key={tag}>{tag}</span>)}</div>}
+          <fieldset className="member-expertises" aria-describedby="member-expertises-help">
+            <legend>Expertises <span className="member-expertise-count" aria-label={`${expertiseCount} expertises sur 3 renseignées`}>{expertiseCount}/3</span></legend>
+            <div className="member-expertise-fields">{form.expertises.map((text, index) => <div className="member-expertise-row" key={index}>
+              <label className="sr-only" htmlFor={`member-expertise-${index}`}>Expertise {index + 1}</label>
+              <input id={`member-expertise-${index}`} value={text} onChange={e => updateExpertise(index, e.target.value)} maxLength={50} disabled={loading} placeholder={["Ex. Gouvernance", "Ex. Suivi-évaluation", "Ex. Gestion de projet"][index]} aria-describedby="member-expertises-help" />
+              <button type="button" className="member-expertise-clear" disabled={loading || !text} aria-label={`Effacer l’expertise ${index + 1}`} onClick={() => updateExpertise(index, "")}>×</button>
+            </div>)}</div>
+            <p id="member-expertises-help" className="editor-help">Facultatif. Une expertise par champ, 50 caractères maximum.</p>
+          </fieldset>
         </section>
       </div>
       <div className="editor-side-column">
@@ -86,10 +93,9 @@ export default function MembreForm({ membre }) {
           <p className="editor-help member-photo-help">L’aperçu suit votre saisie. Choisissez un portrait au visage bien visible, puis enregistrez le profil.</p>
         </section>
         <section className="editor-panel member-publication" aria-labelledby="member-publication-title">
-          <h2 id="member-publication-title">Publication et classement</h2>
+          <h2 id="member-publication-title">Publication</h2>
           <Field label="Statut du profil" id="membreform-4"><EditorSelect id="membreform-4" value={form.statut} options={[{ value: "brouillon", label: "Brouillon" }, { value: "publie", label: "Publié" }]} onChange={value => update("statut", value)} disabled={loading} /></Field>
           <p className={`editor-status-help ${form.statut === "publie" ? "is-published" : ""}`}>{form.statut === "publie" ? "Le profil sera visible sur le site public après enregistrement." : "Le brouillon reste visible uniquement dans l’administration."}</p>
-          <Field label="Ordre d’affichage" id="membreform-5" hint="Les petits nombres apparaissent en premier. Le classement peut aussi être ajusté depuis les options des cartes."><input id="membreform-5" type="number" inputMode="numeric" min={0} max={100000} step={1} value={form.ordre_affichage} onChange={e => update("ordre_affichage", e.target.value)} disabled={loading} /></Field>
         </section>
       </div>
     </div>
