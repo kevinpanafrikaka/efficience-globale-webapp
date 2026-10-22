@@ -41,6 +41,7 @@ async function harness(path, props = {}, { fail = false, network = false } = {})
     "./DashboardIcon": { default: function DashboardIcon() {} },
     "./dashboard-create-menu.css": {},
     "./admin-projects.css": {},
+    "./admin-team.css": {},
     "./project-editor.css": {},
     "@/components/admin/AdminImage": { default: function AdminImage() {} },
     "@/components/admin/DeleteButton": { default: function DeleteButton() {} },
@@ -50,7 +51,7 @@ async function harness(path, props = {}, { fail = false, network = false } = {})
   const cache = new Map();
   async function load(name) {
     if (imports[name]) return new vm.SyntheticModule(Object.keys(imports[name]), function () { for (const [k,v] of Object.entries(imports[name])) this.setExport(k,v); }, { context });
-    const file = name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name;
+    const file = name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./MemberCard" ? "src/components/admin/MemberCard.jsx" : name === "./MemberOptions" ? "src/components/admin/MemberOptions.jsx" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name;
     if (!cache.has(file)) {
       const source = await readFile(new URL("../" + file, import.meta.url), "utf8");
       const { code } = transformSync(source, { filename: file, jsc: { target: "es2022", parser: { syntax: "ecmascript", jsx: true }, transform: { react: { runtime: "automatic" } } }, module: { type: "es6" } });
@@ -315,4 +316,52 @@ test("Compact result inputs grow and shrink with their content without changing 
   assert.equal(node.style.height, "46px");
   await h.render().props.onSubmit({ preventDefault() {} });
   assert.deepEqual(JSON.parse(h.requests[0].options.body).resultats, ["Un résultat"]);
+});
+
+
+test("Team search combines names, roles and expertise with status filters and retains real ordering neighbors", async () => {
+  const membres = [{ id: "a", nom: "Oumar Camara", role: "Direction", statut: "publie" }, { id: "b", nom: "Profil privé", statut: "brouillon" }, { id: "c", nom: "Malick Douet", role: "Médecin", expertises: "Évaluation", statut: "publie" }];
+  const h = await harness("src/components/admin/AdminMembresGrid.jsx", { membres });
+  const card = id => find(h.render(), n => n.type?.name === "MemberCard" && n.props.membre.id === id);
+  assert.ok(card("a")); assert.ok(card("b")); assert.ok(card("c"));
+  find(h.render(), n => n.type === "button" && n.props.children === "Publiés").props.onClick({ currentTarget: {} });
+  assert.equal(card("b"), null);
+  assert.equal(card("c").props.prevId, "b");
+  find(h.render(), n => n.props?.["aria-controls"] === "team-search").props.onClick();
+  const toolbar = find(h.render(), n => n.props?.className === "projects-toolbar");
+  assert.equal(find(toolbar, n => n.props?.className === "projects-browse").props.hidden, true);
+  const input = () => find(h.render(), n => n.props?.id === "team-query");
+  input().props.onChange({ target: { value: "evaluation" } });
+  assert.equal(card("a"), null); assert.ok(card("c"));
+  input().props.onChange({ target: { value: "medecin" } }); assert.ok(card("c"));
+  input().props.onKeyDown({ key: "Escape" });
+  assert.equal(input().props.value, ""); assert.ok(card("a")); assert.equal(card("b"), null);
+});
+
+test("Team portraits use initials for missing and broken photos without losing profile actions", async () => {
+  for (const photo_url of ["", "/uploads/portrait.png"]) {
+    const h = await harness("src/components/admin/MemberCard.jsx", { membre: { id: "malick", nom: "Malick Douet", role: "Chief Staff", statut: "publie", photo_url } });
+    if (photo_url) find(h.render(), n => n.type === "img").props.onError();
+    assert.ok(find(h.render(), n => n.props?.className === "team-initials" && n.props.children === "MD"));
+    assert.ok(find(h.render(), n => n.props?.href === "/admin/membres/malick/modifier"));
+    assert.ok(find(h.render(), n => n.props?.className === "team-photo-note"));
+  }
+});
+
+test("Team options persist a single correct reorder request, report failure and close with Escape", async () => {
+  for (const fail of [false, true]) {
+    const h = await harness("src/components/admin/MemberOptions.jsx", { membre: { id: "c", nom: "Malick Douet" }, prevId: "b" }, { fail });
+    const trigger = () => find(h.render(), n => n.props?.["aria-controls"] === "team-options-c");
+    trigger().props.onClick();
+    const move = find(h.render(), n => n.type === "button" && n.props.children === "Placer avant le précédent");
+    await Promise.all([move.props.onClick(), move.props.onClick()]);
+    assert.equal(h.requests.length, 1);
+    assert.equal(h.requests[0].url, "/api/admin/reorder");
+    assert.deepEqual(JSON.parse(h.requests[0].options.body), { table: "membres", id: "c", targetId: "b" });
+    assert.equal(trigger().props["aria-expanded"], fail);
+    if (fail) assert.ok(find(h.render(), n => n.props?.role === "alert"));
+    else trigger().props.onClick();
+    h.render(); h.dispatch("keydown", { key: "Escape" });
+    assert.equal(trigger().props["aria-expanded"], false);
+  }
 });

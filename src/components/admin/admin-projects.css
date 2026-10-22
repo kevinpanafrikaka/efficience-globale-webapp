@@ -33,13 +33,13 @@
 .admin-projects .project-options-panel > button:hover { background: #edf3e6; }
 .admin-projects .project-options-panel .eg-button--danger { width: 100%; }
 .admin-projects .admin-empty .eg-button { margin-top: 20px; }
-.admin-space .admin-topbar.is-projects .admin-topbar-actions > .eg-button { min-height: 46px; border-radius: 10px; }
+.admin-space .admin-topbar:is(.is-projects,.is-team) .admin-topbar-actions > .eg-button { min-height: 46px; border-radius: 10px; }
 @media (min-width: 720px) { .admin-projects .projects-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media (min-width: 1280px) { .admin-projects .projects-grid { grid-template-columns: repeat(3,minmax(0,1fr)); } }
 @media (max-width: 639px) {
-  .admin-space .admin-topbar.is-projects .admin-topbar-actions { display: block; }
-  .admin-space .admin-topbar.is-projects .admin-topbar-actions > a:first-child { display: none; }
-  .admin-space .admin-topbar.is-projects .admin-topbar-actions > .eg-button { display: flex; width: 100%; justify-content: center; }
+  .admin-space .admin-topbar:is(.is-projects,.is-team) .admin-topbar-actions { display: block; }
+  .admin-space .admin-topbar:is(.is-projects,.is-team) .admin-topbar-actions > a:first-child { display: none; }
+  .admin-space .admin-topbar:is(.is-projects,.is-team) .admin-topbar-actions > .eg-button { display: flex; width: 100%; justify-content: center; }
   .admin-projects .projects-toolbar { align-items: center; gap: 8px; margin-bottom: 20px; }
   .admin-projects .projects-browse { align-items: center; gap: 8px; }
   .admin-projects .projects-filter-window { position: relative; flex: 1; max-width: none; }
