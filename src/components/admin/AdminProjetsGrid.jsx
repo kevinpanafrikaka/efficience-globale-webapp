@@ -56,7 +56,7 @@ export default function AdminProjetsGrid({ projets, secteurs }) {
         return <article key={p.id} className="project-card">
           <div className="project-photo">{p.photo_url ? <AdminImage src={p.photo_url} alt="" className="project-photo-image" /> : <div className="project-photo-empty">Aucune image</div>}</div>
           <div className="project-card-body">
-            <div className="project-metadata"><span className={`project-status ${p.statut === "publie" ? "is-published" : "is-draft"}`}>{p.statut === "publie" ? "Publié" : "Brouillon"}</span><span>{secteurs[p.secteur]?.label || p.secteur}</span>{p.client && <span className="project-client">{p.client}</span>}</div>
+            <div className="project-metadata"><span>{p.statut === "publie" ? "Publié" : "Brouillon"}</span><span>{secteurs[p.secteur]?.label || p.secteur}</span>{p.client && <span>{p.client}</span>}</div>
             <h2>{p.titre}</h2>
             <div className="project-card-actions"><Link href={`/admin/projets/${p.id}/modifier`} className="eg-button eg-button--secondary eg-button--compact">Modifier</Link><ProjectOptions project={p} /></div>
           </div>

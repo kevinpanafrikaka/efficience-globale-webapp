@@ -33,7 +33,6 @@
 .project-editor .editor-preview-meta { display: flex; flex-wrap: wrap; gap: 5px 8px; color: #657260; font-size: 11px; line-height: 1.6; margin-bottom: 10px; }
 .project-editor .editor-preview-meta > span { min-width: 0; overflow-wrap: anywhere; }
 .project-editor .editor-preview-meta > span + span { border-left: 1px solid #dce4d7; padding-left: 8px; }
-.project-editor .editor-preview-meta > span:first-child { color: #4b7728; }
 .project-editor .editor-preview-body h3 { margin: 0; font-size: 18px; line-height: 1.35; }
 .project-editor .editor-preview-body p { color: #657260; font-size: 13px; margin-top: 10px; line-height: 1.6; white-space: pre-line; }
 .project-editor .editor-preview .editor-help { margin-top: 12px; }
