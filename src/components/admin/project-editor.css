@@ -6,7 +6,8 @@
 .project-editor .editor-header-actions .eg-button { min-height: 46px; border-radius: 10px; font-size: 13px; }
 .project-editor .editor-mobile-actions { display: none; }
 .project-editor .editor-layout { display: grid; grid-template-columns: minmax(0,1fr); gap: 20px; }
-.project-editor .editor-layout > div { min-width: 0; display: contents; }
+.project-editor .editor-layout > div { min-width: 0; }
+.project-editor .editor-main-column, .project-editor .editor-side-column { display: contents; }
 .admin-space .project-editor .editor-panel { margin: 0; padding: clamp(18px,2vw,26px); border: 1px solid #dce4d7; border-radius: 16px; background: white; }
 .project-editor .editor-panel h2 { margin: 0 0 20px; font-size: 23px; line-height: 1.25; letter-spacing: -.02em; }
 .project-editor .editor-fields { display: grid; grid-template-columns: minmax(0,1fr); gap: 18px; }
@@ -45,7 +46,7 @@
 .project-editor .editor-error { position: sticky; top: 114px; z-index: 41; margin-bottom: 20px; border: 1px solid #e7b5b5; background: #fff4f2; border-radius: 10px; padding: 14px 18px; color: #a32929; font-size: 14px; }
 @media (min-width: 1200px) {
   .project-editor .editor-layout { grid-template-columns: minmax(0,1.65fr) minmax(300px,1fr); align-items: start; }
-  .project-editor .editor-layout > div { display: flex; flex-direction: column; gap: 20px; }
+  .project-editor .editor-layout > .editor-main-column, .project-editor .editor-layout > .editor-side-column { display: flex; flex-direction: column; gap: 20px; }
   .project-editor .editor-fields { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .project-editor .editor-field-wide { grid-column: 1/-1; }
 }
@@ -111,3 +112,18 @@
 @media (min-width: 1200px) and (max-width: 1450px) { .project-editor .editor-period-dates { grid-template-columns: minmax(0,1fr); } }
 
 .project-editor .editor-select-control { position: relative; }
+
+.project-editor .editor-results-intro { margin-bottom: 18px; }
+.project-editor .editor-results-list { display: grid; gap: 14px; }
+.project-editor .editor-result-item { padding: 14px; border: 1px solid #dce4d7; border-radius: 12px; background: #fafbf8; }
+.project-editor .editor-result-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+.project-editor .editor-result-heading label { font-size: 13px; font-weight: 600; }
+.project-editor .editor-result-heading button { font-size: 12px; color: #657260; padding-inline: 8px; border-radius: 8px; }
+.project-editor .editor-result-heading button:hover { background: #edf3e6; }
+.admin-space .project-editor .editor-result-item textarea { display: block; width: 100%; min-width: 0; min-height: 88px; border: 1px solid #dce4d7; border-radius: 10px; padding: 12px; font-size: 15px; line-height: 1.6; background: white; }
+.project-editor .editor-results-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 18px; }
+@media (max-width: 719px) {
+  .project-editor .editor-result-item { padding: 10px; }
+  .admin-space .project-editor .editor-result-item textarea { font-size: 16px; }
+  .project-editor .editor-results-footer .eg-button { width: 100%; }
+}

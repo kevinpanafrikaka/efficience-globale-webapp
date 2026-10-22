@@ -223,8 +223,9 @@ test("Project editor preserves existing details and synchronizes the preview wit
   const title = find(h.render(), n => n.type === "input" && n.props?.id === "projetform-1");
   title.props.onChange({ target: { value: "Nouveau titre" } });
   assert.ok(find(h.render(), n => n.type === "h3" && n.props.children === "Nouveau titre"));
-  const results = find(h.render(), n => n.type === "textarea" && n.props?.id === "projetform-10");
-  results.props.onChange({ target: { value: " Premier résultat \n\n Deuxième résultat " } });
+  const results = find(h.render(), n => n.type === "textarea" && n.props?.id === "project-result-0");
+  results.props.onChange({ target: { value: " Premier résultat " } });
+  find(h.render(), n => n.type === "textarea" && n.props?.id === "project-result-1").props.onChange({ target: { value: " Deuxième résultat " } });
   await h.render().props.onSubmit({ preventDefault() {} });
   const request = h.requests[0];
   assert.equal(request.url, "/api/admin/projets/pev"); assert.equal(request.options.method, "PUT");
@@ -286,4 +287,19 @@ test("The project form blocks an incomplete period before any network write", as
   await h.render().props.onSubmit({ preventDefault() {} });
   assert.equal(h.requests.length, 0);
   assert.match(find(h.render(), n => n.props?.role === "alert").props.children, /fin précède/);
+});
+
+
+test("Separate result fields retain their contents when adding and removing entries and ignore blank fields when saving", async () => {
+  const h = await harness("src/components/admin/ProjetForm.jsx", { projet: { id: "test", titre: "Projet", photo_url: "/uploads/test.png", resultats: ["Premier résultat", "Deuxième résultat"] } });
+  const field = id => find(h.render(), n => n.type === "textarea" && n.props?.id === id);
+  find(h.render(), n => n.type === "button" && n.props.children === "+ Ajouter un résultat").props.onClick();
+  field("project-result-2").props.onChange({ target: { value: " Troisième résultat " } });
+  find(h.render(), n => n.props?.["aria-label"] === "Retirer le résultat 1").props.onClick();
+  assert.equal(field("project-result-1").props.value, "Deuxième résultat");
+  assert.equal(field("project-result-2").props.value, " Troisième résultat ");
+  find(h.render(), n => n.type === "button" && n.props.children === "+ Ajouter un résultat").props.onClick();
+  assert.equal(field("project-result-3").props.value, "");
+  await h.render().props.onSubmit({ preventDefault() {} });
+  assert.deepEqual(JSON.parse(h.requests[0].options.body).resultats, ["Deuxième résultat", "Troisième résultat"]);
 });
