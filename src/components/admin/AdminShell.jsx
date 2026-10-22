@@ -25,7 +25,7 @@ export default function AdminShell({ children, unread }) {
     <a href="#admin-main" className="admin-skip-link">Aller au contenu</a>
     <aside className="admin-sidebar">
       <div className="admin-brand-row">
-        <a href="/admin" className="admin-brand">Espace administration</a>
+        <span className="admin-brand">Espace administration</span>
         <button type="button" className="eg-button eg-button--inverse eg-button--compact admin-menu-button" aria-expanded={open} aria-controls="admin-navigation" onClick={() => setOpen(!open)}>{open ? "Fermer ×" : "Menu ☰"}</button>
       </div>
       <div id="admin-navigation" className="admin-navigation" data-open={open}>
