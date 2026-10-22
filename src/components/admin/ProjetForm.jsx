@@ -17,8 +17,9 @@ const SECTEURS = [
   { value: "partenariat", label: "Partenariat" },
 ];
 
-function EditorSection({ title, name, children, collapsible = false }) {
+function EditorSection({ title, name, children, collapsible = false, onExpand }) {
   const [open, setOpen] = useState(false);
+  useEffect(() => { if (open) onExpand?.(); }, [open, onExpand]);
   return <section className={`editor-panel ${collapsible ? "editor-collapsible" : ""}`}>
     {collapsible ? <><h2 className="editor-desktop-heading">{title}</h2><h2 className="editor-mobile-heading"><button type="button" aria-expanded={open} aria-controls={`editor-${name}`} onClick={() => setOpen(!open)}>{title}<span aria-hidden="true">{open ? "−" : "+"}</span></button></h2></> : <h2>{title}</h2>}
     <div id={`editor-${name}`} className="editor-section-content" data-open={open}>{children}</div>
@@ -26,6 +27,12 @@ function EditorSection({ title, name, children, collapsible = false }) {
 }
 function Field({ label, id, hint, children, wide = false }) {
   return <div className={`editor-field ${wide ? "editor-field-wide" : ""}`}><label htmlFor={id}>{label}</label>{children}{hint && <p className="editor-help">{hint}</p>}</div>;
+}
+
+function fitResultField(node) {
+  if (!node?.style || !node.scrollHeight) return;
+  node.style.height = "auto";
+  node.style.height = `${Math.max(46, node.scrollHeight + 2)}px`;
 }
 
 export default function ProjetForm({ projet, partenaires = [] }) {
@@ -53,12 +60,18 @@ export default function ProjetForm({ projet, partenaires = [] }) {
   const nextResultId = useRef(projet?.resultats?.length || 1);
   const resultInputs = useRef({});
   const focusResult = useRef(null);
+  function fitResults() { Object.values(resultInputs.current).forEach(fitResultField); }
   useEffect(() => {
+    fitResults();
     if (focusResult.current !== null) {
       resultInputs.current[focusResult.current]?.focus();
       focusResult.current = null;
     }
   }, [form.resultats]);
+  useEffect(() => {
+    window.addEventListener("resize", fitResults);
+    return () => window.removeEventListener("resize", fitResults);
+  }, []);
   function editResult(id, text) {
     setForm(f => ({ ...f, resultats: f.resultats.map(r => r.id === id ? { ...r, text } : r) }));
   }
@@ -122,6 +135,7 @@ export default function ProjetForm({ projet, partenaires = [] }) {
     }
   }
 
+  const resultCount = form.resultats.filter(r => r.text.trim()).length;
   const busy = loading || uploading;
   const statusLabel = form.statut === "publie" ? "Publié" : "Brouillon";
   const saveLabel = uploading ? "Envoi de l’image…" : loading ? "Enregistrement…" : isEdit ? "Enregistrer les modifications" : "Créer le projet";
@@ -138,6 +152,7 @@ export default function ProjetForm({ projet, partenaires = [] }) {
       <div className="editor-general"><EditorSection title="Informations générales" name="general">
         <div className="editor-fields">
           <Field label="Titre du projet" id="projetform-1" wide><input id="projetform-1" value={form.titre} onChange={e => update("titre", e.target.value)} required placeholder="Nom du projet" /></Field>
+          {isEdit && <Field label="Adresse de la page" id="projetform-2" wide hint={`Le lien public sera /realisations/${form.slug || "…"}. Modifier ce champ change l’adresse de la page.`}><input id="projetform-2" value={form.slug} onChange={e => update("slug", e.target.value)} /></Field>}
           <Field label="Secteur" id="projetform-4"><EditorSelect id="projetform-4" value={form.secteur} options={SECTEURS.map(s => ({ value: s.value, label: s.label }))} onChange={v => update("secteur",v)} disabled={loading} /></Field>
           <Field label="Client / bailleur / partenaire" id="projetform-6"><EditorSelect id="projetform-6" value={form.client.split(/\s*·\s*/).map(s => s.trim()).filter(Boolean)} options={partenaires.filter(p => p.nom).map(p => ({ value: p.nom, label: p.nom }))} onChange={v => update("client",v.join(" · "))} multiple searchable allowCustom placeholder="Choisir des organisations…" disabled={loading} /></Field>
           <div className="editor-field-wide"><ProjectPeriodField value={form.periode} onChange={v => update("periode",v)} onValidityChange={setPeriodError} disabled={loading} /></div>
@@ -163,20 +178,19 @@ export default function ProjetForm({ projet, partenaires = [] }) {
         <p className="editor-help">L’aperçu se met à jour pendant la saisie.</p>
       </EditorSection></div>
     </div>
-      <div className="editor-results"><EditorSection title="Résultats obtenus" name="results" collapsible>
-        <p className="editor-help editor-results-intro">Présentez un résultat concret par champ. Privilégiez les réalisations mesurables et les changements obtenus.</p>
+      <div className="editor-results"><EditorSection title={<span className="editor-results-title">Résultats obtenus<span className="editor-result-count" aria-label={`${resultCount} résultats renseignés`}>{resultCount}</span></span>} name="results" collapsible onExpand={fitResults}>
         <div className="editor-results-list">
           {form.resultats.map((r, i) => <div className="editor-result-item" key={r.id}>
-            <div className="editor-result-heading"><label htmlFor={`project-${r.id}`}>Résultat {i + 1}</label><button type="button" disabled={loading} onClick={() => removeResult(r.id)} aria-label={`Retirer le résultat ${i + 1}`}>Retirer</button></div>
-            <textarea id={`project-${r.id}`} ref={node => { resultInputs.current[r.id] = node; }} value={r.text} onChange={e => editResult(r.id, e.target.value)} rows={2} maxLength={1000} disabled={loading} placeholder={i === 0 ? "Ex. 150 professionnels formés à la gestion du programme." : "Décrivez un autre résultat obtenu…"} />
+            <label className="sr-only" htmlFor={`project-${r.id}`}>Résultat {i + 1}</label>
+            <textarea id={`project-${r.id}`} ref={node => { resultInputs.current[r.id] = node; fitResultField(node); }} value={r.text} onChange={e => editResult(r.id, e.target.value)} onInput={e => fitResultField(e.currentTarget)} onFocus={e => fitResultField(e.currentTarget)} rows={1} maxLength={1000} disabled={loading} placeholder={i === 0 ? "Ex. 150 professionnels formés à la gestion du programme." : "Ajouter un résultat concret…"} />
+            <button type="button" className="editor-result-remove" disabled={loading} onClick={() => removeResult(r.id)} aria-label={`Retirer le résultat ${i + 1}`}>×</button>
           </div>)}
         </div>
-        <div className="editor-results-footer"><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={loading || form.resultats.length >= 50} onClick={addResult}>+ Ajouter un résultat</button><span className="editor-help">{form.resultats.filter(r => r.text.trim()).length} résultat{form.resultats.filter(r => r.text.trim()).length > 1 ? "s" : ""} renseigné{form.resultats.filter(r => r.text.trim()).length > 1 ? "s" : ""}</span></div>
+        <div className="editor-results-footer"><button type="button" className="eg-button eg-button--quiet eg-button--compact" disabled={loading || form.resultats.length >= 50} onClick={addResult}>+ Ajouter un résultat</button></div>
       </EditorSection></div>
-      <div className="editor-advanced"><details className="editor-panel editor-advanced-panel"><summary>Options avancées<span aria-hidden="true">+</span></summary><div className="editor-advanced-content">
-        {isEdit && <Field label="Adresse de la page" id="projetform-2" hint={`Le lien public sera /realisations/${form.slug || "…"}. Modifier ce champ change l’adresse de la page.`}><input id="projetform-2" value={form.slug} onChange={e => update("slug", e.target.value)} /></Field>}
-        <Field label="Mot en italique (optionnel)" id="projetform-3" hint="Recopiez exactement le mot ou l’expression du titre à mettre en italique."><input id="projetform-3" value={form.titre_accent} onChange={e => update("titre_accent", e.target.value)} /></Field>
-      </div></details></div>
+      <div className="editor-advanced"><EditorSection title="Italique du titre" name="title-style">
+        <Field label="Mot ou expression à mettre en italique" id="projetform-3" hint="Optionnel. Recopiez exactement le passage du titre."><input id="projetform-3" value={form.titre_accent} onChange={e => update("titre_accent", e.target.value)} placeholder="Ex. Vaccination" /></Field>
+      </EditorSection></div>
     </div>
     <Actions mobile />
   </form>;

@@ -303,3 +303,16 @@ test("Separate result fields retain their contents when adding and removing entr
   await h.render().props.onSubmit({ preventDefault() {} });
   assert.deepEqual(JSON.parse(h.requests[0].options.body).resultats, ["Deuxième résultat", "Troisième résultat"]);
 });
+
+test("Compact result inputs grow and shrink with their content without changing the saved text", async () => {
+  const h = await harness("src/components/admin/ProjetForm.jsx", { projet: { id: "test", titre: "Projet", photo_url: "/uploads/test.png", resultats: ["Un résultat"] } });
+  const field = find(h.render(), n => n.type === "textarea" && n.props?.id === "project-result-0");
+  const node = { style: { height: "46px" }, scrollHeight: 110 };
+  field.props.onInput({ currentTarget: node });
+  assert.equal(node.style.height, "112px");
+  node.scrollHeight = 44;
+  field.props.onInput({ currentTarget: node });
+  assert.equal(node.style.height, "46px");
+  await h.render().props.onSubmit({ preventDefault() {} });
+  assert.deepEqual(JSON.parse(h.requests[0].options.body).resultats, ["Un résultat"]);
+});
