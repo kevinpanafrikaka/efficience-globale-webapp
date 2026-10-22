@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import AdminNavLink from "./AdminNavLink";
 import LogoutButton from "./LogoutButton";
+import DashboardCreateMenu from "./DashboardCreateMenu";
 
 const NAV = [
   ["/admin", "Tableau de bord", "◫"], ["/admin/projets", "Projets", "↗"],
@@ -15,6 +16,7 @@ const NAV = [
 export default function AdminShell({ children, unread }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const dashboard = pathname === "/admin";
   useEffect(() => { setOpen(false); }, [pathname]);
   const current = [...NAV].reverse().find(([href]) => pathname === href || (href !== "/admin" && pathname.startsWith(`${href}/`)))?.[1] || "Administration";
   return <div className="admin-space admin-shell">
@@ -32,7 +34,10 @@ export default function AdminShell({ children, unread }) {
       </div>
     </aside>
     <div className="admin-workspace">
-      <header className="admin-topbar"><span>Administration <span aria-hidden="true">/</span> <strong>{current}</strong></span><a href="/admin/messages" aria-label={`${unread} message${unread > 1 ? "s" : ""} non lu${unread > 1 ? "s" : ""}`}>Messages <span className="admin-unread-count">{unread}</span></a></header>
+      <header className={`admin-topbar ${dashboard ? "is-dashboard" : ""}`}>
+        {dashboard ? <div className="admin-topbar-title"><h1>Tableau de bord</h1><p>Vos contenus, vos échanges et les prochaines actions du cabinet.</p></div> : <span>Administration <span aria-hidden="true">/</span> <strong>{current}</strong></span>}
+        <div className="admin-topbar-actions"><a href="/admin/messages" aria-label={`${unread} message${unread > 1 ? "s" : ""} non lu${unread > 1 ? "s" : ""}`}>Messages <span className="admin-unread-count">{unread}</span></a>{dashboard && <DashboardCreateMenu />}</div>
+      </header>
       <main id="admin-main" className="admin-main" tabIndex={-1}>{children}</main>
       <footer className="admin-footer">Efficience Globale <span>Votre contenu, à votre rythme.</span></footer>
     </div>

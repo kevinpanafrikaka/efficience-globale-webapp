@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { adminRuntime } from "./helpers/admin-runtime.mjs";
 
@@ -46,21 +47,29 @@ test("Dashboard links lead directly to each task and publication, preserve all c
   try {
     seed(runtime);
     const page = await runtime.module("src/app/admin/page.js");
-    const html = renderToStaticMarkup(await page.default());
-    assert.equal((html.match(/<h1\b/g) || []).length, 1);
-    assert.match(html, /Tableau de bord/);
+    const content = await page.default();
+    const html = renderToStaticMarkup(content);
+    const { default: Shell } = await runtime.module("src/components/admin/AdminShell.jsx");
+    const full = renderToStaticMarkup(createElement(Shell, { unread: 2 }, content));
+    const topbar = full.match(/<header class="admin-topbar is-dashboard">([\s\S]*?)<\/header>/)?.[1];
+    assert.ok(topbar);
+    assert.equal((full.match(/<h1\b/g) || []).length, 1);
+    assert.match(topbar, /Tableau de bord/);
+    assert.match(topbar, /Vos contenus, vos échanges/);
+    assert.match(topbar, /Créer un contenu/);
+    assert.doesNotMatch(html, /<h1|Créer un contenu/);
     assert.match(html, /À traiter/);
     assert.match(html, /2 messages à lire/i);
     for (const [type, id] of [["projets", "project-draft"], ["membres", "member-draft"], ["annonces", "news-draft"], ["partenaires", "partner-draft"]]) {
       assert.ok(html.includes(`href="/admin/${type}/${id}/modifier"`));
-      assert.ok(html.includes(`href="/admin/${type}/nouveau"`));
+      assert.ok(full.includes(`href="/admin/${type}/nouveau"`));
     }
     const publications = html.split('id="dashboard-publications-title"')[1];
     assert.match(publications, /href="\/admin\/annonces\/news\/modifier"/);
     assert.doesNotMatch(publications, /à finaliser/);
     assert.doesNotMatch(html, /[↗↘→←↓↑]/);
-    assert.match(html, /aria-controls="dashboard-create-options"/);
-    assert.match(html, /id="dashboard-create-options"[^>]*hidden/);
+    assert.match(topbar, /aria-controls="dashboard-create-options"/);
+    assert.match(topbar, /id="dashboard-create-options"[^>]*hidden/);
     assert.equal(runtime.sqlite.prepare("SELECT COUNT(*) n FROM messages WHERE lu=0").get().n, 2);
   } finally { runtime.close(); }
 });

@@ -3,7 +3,6 @@ import Link from "next/link";
 import { getDashboardStats } from "@/lib/db";
 import { formatDate } from "@/lib/format";
 import AdminImage from "@/components/admin/AdminImage";
-import DashboardCreateMenu from "@/components/admin/DashboardCreateMenu";
 import DashboardIcon from "@/components/admin/DashboardIcon";
 import "./dashboard.css";
 
@@ -37,7 +36,6 @@ export default async function AdminHomePage() {
   const drafts = CONTENT.reduce((sum, item) => sum + (s[item.type]?.brouillons || 0), 0);
   const unread = s.messagesNonLus;
   return <div className="admin-dashboard">
-    <header className="dashboard-heading"><div><p className="dashboard-eyebrow">Votre espace de travail</p><h1>Tableau de bord</h1><p>Vos contenus, vos échanges et les prochaines actions du cabinet.</p></div><DashboardCreateMenu /></header>
 
     <section className="dashboard-stats" aria-label="Les contenus du cabinet">{CONTENT.map((item) => <StatCard key={item.type} item={item} stats={s[item.type]} />)}</section>
 

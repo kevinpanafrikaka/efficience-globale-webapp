@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import DashboardIcon from "./DashboardIcon";
+import "./dashboard-create-menu.css";
 
 const OPTIONS = [
   { type: "projets", label: "Nouveau projet", detail: "Présenter une réalisation", href: "/admin/projets/nouveau" },

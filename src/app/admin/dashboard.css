@@ -1,21 +1,7 @@
 /* Dashboard-only composition. Other administration tabs retain their layouts. */
 .admin-dashboard { width: 100%; min-width: 0; --dashboard-accent: #4b7728; }
 .admin-dashboard :is(h1,h2,h3,p) { margin: 0; }
-.admin-dashboard .dashboard-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 30px; }
-.admin-dashboard .dashboard-heading > div:first-child { flex: 1 1 350px; min-width: 0; }
-.admin-dashboard .dashboard-heading h1 { font-size: clamp(30px,3.4vw,40px); line-height: 1.15; letter-spacing: -.025em; margin-bottom: 12px; }
-.admin-dashboard .dashboard-heading > div > p:last-child { max-width: 580px; color: var(--ink-soft); font-size: 14px; line-height: 1.7; }
 .admin-dashboard .dashboard-eyebrow { margin-bottom: 10px; color: var(--dashboard-accent); font-family: var(--font-body),sans-serif; font-size: 10px; font-weight: 600; letter-spacing: .12em; line-height: 1.5; text-transform: uppercase; }
-/* One creation entry point, with labelled destinations and keyboard dismissal. */
-.admin-dashboard .dashboard-create { position: relative; flex-shrink: 0; }
-.admin-dashboard .dashboard-create > .eg-button { width: 100%; }
-.admin-dashboard .dashboard-create-plus { font-size: 22px; font-weight: 400; line-height: 1; }
-.admin-dashboard .dashboard-create-options { position: absolute; z-index: 30; top: calc(100% + 10px); right: 0; display: grid; width: 300px; max-width: calc(100vw - 40px); padding: 8px; border: 1px solid #d5dece; border-radius: 16px; background: white; box-shadow: 0 20px 50px -25px #16211a66; }
-.admin-dashboard .dashboard-create-options[hidden] { display: none; }
-.admin-dashboard .dashboard-create-options a { display: flex; gap: 14px; min-height: 68px; align-items: center; padding: 12px; border-radius: 10px; }
-.admin-dashboard .dashboard-create-icon { display: grid; place-items: center; width: 36px; height: 36px; flex-shrink: 0; border-radius: 10px; color: var(--dashboard-accent); background: #edf3e6; }
-.admin-dashboard .dashboard-create-options strong { display: block; font-size: 14px; font-weight: 600; }
-.admin-dashboard .dashboard-create-options small { display: block; margin-top: 4px; color: var(--ink-soft); font-size: 12px; line-height: 1.5; }
 /* The four content cards use only live publication and draft counts. */
 .admin-dashboard .dashboard-stats { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; margin-bottom: 24px; }
 .admin-dashboard .dashboard-stat { display: flex; min-width: 0; flex-direction: column; padding: 20px; border: 1px solid #dce4d7; border-radius: 16px; background: white; transition: border-color .2s,box-shadow .2s; }
@@ -99,9 +85,6 @@
   .admin-dashboard .dashboard-publication-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
 }
 @media (max-width: 639px) {
-  .admin-dashboard .dashboard-heading { gap: 20px; }
-  .admin-dashboard .dashboard-create { width: 100%; }
-  .admin-dashboard .dashboard-create-options { width: 100%; max-width: 100%; }
   .admin-dashboard .dashboard-stats { gap: 10px; }
   .admin-dashboard .dashboard-stat { padding: 16px 14px; }
   .admin-dashboard .dashboard-stat-top { font-size: 12px; gap: 6px; }
@@ -124,7 +107,6 @@
 }
 @media (hover: hover) and (pointer: fine) {
   .admin-dashboard .dashboard-stat:hover { border-color: #9eb58f; box-shadow: 0 10px 25px -22px #26362a99; }
-  .admin-dashboard .dashboard-create-options a:hover { background: #f1f5ec; }
   .admin-dashboard .dashboard-message:hover .dashboard-message-copy strong, .admin-dashboard .dashboard-draft-list > a:hover strong { color: #4b7728; }
   .admin-dashboard .dashboard-publication:hover, .admin-dashboard .dashboard-unread-task:hover { border-color: #9eb58f; }
 }

@@ -35,6 +35,7 @@ async function harness(path, props = {}, { fail = false, network = false } = {})
     "react/jsx-runtime": jsx,
     "next/link": { default: function Link() {} },
     "./DashboardIcon": { default: function DashboardIcon() {} },
+    "./dashboard-create-menu.css": {},
     "next/navigation": { useRouter: () => ({ push: value => navigations.push(value), refresh() {} }) },
     "@/components/admin/ImageUpload": { default: function ImageUpload() {} },
   };
