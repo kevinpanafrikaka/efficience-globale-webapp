@@ -13,8 +13,8 @@ export default function MemberCard({ membre, prevId, nextId }) {
       <div className="team-portrait" aria-hidden="true">
         {hasPhoto ? <img src={membre.photo_url} alt="" loading="lazy" decoding="async" onError={() => setFailed(membre.photo_url)} /> : <span className="team-initials">{initials}</span>}
       </div>
-      <div className="team-identity"><h2>{membre.nom}</h2><div className="team-metadata"><span>{membre.statut === "publie" ? "Publié" : "Brouillon"}</span>{membre.role && <span>{membre.role}</span>}</div>{!hasPhoto && <p className="team-photo-note">Photo à compléter</p>}</div>
+      <div className="team-identity"><h2>{membre.nom}</h2>{membre.role && <p className="team-role">{membre.role}</p>}{!hasPhoto && <p className="team-photo-note">Photo à compléter</p>}</div>
     </div>
-    <div className="team-card-actions"><Link href={`/admin/membres/${membre.id}/modifier`} className="eg-button eg-button--secondary eg-button--compact">Modifier</Link><MemberOptions membre={membre} prevId={prevId} nextId={nextId} /></div>
+    <div className="team-card-footer"><span className="team-status">{membre.statut === "publie" ? "Publié" : "Brouillon"}</span><div className="team-card-actions"><Link href={`/admin/membres/${membre.id}/modifier`} className="eg-button eg-button--secondary eg-button--compact">Modifier</Link><MemberOptions membre={membre} prevId={prevId} nextId={nextId} /></div></div>
   </article>;
 }
