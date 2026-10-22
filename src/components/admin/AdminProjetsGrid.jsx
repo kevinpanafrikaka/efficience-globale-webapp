@@ -1,96 +1,75 @@
 "use client";
-import AdminImage from "@/components/admin/AdminImage";
-
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import AdminImage from "@/components/admin/AdminImage";
 import DeleteButton from "@/components/admin/DeleteButton";
-import ReorderButtons from "@/components/admin/ReorderButtons";
+import useAdminAction from "./useAdminAction";
+import "./admin-projects.css";
 
-const SECTEUR_FILTERS = [
-  { key: "all", label: "Tous les secteurs" },
-  { key: "sante", label: "Santé publique" },
-  { key: "ia", label: "Intelligence Artificielle" },
-  { key: "education", label: "Éducation" },
-  { key: "gouvernance", label: "Gouvernance" },
-  { key: "local", label: "Développement local" },
-  { key: "partenariat", label: "Partenariat" },
-];
+const FILTERS = [["all", "Tous les secteurs"], ["sante", "Santé publique"], ["ia", "Intelligence Artificielle"], ["education", "Éducation"], ["gouvernance", "Gouvernance"], ["local", "Développement local"], ["partenariat", "Partenariat"]];
+function normalize(value) { return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
 
-function FilterRow({ options, active, onChange }) {
-  return (
-    <div className="admin-filters flex flex-wrap gap-2">
-      {options.map((o) => (
-        <button
-          key={o.key}
-          type="button"
-          onClick={() => onChange(o.key)}
-          aria-pressed={active === o.key}
-          className="eg-button eg-button--filter eg-button--compact admin-filter-button"
-        >
-          {o.label}
-        </button>
-      ))}
-    </div>
-  );
+function ProjectOptions({ project, prevId, nextId }) {
+  const router = useRouter();
+  const { run, loading, error } = useAdminAction();
+  const [open, setOpen] = useState(false);
+  const root = useRef(null), trigger = useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    const outside = e => { if (!root.current?.contains(e.target)) setOpen(false); };
+    const escape = e => { if (e.key === "Escape") { setOpen(false); trigger.current?.focus(); } };
+    document.addEventListener("pointerdown", outside);
+    document.addEventListener("keydown", escape);
+    return () => { document.removeEventListener("pointerdown", outside); document.removeEventListener("keydown", escape); };
+  }, [open]);
+  async function move(targetId) {
+    if (!targetId) return;
+    await run("/api/admin/reorder", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ table: "projets", id: project.id, targetId }) }, () => { setOpen(false); router.refresh(); });
+  }
+  return <div className="project-options" ref={root}>
+    <button type="button" ref={trigger} className="eg-button eg-button--secondary eg-button--icon" aria-label={`Options pour ${project.titre}`} aria-expanded={open} onClick={() => setOpen(!open)}>···</button>
+    {open && <div className="project-options-panel" role="group" aria-label="Actions du projet">
+      <p>Ordre sur le site</p>
+      <button type="button" disabled={!prevId || loading} aria-busy={loading} onClick={() => move(prevId)}>Placer avant le précédent</button>
+      <button type="button" disabled={!nextId || loading} aria-busy={loading} onClick={() => move(nextId)}>Placer après le suivant</button>
+      {error && <span role="alert">{error}</span>}
+      <DeleteButton endpoint={`/api/admin/projets/${project.id}`} confirmMessage={`Supprimer « ${project.titre} » définitivement ?`} />
+    </div>}
+  </div>;
 }
 
 export default function AdminProjetsGrid({ projets, secteurs }) {
-  const [secteurFilter, setSecteurFilter] = useState("all");
-
-  const filtered = projets.filter((p) => secteurFilter === "all" || p.secteur === secteurFilter);
-
-  return (
-    <div>
-      <div className="mb-6">
-        <FilterRow options={SECTEUR_FILTERS} active={secteurFilter} onChange={setSecteurFilter} />
-      </div>
-
-      {filtered.length === 0 ? (
-        <p className="text-[14.5px] text-ink-soft">Aucun projet ne correspond à ce filtre.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filtered.map((p, i) => (
-            <div key={p.id} className="border border-line rounded-lg overflow-hidden flex flex-col bg-white">
-              <div className="relative h-36 bg-cream">
-                {p.photo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <AdminImage src={p.photo_url} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[12px] text-ink-faint">
-                    Aucune image
-                  </div>
-                )}
-                <span
-                  className={`absolute top-2 left-2 text-[10.5px] font-bold tracking-wide px-1.5 py-0.5 rounded ${
-                    p.statut === "publie" ? "bg-lime text-ink" : "bg-white text-ink-faint"
-                  }`}
-                >
-                  {p.statut === "publie" ? "PUBLIÉ" : "BROUILLON"}
-                </span>
-              </div>
-              <div className="p-4 flex flex-col gap-1.5 flex-1">
-                <div className="text-[11px] font-bold text-lime tracking-wide">
-                  {secteurs[p.secteur]?.label || p.secteur}
-                </div>
-                <h3 className="text-[15px] font-semibold text-dark leading-snug">{p.titre}</h3>
-                <div className="text-[12.5px] text-ink-faint">{p.client || "—"}</div>
-                <div className="mt-auto flex items-center justify-between pt-3 border-t border-line">
-                  <ReorderButtons table="projets" id={p.id} prevId={filtered[i - 1]?.id} nextId={filtered[i + 1]?.id} />
-                  <div className="flex items-center gap-4">
-                    <Link
-                      href={`/admin/projets/${p.id}/modifier`}
-                      className="eg-button eg-button--secondary eg-button--compact"
-                    >
-                      Modifier
-                    </Link>
-                    <DeleteButton endpoint={`/api/admin/projets/${p.id}`} confirmMessage={`Supprimer "${p.titre}" ?`} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+  const [sector, setSector] = useState("all"), [query, setQuery] = useState(""), [searchOpen, setSearchOpen] = useState(false);
+  const input = useRef(null), searchButton = useRef(null);
+  useEffect(() => { if (searchOpen) input.current?.focus(); }, [searchOpen]);
+  const filtered = projets.filter(p => (sector === "all" || p.secteur === sector) && normalize(`${p.titre} ${p.client || ""} ${secteurs[p.secteur]?.label || p.secteur}`).includes(normalize(query).trim()));
+  function closeSearch() { setSearchOpen(false); setQuery(""); searchButton.current?.focus(); }
+  return <div className="admin-projects">
+    <div className="projects-toolbar">
+      <div className="projects-filter-window"><div className="projects-filters" role="group" aria-label="Filtrer par secteur">
+        {FILTERS.map(([key, label]) => <button key={key} type="button" className="eg-button eg-button--filter eg-button--compact" aria-pressed={sector === key} onClick={e => { setSector(key); e.currentTarget.scrollIntoView?.({ block: "nearest", inline: "nearest" }); }}>{label}</button>)}
+      </div></div>
+      <button ref={searchButton} type="button" className="eg-button eg-button--secondary eg-button--icon projects-search-toggle" aria-label={searchOpen ? "Fermer la recherche" : "Rechercher un projet"} aria-expanded={searchOpen} aria-controls="projects-search" onClick={() => searchOpen ? closeSearch() : setSearchOpen(true)}>
+        <svg aria-hidden="true" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 5 5" /></svg>
+      </button>
     </div>
-  );
+    <div id="projects-search" hidden={!searchOpen} className="projects-search">
+      <label htmlFor="project-query">Rechercher par titre, client ou secteur</label>
+      <div><input id="project-query" ref={input} type="search" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === "Escape") closeSearch(); }} placeholder="Rechercher un projet…" /><button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={closeSearch}>Fermer</button></div>
+    </div>
+    {filtered.length === 0 ? <div className="admin-empty" role="status"><h2>{projets.length ? "Aucun projet correspondant" : "Votre première réalisation"}</h2><p>{projets.length ? "Essayez un autre secteur ou une autre recherche." : "Ajoutez un projet pour présenter les réalisations du cabinet."}</p>{projets.length > 0 && <button type="button" className="eg-button eg-button--secondary" onClick={() => { setSector("all"); setQuery(""); }}>Réinitialiser les filtres</button>}</div> : <div className="projects-grid">
+      {filtered.map(p => {
+        const index = projets.findIndex(item => item.id === p.id);
+        return <article key={p.id} className="project-card">
+          <div className="project-photo">{p.photo_url ? <AdminImage src={p.photo_url} alt="" className="project-photo-image" /> : <div className="project-photo-empty">Aucune image</div>}</div>
+          <div className="project-card-body">
+            <div className="project-metadata"><span className={`project-status ${p.statut === "publie" ? "is-published" : "is-draft"}`}>{p.statut === "publie" ? "Publié" : "Brouillon"}</span><span>{secteurs[p.secteur]?.label || p.secteur}</span>{p.client && <span className="project-client">{p.client}</span>}</div>
+            <h2>{p.titre}</h2>
+            <div className="project-card-actions"><Link href={`/admin/projets/${p.id}/modifier`} className="eg-button eg-button--secondary eg-button--compact">Modifier</Link><ProjectOptions project={p} prevId={projets[index - 1]?.id} nextId={projets[index + 1]?.id} /></div>
+          </div>
+        </article>;
+      })}
+    </div>}
+  </div>;
 }

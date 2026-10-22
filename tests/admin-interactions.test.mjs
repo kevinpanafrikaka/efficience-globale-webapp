@@ -40,6 +40,9 @@ async function harness(path, props = {}, { fail = false, network = false } = {})
     "next/link": { default: function Link() {} },
     "./DashboardIcon": { default: function DashboardIcon() {} },
     "./dashboard-create-menu.css": {},
+    "./admin-projects.css": {},
+    "@/components/admin/AdminImage": { default: function AdminImage() {} },
+    "@/components/admin/DeleteButton": { default: function DeleteButton() {} },
     "next/navigation": { useRouter: () => ({ push: value => navigations.push(value), refresh() {} }) },
     "@/components/admin/ImageUpload": { default: function ImageUpload() {} },
   };
@@ -184,4 +187,36 @@ test("Creation menu uses the visible viewport when browser chrome or zoom change
   h.viewport(300, 10);
   h.dispatch("resize", {});
   assert.equal(style.get("--dashboard-menu-room"), "86px");
+});
+
+
+test("Projects combine sector and accent-insensitive search, keep all statuses and reset on close", async () => {
+  const projets = [
+    { id: "a", titre: "Évaluation du PEV", client: "Gavi", secteur: "sante", statut: "publie" },
+    { id: "b", titre: "Formation IA", client: "UNICEF", secteur: "ia", statut: "brouillon" },
+  ];
+  const h = await harness("src/components/admin/AdminProjetsGrid.jsx", { projets, secteurs: { sante: { label: "Santé publique" }, ia: { label: "Intelligence artificielle" } } });
+  const card = id => find(h.render(), n => n.type === "article" && n.key === id);
+  const field = () => find(h.render(), n => n.props?.id === "project-query");
+  assert.ok(card("a")); assert.ok(card("b"));
+  find(h.render(), n => n.props?.["aria-controls"] === "projects-search").props.onClick();
+  assert.equal(find(h.render(), n => n.props?.id === "projects-search").props.hidden, false);
+  field().props.onChange({ target: { value: "evaluation" } });
+  assert.ok(card("a")); assert.equal(card("b"), null);
+  field().props.onChange({ target: { value: "UNICEF" } });
+  assert.equal(card("a"), null); assert.ok(card("b"));
+  find(h.render(), n => n.type === "button" && n.props.children === "Santé publique").props.onClick({ currentTarget: {} });
+  assert.equal(card("b"), null);
+  field().props.onKeyDown({ key: "Escape" });
+  assert.equal(field().props.value, ""); assert.ok(card("a"));
+  assert.equal(find(h.render(), n => n.props?.id === "projects-search").props.hidden, true);
+});
+
+test("Project ordering uses actual neighbors even when the sector filter hides them", async () => {
+  const projets = [{ id: "a", titre: "A", secteur: "sante" }, { id: "b", titre: "B", secteur: "ia" }, { id: "c", titre: "C", secteur: "sante" }];
+  const h = await harness("src/components/admin/AdminProjetsGrid.jsx", { projets, secteurs: {} });
+  find(h.render(), n => n.type === "button" && n.props.children === "Santé publique").props.onClick({ currentTarget: {} });
+  const options = find(h.render(), n => n.type?.name === "ProjectOptions" && n.props.project.id === "c");
+  assert.equal(options.props.prevId, "b");
+  assert.equal(options.props.nextId, undefined);
 });

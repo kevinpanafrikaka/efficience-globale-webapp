@@ -7,7 +7,7 @@ import LogoutButton from "./LogoutButton";
 import DashboardCreateMenu from "./DashboardCreateMenu";
 
 const NAV = [
-  ["/admin", "Tableau de bord", "◫"], ["/admin/projets", "Projets", "↗"],
+  ["/admin", "Tableau de bord", "◫"], ["/admin/projets", "Projets", "▤"],
   ["/admin/membres", "Équipe", "♧"], ["/admin/annonces", "Annonces", "◷"],
   ["/admin/partenaires", "Partenaires", "◇"], ["/admin/messages", "Messages", "✉"],
   ["/admin/medias", "Médiathèque", "▧"], ["/admin/reglages", "Réglages", "⚙"],
@@ -17,6 +17,7 @@ export default function AdminShell({ children, unread }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const dashboard = pathname === "/admin";
+  const projects = pathname === "/admin/projets";
   useEffect(() => { setOpen(false); }, [pathname]);
   const current = [...NAV].reverse().find(([href]) => pathname === href || (href !== "/admin" && pathname.startsWith(`${href}/`)))?.[1] || "Administration";
   return <div className="admin-space admin-shell">
@@ -34,9 +35,9 @@ export default function AdminShell({ children, unread }) {
       </div>
     </aside>
     <div className="admin-workspace">
-      <header className={`admin-topbar ${dashboard ? "is-dashboard" : ""}`}>
-        {dashboard ? <div className="admin-topbar-title"><h1>Tableau de bord</h1><p>Vos contenus, vos échanges et les prochaines actions du cabinet.</p></div> : <span>Administration <span aria-hidden="true">/</span> <strong>{current}</strong></span>}
-        <div className="admin-topbar-actions"><a href="/admin/messages" aria-label={`${unread} message${unread > 1 ? "s" : ""} non lu${unread > 1 ? "s" : ""}`}>Messages <span className="admin-unread-count">{unread}</span></a>{dashboard && <DashboardCreateMenu />}</div>
+      <header className={`admin-topbar ${dashboard || projects ? "is-dashboard" : ""}${projects ? " is-projects" : ""}`}>
+        {dashboard || projects ? <div className="admin-topbar-title"><h1>{projects ? "Projets" : "Tableau de bord"}</h1><p>{projects ? "Gérez les réalisations du cabinet." : "Vos contenus, vos échanges et les prochaines actions du cabinet."}</p></div> : <span>Administration <span aria-hidden="true">/</span> <strong>{current}</strong></span>}
+        <div className="admin-topbar-actions"><a href="/admin/messages" aria-label={`${unread} message${unread > 1 ? "s" : ""} non lu${unread > 1 ? "s" : ""}`}>Messages <span className="admin-unread-count">{unread}</span></a>{dashboard && <DashboardCreateMenu />}{projects && <a href="/admin/projets/nouveau" className="eg-button eg-button--primary">+ Nouveau projet</a>}</div>
       </header>
       <main id="admin-main" className="admin-main" tabIndex={-1}>{children}</main>
       <footer className="admin-footer">Efficience Globale <span>Votre contenu, à votre rythme.</span></footer>
