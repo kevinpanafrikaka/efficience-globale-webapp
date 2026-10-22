@@ -1,0 +1,17 @@
+.member-editor .member-photo > .flex > .eg-button { width: 100%; }
+.member-editor .member-photo-help { margin-top: 12px; }
+.member-editor .member-publication .editor-status-help { margin-bottom: 18px; }
+.member-editor .member-publication input[type="number"] { max-width: 120px; }
+.member-editor .member-expertise-preview { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+.member-editor .member-expertise-preview span { padding: 6px 10px; border-radius: 8px; background: #edf3e6; color: #36581d; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.member-editor .member-card-preview { margin-bottom: 16px; }
+.member-editor .member-card-preview .team-card h2 { margin-bottom: 0; font-size: 22px; }
+.member-editor .member-card-preview .team-photo-note { margin-top: 10px; margin-bottom: 0; }
+.member-editor .editor-panel { min-width: 0; }
+.member-editor .editor-error { position: static; }
+@media (max-width: 1199px) {
+  .member-editor .member-identity { order: 0; }
+  .member-editor .member-photo { order: 1; }
+  .member-editor .member-biography { order: 2; }
+  .member-editor .member-publication { order: 3; }
+}

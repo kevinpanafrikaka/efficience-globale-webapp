@@ -1,17 +1,23 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/admin/ImageUpload";
+import EditorSelect from "./EditorSelect";
+import MemberCard from "./MemberCard";
+import { expertiseTags } from "@/lib/member-expertises.mjs";
+import "./project-editor.css";
+import "./admin-projects.css";
+import "./admin-team.css";
+import "./member-editor.css";
 
-const inputClass =
-  "rounded-lg border border-line px-3.5 py-2.5 text-[15px] focus:outline-none focus:ring-2 focus:ring-lime w-full";
-const labelClass = "text-[13px] font-semibold text-dark";
+function Field({ label, id, hint, children }) {
+  return <div className="editor-field"><label htmlFor={id}>{label}</label>{children}{hint && <p className="editor-help">{hint}</p>}</div>;
+}
 
 export default function MembreForm({ membre }) {
   const router = useRouter();
   const isEdit = !!membre;
-
   const [form, setForm] = useState({
     nom: membre?.nom || "",
     role: membre?.role || "",
@@ -23,116 +29,70 @@ export default function MembreForm({ membre }) {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const saving = useRef(false);
   const [uploading, setUploading] = useState(false);
-
-  function update(field, value) {
-    setForm((f) => ({ ...f, [field]: value }));
-  }
-
+  const saving = useRef(false), errorRef = useRef(null);
+  useEffect(() => {
+    if (error) { errorRef.current?.focus(); errorRef.current?.scrollIntoView?.({ block: "center", behavior: "instant" }); }
+  }, [error]);
+  function update(field, value) { setForm(f => ({ ...f, [field]: value })); }
   async function handleSubmit(e) {
     e.preventDefault();
-    if (saving.current || uploading) return;
-    if (uploading || loading) return;
+    if (saving.current || uploading || loading) return;
     saving.current = true;
-    setLoading(true);
-    setError("");
-
+    setLoading(true); setError("");
     const payload = { ...form, ordre_affichage: Number(form.ordre_affichage) || 0 };
-
     try {
       const res = await fetch(isEdit ? `/api/admin/membres/${membre.id}` : "/api/admin/membres", {
-        method: isEdit ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        method: isEdit ? "PUT" : "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || "Une erreur est survenue.");
-        setLoading(false);
-        return;
-      }
-      router.push("/admin/membres");
-      router.refresh();
+      if (!res.ok) { setError(data.error || "Une erreur est survenue."); setLoading(false); return; }
+      router.push("/admin/membres"); router.refresh();
     } catch {
-      setError("Impossible d'enregistrer. Vérifiez votre connexion.");
-      setLoading(false);
-    } finally {
-      saving.current = false;
-    }
+      setError("Impossible d’enregistrer. Vérifiez votre connexion."); setLoading(false);
+    } finally { saving.current = false; }
   }
-
-  return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-xl">
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="membreform-1" className={labelClass}>Nom</label>
-        <input id="membreform-1" value={form.nom} onChange={(e) => update("nom", e.target.value)} required className={inputClass} />
+  const busy = loading || uploading;
+  const tags = expertiseTags(form.expertises);
+  const saveLabel = uploading ? "Envoi de la photo…" : loading ? "Enregistrement…" : isEdit ? "Enregistrer les modifications" : "Créer le membre";
+  function Actions({ mobile = false }) {
+    return <div className={mobile ? "editor-mobile-actions" : "editor-header-actions"}>
+      <a href="/admin/membres" className="eg-button eg-button--secondary" aria-disabled={busy} onClick={e => { if (busy) e.preventDefault(); }}>Annuler</a>
+      <button type="submit" disabled={busy} aria-busy={busy} className="eg-button eg-button--primary">{mobile && !busy && isEdit ? "Enregistrer" : saveLabel}</button>
+    </div>;
+  }
+  return <form onSubmit={handleSubmit} className="project-editor member-editor">
+    <header className="editor-header"><div><h1>{isEdit ? "Modifier le membre" : "Nouveau membre"}</h1><p>{isEdit ? "Mettez à jour le profil et sa présentation." : "Présentez un membre de l’équipe du cabinet."}</p></div><Actions /></header>
+    {error && <div className="editor-error" role="alert" ref={errorRef} tabIndex={-1}>{error}</div>}
+    <div className="editor-layout">
+      <div className="editor-main-column">
+        <section className="editor-panel member-identity" aria-labelledby="member-identity-title">
+          <h2 id="member-identity-title">Identité et fonction</h2>
+          <Field label="Nom complet" id="membreform-1"><input id="membreform-1" value={form.nom} onChange={e => update("nom", e.target.value)} required maxLength={200} disabled={loading} autoComplete="name" placeholder="Prénom et nom du membre" /></Field>
+          <Field label="Fonction au cabinet" id="membreform-2" hint="Visible sous le nom sur le site public."><input id="membreform-2" value={form.role} onChange={e => update("role", e.target.value)} maxLength={300} disabled={loading} autoComplete="organization-title" placeholder="Ex. Consultant en santé publique" /></Field>
+        </section>
+        <section className="editor-panel member-biography" aria-labelledby="member-biography-title">
+          <h2 id="member-biography-title">Parcours et expertises</h2>
+          <Field label="Biographie" id="membreform-3" hint="Présentez le parcours, l’expérience et la contribution du membre au cabinet."><textarea id="membreform-3" value={form.bio} onChange={e => update("bio", e.target.value)} maxLength={10000} disabled={loading} rows={6} placeholder="Quelques phrases pour présenter son parcours…" /></Field>
+          <Field label="Expertises" id="member-expertises" hint="Jusqu’à 3 expertises séparées par des virgules, 50 caractères chacune."><input id="member-expertises" value={form.expertises} onChange={e => update("expertises", e.target.value)} maxLength={500} disabled={loading} placeholder="Gouvernance, Suivi-évaluation, Gestion de projet" /></Field>
+          {tags.length > 0 && <div className="member-expertise-preview" aria-label="Expertises affichées sur le site">{tags.map(tag => <span key={tag}>{tag}</span>)}</div>}
+        </section>
       </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="membreform-2" className={labelClass}>Rôle</label>
-        <input id="membreform-2" value={form.role} onChange={(e) => update("role", e.target.value)} className={inputClass} />
+      <div className="editor-side-column">
+        <section className="editor-panel member-photo" aria-labelledby="member-photo-title">
+          <h2 id="member-photo-title">Photo et aperçu</h2>
+          <div className="admin-projects admin-team member-card-preview"><MemberCard membre={{ ...form, nom: form.nom.trim() || "Nom du membre" }} preview /></div>
+          <ImageUpload value={form.photo_url} onChange={url => update("photo_url", url)} onUploadingChange={setUploading} allowRemove showPreview={false} disabled={loading || uploading} />
+          <p className="editor-help member-photo-help">L’aperçu suit votre saisie. Choisissez un portrait au visage bien visible, puis enregistrez le profil.</p>
+        </section>
+        <section className="editor-panel member-publication" aria-labelledby="member-publication-title">
+          <h2 id="member-publication-title">Publication et classement</h2>
+          <Field label="Statut du profil" id="membreform-4"><EditorSelect id="membreform-4" value={form.statut} options={[{ value: "brouillon", label: "Brouillon" }, { value: "publie", label: "Publié" }]} onChange={value => update("statut", value)} disabled={loading} /></Field>
+          <p className={`editor-status-help ${form.statut === "publie" ? "is-published" : ""}`}>{form.statut === "publie" ? "Le profil sera visible sur le site public après enregistrement." : "Le brouillon reste visible uniquement dans l’administration."}</p>
+          <Field label="Ordre d’affichage" id="membreform-5" hint="Les petits nombres apparaissent en premier. Le classement peut aussi être ajusté depuis les options des cartes."><input id="membreform-5" type="number" inputMode="numeric" min={0} max={100000} step={1} value={form.ordre_affichage} onChange={e => update("ordre_affichage", e.target.value)} disabled={loading} /></Field>
+        </section>
       </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="membreform-3" className={labelClass}>Bio</label>
-        <textarea id="membreform-3"
-          value={form.bio}
-          onChange={(e) => update("bio", e.target.value)}
-          rows={4}
-          className={`${inputClass} resize-none`}
-        />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="member-expertises" className={labelClass}>Expertises (facultatif)</label>
-        <input id="member-expertises" value={form.expertises} onChange={(event) => update("expertises", event.target.value)}
-          placeholder="Gouvernance, Suivi-évaluation, Gestion de projet" aria-describedby="expertises-help" className={inputClass} />
-        <p id="expertises-help" className="text-[12px] text-ink-soft">Jusqu’à 3 expertises séparées par des virgules, 50 caractères chacune.</p>
-      </div>
-
-      <fieldset className="flex flex-col gap-1.5">
-        <legend className={`${labelClass} mb-2`}>Photo du membre</legend>
-        <ImageUpload
-          value={form.photo_url}
-          onChange={(url) => update("photo_url", url)}
-          onUploadingChange={setUploading}
-          allowRemove
-          disabled={loading || uploading} aria-busy={loading || uploading}
-        />
-        <p className="text-[12px] text-ink-soft mt-1">
-          Sélectionnez un portrait depuis votre ordinateur, puis enregistrez le membre pour conserver la photo.
-        </p>
-      </fieldset>
-
-      <div className="grid grid-cols-2 gap-3">
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="membreform-4" className={labelClass}>Statut</label>
-          <select id="membreform-4" value={form.statut} onChange={(e) => update("statut", e.target.value)} className={inputClass}>
-            <option value="brouillon">Brouillon</option>
-            <option value="publie">Publié</option>
-          </select>
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="membreform-5" className={labelClass}>Ordre d&apos;affichage</label>
-          <input id="membreform-5"
-            type="number"
-            value={form.ordre_affichage}
-            onChange={(e) => update("ordre_affichage", e.target.value)}
-            className={inputClass}
-          />
-        </div>
-      </div>
-
-      {error && <p role="alert" className="text-[13.5px] text-red-600">{error}</p>}
-
-      <button
-        type="submit"
-        disabled={loading || uploading} aria-busy={loading || uploading}
-        className="eg-button eg-button--primary mt-1"
-      >
-        {uploading ? "Envoi de la photo…" : loading ? "Enregistrement…" : isEdit ? "Enregistrer les modifications" : "Créer le membre"}
-      </button>
-    </form>
-  );
+    </div>
+    <Actions mobile />
+  </form>;
 }

@@ -43,6 +43,7 @@ async function harness(path, props = {}, { fail = false, network = false } = {})
     "./admin-projects.css": {},
     "./admin-team.css": {},
     "./project-editor.css": {},
+    "./member-editor.css": {},
     "@/components/admin/AdminImage": { default: function AdminImage() {} },
     "@/components/admin/DeleteButton": { default: function DeleteButton() {} },
     "next/navigation": { useRouter: () => ({ push: value => navigations.push(value), refresh() {} }) },
@@ -51,7 +52,7 @@ async function harness(path, props = {}, { fail = false, network = false } = {})
   const cache = new Map();
   async function load(name) {
     if (imports[name]) return new vm.SyntheticModule(Object.keys(imports[name]), function () { for (const [k,v] of Object.entries(imports[name])) this.setExport(k,v); }, { context });
-    const file = name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./MemberCard" ? "src/components/admin/MemberCard.jsx" : name === "./MemberOptions" ? "src/components/admin/MemberOptions.jsx" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name;
+    const file = name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./MemberCard" ? "src/components/admin/MemberCard.jsx" : name === "./MemberOptions" ? "src/components/admin/MemberOptions.jsx" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name === "@/lib/member-expertises.mjs" ? "src/lib/member-expertises.mjs" : name;
     if (!cache.has(file)) {
       const source = await readFile(new URL("../" + file, import.meta.url), "utf8");
       const { code } = transformSync(source, { filename: file, jsc: { target: "es2022", parser: { syntax: "ecmascript", jsx: true }, transform: { react: { runtime: "automatic" } } }, module: { type: "es6" } });
@@ -248,6 +249,47 @@ test("Project editor keeps a failed save on the page and requires an image befor
     assert.equal(h.navigations.length, 0);
     await h.render().props.onSubmit({ preventDefault() {} });
     assert.equal(h.requests.length, 2);
+  }
+});
+
+test("Member editor keeps stored profile details and updates the shared card preview before saving", async () => {
+  const membre = { id: "malick", nom: "Malick Douet", role: "Chief Staff", bio: "Son parcours détaillé", expertises: "Gouvernance, Évaluation", photo_url: "/uploads/malick.png", statut: "publie", ordre_affichage: 7 };
+  const h = await harness("src/components/admin/MembreForm.jsx", { membre });
+  const input = id => find(h.render(), n => n.props?.id === id && typeof n.props.onChange === "function");
+  input("membreform-1").props.onChange({ target: { value: "Malick D. Douet" } });
+  input("membreform-2").props.onChange({ target: { value: "Directeur des opérations" } });
+  input("membreform-4").props.onChange("brouillon");
+  const preview = find(h.render(), n => n.type?.name === "MemberCard");
+  assert.equal(preview.props.preview, true);
+  assert.equal(preview.props.membre.nom, "Malick D. Douet");
+  assert.equal(preview.props.membre.role, "Directeur des opérations");
+  assert.equal(preview.props.membre.statut, "brouillon");
+  await h.render().props.onSubmit({ preventDefault() {} });
+  assert.equal(h.requests[0].url, "/api/admin/membres/malick");
+  assert.equal(h.requests[0].options.method, "PUT");
+  const data = JSON.parse(h.requests[0].options.body);
+  for (const key of ["bio", "expertises", "photo_url", "ordre_affichage"]) assert.equal(data[key], membre[key], key);
+  assert.equal(data.nom, "Malick D. Douet"); assert.equal(data.role, "Directeur des opérations"); assert.equal(data.statut, "brouillon");
+  assert.deepEqual(h.navigations, ["/admin/membres"]);
+});
+
+test("Member creation accepts a draft without a portrait and failed saves preserve inputs for retry", async () => {
+  const fresh = await harness("src/components/admin/MembreForm.jsx");
+  find(fresh.render(), n => n.type === "input" && n.props?.id === "membreform-1").props.onChange({ target: { value: "Nouveau membre" } });
+  await fresh.render().props.onSubmit({ preventDefault() {} });
+  assert.equal(fresh.requests[0].url, "/api/admin/membres"); assert.equal(fresh.requests[0].options.method, "POST");
+  const created = JSON.parse(fresh.requests[0].options.body);
+  assert.equal(created.nom, "Nouveau membre"); assert.equal(created.photo_url, ""); assert.equal(created.statut, "brouillon");
+  for (const options of [{ fail: true }, { network: true }]) {
+    const h = await harness("src/components/admin/MembreForm.jsx", { membre: { id: "m", nom: "Membre existant", bio: "Parcours conservé", ordre_affichage: 4 } }, options);
+    find(h.render(), n => n.type === "input" && n.props?.id === "member-expertises").props.onChange({ target: { value: "Formation, Gouvernance" } });
+    await h.render().props.onSubmit({ preventDefault() {} });
+    assert.ok(find(h.render(), n => n.props?.role === "alert"));
+    assert.equal(h.navigations.length, 0);
+    assert.equal(find(h.render(), n => n.type === "input" && n.props?.id === "member-expertises").props.value, "Formation, Gouvernance");
+    await h.render().props.onSubmit({ preventDefault() {} });
+    assert.equal(h.requests.length, 2);
+    assert.equal(JSON.parse(h.requests[1].options.body).bio, "Parcours conservé");
   }
 });
 

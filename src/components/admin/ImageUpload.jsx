@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import AdminImage from "./AdminImage";
 
-export default function ImageUpload({ value, onChange, required, disabled = false, onUploadingChange, allowRemove = false }) {
+export default function ImageUpload({ value, onChange, required, disabled = false, onUploadingChange, allowRemove = false, showPreview = true }) {
   const inputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
@@ -43,7 +43,7 @@ export default function ImageUpload({ value, onChange, required, disabled = fals
 
   return (
     <div className="flex flex-col gap-2" aria-busy={uploading}>
-      {value ? (
+      {showPreview && (value ? (
         <div className="relative w-full h-40 rounded-lg overflow-hidden border border-line bg-cream">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <AdminImage src={value} alt="Aperçu de l’image sélectionnée" className="w-full h-full object-contain" />
@@ -56,7 +56,7 @@ export default function ImageUpload({ value, onChange, required, disabled = fals
         >
           Aucune image {required && "(requise)"}
         </div>
-      )}
+      ))}
 
       <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" disabled={disabled || uploading} onChange={handleFileChange} aria-label="Choisir un fichier image" className="admin-upload-input" />
       <button

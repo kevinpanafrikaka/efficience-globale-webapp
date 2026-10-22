@@ -20,6 +20,7 @@ export default function AdminShell({ children, unread }) {
   const projects = pathname === "/admin/projets";
   const team = pathname === "/admin/membres";
   const projectEditor = pathname === "/admin/projets/nouveau" || /^\/admin\/projets\/[^/]+\/modifier$/.test(pathname);
+  const memberEditor = pathname === "/admin/membres/nouveau" || /^\/admin\/membres\/[^/]+\/modifier$/.test(pathname);
   useEffect(() => { setOpen(false); }, [pathname]);
   const current = [...NAV].reverse().find(([href]) => pathname === href || (href !== "/admin" && pathname.startsWith(`${href}/`)))?.[1] || "Administration";
   return <div className="admin-space admin-shell">
@@ -37,7 +38,7 @@ export default function AdminShell({ children, unread }) {
       </div>
     </aside>
     <div className="admin-workspace">
-      {!projectEditor && <header className={`admin-topbar ${dashboard || projects || team ? "is-dashboard" : ""}${projects ? " is-projects" : team ? " is-team" : ""}`}>
+      {!projectEditor && !memberEditor && <header className={`admin-topbar ${dashboard || projects || team ? "is-dashboard" : ""}${projects ? " is-projects" : team ? " is-team" : ""}`}>
         {dashboard || projects || team ? <div className="admin-topbar-title"><h1>{team ? "Équipe" : projects ? "Projets" : "Tableau de bord"}</h1><p>{team ? "Gérez les profils du cabinet." : projects ? "Gérez les réalisations du cabinet." : "Vos contenus, vos échanges et les prochaines actions du cabinet."}</p></div> : <span>Administration <span aria-hidden="true">/</span> <strong>{current}</strong></span>}
         <div className="admin-topbar-actions"><a href="/admin/messages" aria-label={`${unread} message${unread > 1 ? "s" : ""} non lu${unread > 1 ? "s" : ""}`}>Messages <span className="admin-unread-count">{unread}</span></a>{dashboard && <DashboardCreateMenu />}{projects && <a href="/admin/projets/nouveau" className="eg-button eg-button--primary">+ Nouveau projet</a>}{team && <a href="/admin/membres/nouveau" className="eg-button eg-button--primary">+ Nouveau membre</a>}</div>
       </header>}
