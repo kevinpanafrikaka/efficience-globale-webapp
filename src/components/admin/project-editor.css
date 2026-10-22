@@ -7,7 +7,7 @@
 .project-editor .editor-mobile-actions { display: none; }
 .project-editor .editor-layout { display: grid; grid-template-columns: minmax(0,1fr); gap: 20px; }
 .project-editor .editor-layout > div { min-width: 0; }
-.project-editor .editor-media-column { display: contents; }
+.project-editor .editor-main-column, .project-editor .editor-side-column { display: contents; }
 .admin-space .project-editor .editor-panel { margin: 0; padding: clamp(18px,2vw,26px); border: 1px solid #dce4d7; border-radius: 16px; background: white; }
 .project-editor .editor-panel h2 { margin: 0 0 20px; font-size: 23px; line-height: 1.25; letter-spacing: -.02em; }
 .project-editor .editor-fields { display: grid; grid-template-columns: minmax(0,1fr); gap: 18px; }
@@ -40,22 +40,15 @@
 .project-editor .editor-mobile-heading { display: none; }
 .project-editor .editor-error { position: sticky; top: 114px; z-index: 41; margin-bottom: 20px; border: 1px solid #e7b5b5; background: #fff4f2; border-radius: 10px; padding: 14px 18px; color: #a32929; font-size: 14px; }
 @media (min-width: 1200px) {
-  .project-editor .editor-layout {
-    grid-template-columns: minmax(0,1.6fr) minmax(300px,1fr);
-    grid-template-areas: "general media" "presentation preview" "results accent";
-    align-items: start;
-    gap: 24px;
-  }
-  .project-editor .editor-general { grid-area: general; }
-  .project-editor .editor-media-column { grid-area: media; display: flex; flex-direction: column; gap: 20px; }
-  .project-editor .editor-presentation { grid-area: presentation; }
-  .project-editor .editor-preview { grid-area: preview; }
-  .project-editor .editor-results { grid-area: results; }
-  .project-editor .editor-advanced { grid-area: accent; }
-  .project-editor .editor-image .h-40 { aspect-ratio: 16/9; }
-  .project-editor .editor-preview-image { aspect-ratio: 16/9; }
+  .project-editor .editor-layout { grid-template-columns: minmax(0,1.6fr) minmax(300px,1fr); align-items: start; gap: 24px; }
+  .project-editor .editor-layout > .editor-main-column, .project-editor .editor-layout > .editor-side-column { display: flex; flex-direction: column; gap: 20px; }
   .project-editor .editor-fields { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .project-editor .editor-field-wide { grid-column: 1/-1; }
+  .project-editor .editor-image .h-40 { aspect-ratio: 16/9; }
+  .project-editor .editor-image .h-40.border-dashed { height: 140px; aspect-ratio: auto; }
+  .project-editor .editor-preview-image:has(> span) { height: 130px; aspect-ratio: auto; }
+  .project-editor .editor-publication .editor-panel h2 { margin-bottom: 12px; }
+  .project-editor .editor-publication .editor-status-help { padding: 0; margin-top: 10px; background: transparent; }
 }
 @media (min-width: 1024px) {
   .project-editor .editor-header { margin: -40px -36px 32px; padding-inline: 36px; min-height: 112px; }
@@ -116,7 +109,6 @@
   .project-editor .editor-period-dates { grid-template-columns: minmax(0,1fr); }
   .project-editor .editor-period-pair { grid-template-columns: minmax(0,1fr) 90px; }
 }
-@media (min-width: 1200px) and (max-width: 1450px) { .project-editor .editor-period-dates { grid-template-columns: minmax(0,1fr); } }
 
 .project-editor .editor-select-control { position: relative; }
 
