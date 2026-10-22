@@ -41,6 +41,7 @@ async function harness(path, props = {}, { fail = false, network = false } = {})
     "./DashboardIcon": { default: function DashboardIcon() {} },
     "./dashboard-create-menu.css": {},
     "./admin-projects.css": {},
+    "./project-editor.css": {},
     "@/components/admin/AdminImage": { default: function AdminImage() {} },
     "@/components/admin/DeleteButton": { default: function DeleteButton() {} },
     "next/navigation": { useRouter: () => ({ push: value => navigations.push(value), refresh() {} }) },
@@ -223,4 +224,37 @@ test("Project ordering uses actual neighbors even when the sector filter hides t
   const options = find(h.render(), n => n.type?.name === "ProjectOptions" && n.props.project.id === "c");
   assert.equal(options.props.prevId, "b");
   assert.equal(options.props.nextId, undefined);
+});
+
+
+test("Project editor preserves existing details and synchronizes the preview with edits before saving", async () => {
+  const projet = { id: "pev", titre: "Ancien titre", slug: "pev", titre_accent: "titre", secteur: "sante", client: "Gavi", periode: "2024", resume: "Résumé", description: "Description", resultats: ["Un", "Deux"], photo_url: "/uploads/pev.png", statut: "publie", ordre_affichage: 4 };
+  const h = await harness("src/components/admin/ProjetForm.jsx", { projet });
+  const title = find(h.render(), n => n.type === "input" && n.props?.id === "projetform-1");
+  title.props.onChange({ target: { value: "Nouveau titre" } });
+  assert.ok(find(h.render(), n => n.type === "h3" && n.props.children === "Nouveau titre"));
+  const results = find(h.render(), n => n.type === "textarea" && n.props?.id === "projetform-10");
+  results.props.onChange({ target: { value: " Premier résultat \n\n Deuxième résultat " } });
+  await h.render().props.onSubmit({ preventDefault() {} });
+  const request = h.requests[0];
+  assert.equal(request.url, "/api/admin/projets/pev"); assert.equal(request.options.method, "PUT");
+  const data = JSON.parse(request.options.body);
+  assert.equal(data.titre, "Nouveau titre");
+  assert.deepEqual(data.resultats, ["Premier résultat", "Deuxième résultat"]);
+  for (const key of ["slug", "titre_accent", "secteur", "client", "periode", "resume", "description", "photo_url", "statut", "ordre_affichage"]) assert.equal(data[key], projet[key], key);
+});
+
+test("Project editor keeps a failed save on the page and requires an image before creation", async () => {
+  const missing = await harness("src/components/admin/ProjetForm.jsx");
+  await missing.render().props.onSubmit({ preventDefault() {} });
+  assert.equal(missing.requests.length, 0);
+  assert.match(find(missing.render(), n => n.props?.role === "alert").props.children, /image est requise/);
+  for (const options of [{ fail: true }, { network: true }]) {
+    const h = await harness("src/components/admin/ProjetForm.jsx", { projet: { id: "a", titre: "Projet", photo_url: "/uploads/image.png", resultats: [] } }, options);
+    await h.render().props.onSubmit({ preventDefault() {} });
+    assert.ok(find(h.render(), n => n.props?.role === "alert"));
+    assert.equal(h.navigations.length, 0);
+    await h.render().props.onSubmit({ preventDefault() {} });
+    assert.equal(h.requests.length, 2);
+  }
 });
