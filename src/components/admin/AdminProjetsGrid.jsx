@@ -41,22 +41,27 @@ function ProjectOptions({ project, prevId, nextId }) {
 
 export default function AdminProjetsGrid({ projets, secteurs }) {
   const [sector, setSector] = useState("all"), [query, setQuery] = useState(""), [searchOpen, setSearchOpen] = useState(false);
-  const input = useRef(null), searchButton = useRef(null);
-  useEffect(() => { if (searchOpen) input.current?.focus(); }, [searchOpen]);
+  const input = useRef(null), searchButton = useRef(null), restoreSearchFocus = useRef(false);
+  useEffect(() => {
+    if (searchOpen) input.current?.focus();
+    else if (restoreSearchFocus.current) { searchButton.current?.focus(); restoreSearchFocus.current = false; }
+  }, [searchOpen]);
   const filtered = projets.filter(p => (sector === "all" || p.secteur === sector) && normalize(`${p.titre} ${p.client || ""} ${secteurs[p.secteur]?.label || p.secteur}`).includes(normalize(query).trim()));
-  function closeSearch() { setSearchOpen(false); setQuery(""); searchButton.current?.focus(); }
+  function closeSearch() { restoreSearchFocus.current = true; setSearchOpen(false); setQuery(""); }
   return <div className="admin-projects">
     <div className="projects-toolbar">
+      <div className="projects-browse" hidden={searchOpen}>
       <div className="projects-filter-window"><div className="projects-filters" role="group" aria-label="Filtrer par secteur">
         {FILTERS.map(([key, label]) => <button key={key} type="button" className="eg-button eg-button--filter eg-button--compact" aria-pressed={sector === key} onClick={e => { setSector(key); e.currentTarget.scrollIntoView?.({ block: "nearest", inline: "nearest" }); }}>{label}</button>)}
       </div></div>
       <button ref={searchButton} type="button" className="eg-button eg-button--secondary eg-button--icon projects-search-toggle" aria-label={searchOpen ? "Fermer la recherche" : "Rechercher un projet"} aria-expanded={searchOpen} aria-controls="projects-search" onClick={() => searchOpen ? closeSearch() : setSearchOpen(true)}>
         <svg aria-hidden="true" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 5 5" /></svg>
       </button>
-    </div>
+      </div>
     <div id="projects-search" hidden={!searchOpen} className="projects-search">
-      <label htmlFor="project-query">Rechercher par titre, client ou secteur</label>
+      <label className="sr-only" htmlFor="project-query">Rechercher par titre, client ou secteur</label>
       <div><input id="project-query" ref={input} type="search" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === "Escape") closeSearch(); }} placeholder="Rechercher un projet…" /><button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={closeSearch}>Fermer</button></div>
+    </div>
     </div>
     {filtered.length === 0 ? <div className="admin-empty" role="status"><h2>{projets.length ? "Aucun projet correspondant" : "Votre première réalisation"}</h2><p>{projets.length ? "Essayez un autre secteur ou une autre recherche." : "Ajoutez un projet pour présenter les réalisations du cabinet."}</p>{projets.length > 0 && <button type="button" className="eg-button eg-button--secondary" onClick={() => { setSector("all"); setQuery(""); }}>Réinitialiser les filtres</button>}</div> : <div className="projects-grid">
       {filtered.map(p => {

@@ -201,6 +201,9 @@ test("Projects combine sector and accent-insensitive search, keep all statuses a
   assert.ok(card("a")); assert.ok(card("b"));
   find(h.render(), n => n.props?.["aria-controls"] === "projects-search").props.onClick();
   assert.equal(find(h.render(), n => n.props?.id === "projects-search").props.hidden, false);
+  assert.equal(find(h.render(), n => n.props?.className === "projects-browse").props.hidden, true);
+  const toolbar = find(h.render(), n => n.props?.className === "projects-toolbar");
+  assert.ok(find(toolbar, n => n.props?.id === "projects-search"));
   field().props.onChange({ target: { value: "evaluation" } });
   assert.ok(card("a")); assert.equal(card("b"), null);
   field().props.onChange({ target: { value: "UNICEF" } });
@@ -209,6 +212,7 @@ test("Projects combine sector and accent-insensitive search, keep all statuses a
   assert.equal(card("b"), null);
   field().props.onKeyDown({ key: "Escape" });
   assert.equal(field().props.value, ""); assert.ok(card("a"));
+  assert.equal(find(h.render(), n => n.props?.className === "projects-browse").props.hidden, false);
   assert.equal(find(h.render(), n => n.props?.id === "projects-search").props.hidden, true);
 });
 
