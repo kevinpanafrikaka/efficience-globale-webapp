@@ -484,6 +484,21 @@ export async function getDashboardStats() {
   } catch {
     // migration 001 non appliquée
   }
+  const sources = [
+    { table: "projets", title: "titre", image: "photo_url" },
+    { table: "membres", title: "nom", image: "photo_url" },
+    { table: "annonces", title: "titre", image: "image_url" },
+    ...(stats.partenaires ? [{ table: "partenaires", title: "nom", image: "logo_url" }] : []),
+  ];
+  // Source identifiers are fixed above; no user input enters these queries.
+  const latest = async (published, limit) => {
+    const query = sources.map(({ table, title, image }) =>
+      `SELECT id, ${title} AS titre, ${image} AS image_url, cree_le AS date, '${table}' AS type FROM ${table} WHERE statut ${published ? "= 'publie'" : "!= 'publie'"}`
+    ).join(" UNION ALL ");
+    const { results } = await db.prepare(`${query} ORDER BY date DESC, type ASC, id ASC LIMIT ?`).bind(limit).all();
+    return results;
+  };
+  [stats.dernieresPublications, stats.derniersBrouillons] = await Promise.all([latest(true, 6), latest(false, 4)]);
   return stats;
 }
 

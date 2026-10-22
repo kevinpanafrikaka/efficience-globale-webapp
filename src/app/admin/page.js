@@ -2,93 +2,61 @@ import { adminPageAllowed } from "@/lib/admin-page";
 import Link from "next/link";
 import { getDashboardStats } from "@/lib/db";
 import { formatDate } from "@/lib/format";
+import AdminImage from "@/components/admin/AdminImage";
+import DashboardCreateMenu from "@/components/admin/DashboardCreateMenu";
+import DashboardIcon from "@/components/admin/DashboardIcon";
+import "./dashboard.css";
 
 export const dynamic = "force-dynamic";
 
-function StatCard({ href, label, publies, brouillons }) {
-  return (
-    <Link href={href} className="border border-line rounded-lg bg-white p-5 hover:border-lime transition-colors">
-      <div className="text-[12px] font-bold tracking-wide text-ink-faint mb-2">{label}</div>
-      <div className="text-[32px] leading-none font-extrabold text-dark-2 tabular-nums mb-1.5">{publies}</div>
-      <div className="text-[12.5px] text-ink-soft">
-        publié{publies > 1 ? "s" : ""}
-        {brouillons > 0 && ` · ${brouillons} brouillon${brouillons > 1 ? "s" : ""}`}
-      </div>
-    </Link>
-  );
+const CONTENT = [
+  { type: "projets", label: "Projets", singular: "Projet" },
+  { type: "membres", label: "Équipe", singular: "Profil d’équipe" },
+  { type: "annonces", label: "Annonces", singular: "Annonce" },
+  { type: "partenaires", label: "Partenaires", singular: "Partenaire" },
+];
+const contentLabel = (type) => CONTENT.find((item) => item.type === type)?.singular || "Contenu";
+const editHref = (item) => `/admin/${item.type}/${encodeURIComponent(item.id)}/modifier`;
+
+function Initials({ name }) {
+  const letters = name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((word) => word[0]).join("");
+  return <span className="dashboard-avatar" aria-hidden="true">{letters || "EG"}</span>;
 }
 
-const SHORTCUTS = [
-  { href: "/admin/projets/nouveau", label: "+ Nouveau projet" },
-  { href: "/admin/annonces/nouveau", label: "+ Nouvelle annonce" },
-  { href: "/admin/membres/nouveau", label: "+ Nouveau membre" },
-  { href: "/admin/partenaires/nouveau", label: "+ Nouveau partenaire" },
-];
+function StatCard({ item, stats }) {
+  return <Link href={`/admin/${item.type}`} className="dashboard-stat" aria-label={`Gérer ${item.label.toLowerCase()} : ${stats?.publies ?? "données indisponibles"} en ligne${stats ? `, ${stats.brouillons} brouillon${stats.brouillons > 1 ? "s" : ""}` : ""}`}>
+    <div className="dashboard-stat-top"><span>{item.label}</span><span className="dashboard-stat-icon"><DashboardIcon type={item.type} /></span></div>
+    <div className="dashboard-stat-value"><strong>{stats ? stats.publies.toLocaleString("fr-FR") : "—"}</strong><span>{stats ? "en ligne" : "Indisponible"}</span></div>
+    <div className="dashboard-stat-foot"><span className={stats?.brouillons > 0 ? "dashboard-draft-count" : ""}>{stats ? stats.brouillons > 0 ? `${stats.brouillons} brouillon${stats.brouillons > 1 ? "s" : ""}` : "Aucun brouillon" : "Données indisponibles"}</span><span>Gérer</span></div>
+  </Link>;
+}
 
 export default async function AdminHomePage() {
   if (!(await adminPageAllowed())) return null;
   const s = await getDashboardStats();
+  const drafts = CONTENT.reduce((sum, item) => sum + (s[item.type]?.brouillons || 0), 0);
+  const unread = s.messagesNonLus;
+  return <div className="admin-dashboard">
+    <header className="dashboard-heading"><div><p className="dashboard-eyebrow">Votre espace de travail</p><h1>Tableau de bord</h1><p>Vos contenus, vos échanges et les prochaines actions du cabinet.</p></div><DashboardCreateMenu /></header>
 
-  return (
-    <div className="max-w-4xl">
-      <div className="admin-dashboard-heading"><p className="admin-dashboard-eyebrow">EFFICIENCE GLOBALE · ADMINISTRATION</p><h1 className="text-[24px] mb-3">Votre site, en un regard.</h1><p className="text-[15px] text-ink-soft mb-8">Retrouvez vos contenus, préparez vos prochaines publications et suivez les demandes reçues.</p></div>
+    <section className="dashboard-stats" aria-label="Les contenus du cabinet">{CONTENT.map((item) => <StatCard key={item.type} item={item} stats={s[item.type]} />)}</section>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCard href="/admin/projets" label="PROJETS" {...s.projets} />
-        <StatCard href="/admin/membres" label="MEMBRES" {...s.membres} />
-        <StatCard href="/admin/annonces" label="ANNONCES" {...s.annonces} />
-        {s.partenaires ? (
-          <StatCard href="/admin/partenaires" label="PARTENAIRES" {...s.partenaires} />
-        ) : (
-          <div className="border border-dashed border-line rounded-lg p-5 text-[12.5px] text-ink-faint">
-            Partenaires et messages : appliquez la migration 001 sur D1.
-          </div>
-        )}
-      </div>
+    <div className="dashboard-workspace">
+      <section className="dashboard-panel dashboard-inbox" aria-labelledby="dashboard-inbox-title">
+        <header className="dashboard-panel-heading"><div><p className="dashboard-eyebrow">Les échanges</p><h2 id="dashboard-inbox-title">Derniers messages</h2></div>{unread !== null && <span className={`dashboard-status ${unread > 0 ? "is-unread" : ""}`}>{unread} non lu{unread > 1 ? "s" : ""}</span>}</header>
+        {unread === null ? <div className="dashboard-empty"><DashboardIcon type="messages" size={28} /><h3>Messages indisponibles</h3><p>La boîte de réception n’est pas accessible pour le moment.</p></div> : s.derniersMessages.length === 0 ? <div className="dashboard-empty"><DashboardIcon type="messages" size={28} /><h3>La conversation commence ici.</h3><p>Les demandes envoyées depuis le formulaire de contact apparaîtront dans cet espace.</p></div> : <div className="dashboard-message-list">{s.derniersMessages.map((message) => <Link key={message.id} href={`/admin/messages/${encodeURIComponent(message.id)}`} className={`dashboard-message ${!message.lu ? "is-unread" : ""}`}><Initials name={message.nom} /><div className="dashboard-message-copy"><div><strong>{message.nom}</strong>{!message.lu && <span className="dashboard-unread-dot" aria-label="Non lu" />}</div><p>{message.sujet || "Message sans objet"}</p><time>{formatDate(message.cree_le)}</time></div><span className="dashboard-message-action">Ouvrir</span></Link>)}</div>}
+        {unread !== null && <footer className="dashboard-panel-footer"><Link href="/admin/messages" className="eg-button eg-button--secondary eg-button--compact">Tous les messages</Link></footer>}
+      </section>
 
-      <div className="flex flex-wrap gap-3 mb-10">
-        {SHORTCUTS.map((l) => (
-          <Link
-            key={l.href}
-            href={l.href}
-            className="eg-button eg-button--secondary eg-button--compact"
-          >
-            {l.label}
-          </Link>
-        ))}
-      </div>
-
-      {s.messagesNonLus !== null && (
-        <section>
-          <div className="flex items-baseline justify-between mb-3">
-            <h2 className="text-[16px]">
-              Derniers messages
-              {s.messagesNonLus > 0 && <span className="ml-2 text-[13px] font-semibold text-lime">{s.messagesNonLus} non lu{s.messagesNonLus > 1 ? "s" : ""}</span>}
-            </h2>
-            <Link href="/admin/messages" className="eg-button eg-button--quiet eg-button--compact">
-              Tout voir →
-            </Link>
-          </div>
-          {s.derniersMessages.length === 0 ? (
-            <p className="admin-empty text-[14px] text-ink-soft">Aucun message reçu pour le moment. Les demandes envoyées depuis Contact apparaîtront ici.</p>
-          ) : (
-            <div className="border border-line rounded-lg overflow-hidden bg-white">
-              {s.derniersMessages.map((m, i) => (
-                <Link
-                  key={m.id}
-                  href={`/admin/messages/${m.id}`}
-                  className={`flex items-center justify-between gap-4 px-4 py-3 hover:bg-cream transition-colors ${i > 0 ? "border-t border-line" : ""}`}
-                >
-                  <span className={`text-[14px] truncate ${m.lu ? "text-dark" : "font-semibold text-dark"}`}>
-                    {m.nom} — {m.sujet || "(sans sujet)"}
-                  </span>
-                  <span className="text-[12px] text-ink-faint shrink-0">{formatDate(m.cree_le)}</span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </section>
-      )}
+      <section className="dashboard-panel dashboard-priorities" aria-labelledby="dashboard-priorities-title">
+        <header className="dashboard-panel-heading"><div><p className="dashboard-eyebrow">Le prochain pas</p><h2 id="dashboard-priorities-title">À traiter</h2></div><span className="dashboard-priority-icon"><DashboardIcon type="draft" /></span></header>
+        {unread > 0 && <Link href="/admin/messages" className="dashboard-unread-task" aria-label={`${unread} message${unread > 1 ? "s" : ""} à lire`}><span className="dashboard-task-count">{unread}</span><span><strong>Message{unread > 1 ? "s" : ""} à lire</strong><small>Consulter la boîte de réception</small></span></Link>}
+        {drafts > 0 ? <div className="dashboard-drafts"><p className="dashboard-drafts-heading"><strong>{drafts}</strong> contenu{drafts > 1 ? "s" : ""} à finaliser</p><div className="dashboard-draft-list">{s.derniersBrouillons.map((item) => <Link key={`${item.type}-${item.id}`} href={editHref(item)}><span><small>{contentLabel(item.type)}</small><strong>{item.titre}</strong></span><span className="dashboard-draft-resume">Reprendre</span></Link>)}</div>{drafts > s.derniersBrouillons.length && <nav className="dashboard-draft-groups" aria-label="Retrouver tous les brouillons">{CONTENT.filter((item) => s[item.type]?.brouillons > 0).map((item) => <Link key={item.type} href={`/admin/${item.type}`}>{item.label}<span>{s[item.type].brouillons}</span></Link>)}</nav>}</div> : <div className="dashboard-clear"><span className="dashboard-clear-icon"><DashboardIcon type="check" size={28} /></span><h3>Aucun brouillon en attente.</h3><p>{unread === 0 && s.partenaires ? "Vous n’avez aucun message non lu ni brouillon à finaliser." : "Les brouillons à finaliser apparaîtront dans cet espace."}</p></div>}
+      </section>
     </div>
-  );
+
+    <section className="dashboard-panel dashboard-publications" aria-labelledby="dashboard-publications-title"><header className="dashboard-panel-heading"><div><p className="dashboard-eyebrow">Sur votre site</p><h2 id="dashboard-publications-title">Publications récentes</h2><p>Les derniers contenus ajoutés et actuellement en ligne.</p></div><span className="dashboard-publication-count">{s.dernieresPublications.length ? "Accès direct à la modification" : "Vos contenus à venir"}</span></header>
+      {s.dernieresPublications.length === 0 ? <div className="dashboard-empty"><DashboardIcon type="projets" size={28} /><h3>Votre prochaine publication commence ici.</h3><p>Créez un projet, une annonce, un profil ou un partenaire pour enrichir votre site.</p></div> : <div className="dashboard-publication-grid">{s.dernieresPublications.map((item) => <Link key={`${item.type}-${item.id}`} href={editHref(item)} className="dashboard-publication"><div className={`dashboard-publication-thumb ${item.type === "partenaires" ? "is-logo" : ""}`}>{item.image_url ? <AdminImage src={item.image_url} alt="" className="dashboard-publication-image" /> : <DashboardIcon type={item.type} size={26} />}</div><div className="dashboard-publication-copy"><span className="dashboard-publication-type">{contentLabel(item.type)}</span><h3>{item.titre}</h3><time>Ajouté le {formatDate(item.date)}</time></div><span className="dashboard-publication-edit">Modifier</span></Link>)}</div>}
+    </section>
+  </div>;
 }
