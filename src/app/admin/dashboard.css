@@ -94,10 +94,15 @@
   .admin-dashboard .dashboard-stat-value strong { font-size: 36px; }
   .admin-dashboard .dashboard-stat-foot { font-size: 10px; margin-top: 18px; }
   .admin-dashboard .dashboard-panel-heading { padding: 22px 20px; }
-  .admin-dashboard .dashboard-panel-heading h2 { font-size: 23px; }
+  .admin-dashboard .dashboard-panel-heading h2 { font-size: 21px; }
   .admin-dashboard .dashboard-message-list { padding-inline: 20px; }
   .admin-dashboard .dashboard-message { gap: 11px; }
   .admin-dashboard .dashboard-message-action { display: none; }
+  .admin-dashboard .dashboard-message-copy p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: normal; overflow-wrap: anywhere; }
+  .admin-dashboard .dashboard-stat-top > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+  .admin-dashboard .dashboard-publication { grid-template-columns: 56px minmax(0,1fr); padding: 14px; gap: 12px; }
+  .admin-dashboard .dashboard-publication-thumb { width: 56px; height: 56px; }
+  .admin-dashboard .dashboard-publication h3 { font-size: 14px; }
   .admin-dashboard .dashboard-panel-footer { padding-inline: 20px; }
   .admin-dashboard .dashboard-panel-footer > .eg-button { width: 100%; }
   .admin-dashboard .dashboard-unread-task { margin-inline: 20px; padding: 14px; }

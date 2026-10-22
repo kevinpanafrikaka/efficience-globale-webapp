@@ -14,7 +14,11 @@ async function harness(path, props = {}, { fail = false, network = false } = {})
   let cursor = 0;
   const context = vm.createContext({
     fetch: async (url, options) => { requests.push({ url, options }); if (network) throw Error("offline"); return Response.json(fail ? { error: "Échec de test" } : { success: true }, { status: fail ? 401 : 200 }); },
-    window: { confirm: () => true },
+    window: {
+      confirm: () => true, innerHeight: 700,
+      addEventListener(type, callback) { if (!listeners.has(type)) listeners.set(type, new Set()); listeners.get(type).add(callback); },
+      removeEventListener(type, callback) { listeners.get(type)?.delete(callback); },
+    },
     document: {
       addEventListener(type, callback) { if (!listeners.has(type)) listeners.set(type, new Set()); listeners.get(type).add(callback); },
       removeEventListener(type, callback) { listeners.get(type)?.delete(callback); },
@@ -52,6 +56,14 @@ async function harness(path, props = {}, { fail = false, network = false } = {})
   }
   const module = await load(path); await module.evaluate();
   return { requests, navigations,
+    viewport(height, offsetTop) {
+      context.window.innerHeight = height;
+      context.window.visualViewport = offsetTop === undefined ? undefined : {
+        height, offsetTop,
+        addEventListener(type, callback) { if (!listeners.has(type)) listeners.set(type, new Set()); listeners.get(type).add(callback); },
+        removeEventListener(type, callback) { listeners.get(type)?.delete(callback); },
+      };
+    },
     dispatch(type, event) { for (const listener of listeners.get(type) || []) listener(event); },
     render() { cursor = 0; pendingEffects = []; const tree = module.namespace.default(props); for (const effect of pendingEffects) effect(); return tree; },
   };
@@ -133,4 +145,43 @@ test("Dashboard creation menu opens all destinations and closes with Escape, out
   const destination = find(h.render(), n => n.props?.href === "/admin/annonces/nouveau");
   destination.props.onClick();
   assert.equal(menu().props.hidden, true);
+});
+
+
+test("Creation menu adapts to portrait, landscape and scrolling without putting options below the visible screen", async () => {
+  const h = await harness("src/components/admin/DashboardCreateMenu.jsx");
+  const style = new Map();
+  let buttonBottom = 250;
+  let root = h.render();
+  root.props.ref.current = { contains() { return false; }, style: { setProperty(key, value) { style.set(key, value); } } };
+  find(root, n => n.type === "button").props.ref.current = { getBoundingClientRect() { return { bottom: buttonBottom }; } };
+  h.viewport(640);
+  find(root, n => n.type === "button").props.onClick();
+  h.render();
+  assert.equal(style.get("--dashboard-menu-room"), "366px");
+  h.viewport(360);
+  buttonBottom = 190;
+  h.dispatch("resize", {});
+  assert.equal(style.get("--dashboard-menu-room"), "146px");
+  buttonBottom = 140;
+  h.dispatch("scroll", {});
+  assert.equal(style.get("--dashboard-menu-room"), "196px");
+  h.viewport(120);
+  h.dispatch("resize", {});
+  assert.equal(style.get("--dashboard-menu-room"), "0px");
+});
+
+test("Creation menu uses the visible viewport when browser chrome or zoom changes the available height", async () => {
+  const h = await harness("src/components/admin/DashboardCreateMenu.jsx");
+  const style = new Map();
+  const root = h.render();
+  root.props.ref.current = { contains() { return false; }, style: { setProperty(key, value) { style.set(key, value); } } };
+  find(root, n => n.type === "button").props.ref.current = { getBoundingClientRect() { return { bottom: 200 }; } };
+  h.viewport(400, 30);
+  find(root, n => n.type === "button").props.onClick();
+  h.render();
+  assert.equal(style.get("--dashboard-menu-room"), "206px");
+  h.viewport(300, 10);
+  h.dispatch("resize", {});
+  assert.equal(style.get("--dashboard-menu-room"), "86px");
 });

@@ -16,16 +16,36 @@ export default function DashboardCreateMenu() {
   const [open, setOpen] = useState(false);
   const container = useRef(null);
   const trigger = useRef(null);
+  function updateRoom() {
+    const bounds = trigger.current?.getBoundingClientRect?.();
+    if (!bounds || !container.current) return;
+    const viewport = window.visualViewport;
+    const viewportBottom = viewport ? viewport.height + viewport.offsetTop : window.innerHeight;
+    const room = Math.max(0, Math.floor(viewportBottom - bounds.bottom - 24));
+    container.current.style.setProperty("--dashboard-menu-room", `${room}px`);
+  }
   useEffect(() => {
     if (!open) return;
     function outside(event) { if (!container.current?.contains(event.target)) setOpen(false); }
     function escape(event) { if (event.key === "Escape") { setOpen(false); trigger.current?.focus(); } }
+    updateRoom();
+    window.addEventListener("resize", updateRoom);
+    window.addEventListener("scroll", updateRoom, { passive: true });
+    window.visualViewport?.addEventListener("resize", updateRoom);
+    window.visualViewport?.addEventListener("scroll", updateRoom);
     document.addEventListener("pointerdown", outside);
     document.addEventListener("keydown", escape);
-    return () => { document.removeEventListener("pointerdown", outside); document.removeEventListener("keydown", escape); };
+    return () => {
+      document.removeEventListener("pointerdown", outside);
+      document.removeEventListener("keydown", escape);
+      window.removeEventListener("resize", updateRoom);
+      window.removeEventListener("scroll", updateRoom);
+      window.visualViewport?.removeEventListener("resize", updateRoom);
+      window.visualViewport?.removeEventListener("scroll", updateRoom);
+    };
   }, [open]);
   return <div className="dashboard-create" ref={container}>
-    <button ref={trigger} type="button" className="eg-button eg-button--primary" aria-expanded={open} aria-controls="dashboard-create-options" onClick={() => setOpen((value) => !value)}><span aria-hidden="true" className="dashboard-create-plus">+</span>Créer un contenu</button>
+    <button ref={trigger} type="button" className="eg-button eg-button--primary" aria-expanded={open} aria-controls="dashboard-create-options" onClick={() => { if (!open) updateRoom(); setOpen((value) => !value); }}><span aria-hidden="true" className="dashboard-create-plus">+</span>Créer un contenu</button>
     <nav id="dashboard-create-options" className="dashboard-create-options" aria-label="Choisir un contenu à créer" hidden={!open}>{OPTIONS.map((option) => <Link key={option.type} href={option.href} onClick={() => setOpen(false)}><span className="dashboard-create-icon"><DashboardIcon type={option.type} size={20} /></span><span><strong>{option.label}</strong><small>{option.detail}</small></span></Link>)}</nav>
   </div>;
 }

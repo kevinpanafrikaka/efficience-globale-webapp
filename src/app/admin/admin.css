@@ -111,6 +111,9 @@
   .admin-topbar.is-dashboard { align-items: stretch; flex-direction: column; gap: 12px; padding-block: 16px; }
   .admin-topbar-title h1 { font-size: 25px; }
   .admin-topbar-title p { font-size: 12px; }
+  .admin-brand-row { gap: 12px; }
+  .admin-brand { min-width: 0; flex: 1; font-size: 16px; }
+  .admin-topbar.is-dashboard .admin-topbar-actions { display: grid; grid-template-columns: auto minmax(0,1fr); gap: 12px; }
   .admin-topbar-actions { justify-content: space-between; gap: 12px; }
   .admin-topbar-actions .dashboard-create > .eg-button { min-height: 44px; padding: 10px 12px; font-size: 13px; }
 
