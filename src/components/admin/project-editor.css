@@ -77,3 +77,40 @@
   .admin-space .project-editor .editor-field :is(input,select,textarea) { font-size: 16px; }
   .project-editor .editor-error { top: 100px; }
 }
+/* Custom selectors use the same visual language on every device. */
+.project-editor .editor-select { position: relative; min-width: 0; }
+.project-editor .editor-select:has(.editor-select-panel) { z-index: 30; }
+.admin-space .project-editor .editor-select-trigger { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 46px; padding: 11px 13px; border: 1px solid #dce4d7; border-radius: 10px; background: white; color: var(--ink); font-size: 15px; line-height: 1.5; text-align: left; }
+.project-editor .editor-select-trigger > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.project-editor .editor-select-mark { font-size: 19px; line-height: 1; color: #4b7728; flex-shrink: 0; }
+.project-editor .editor-select-panel { position: absolute; top: calc(100% + 6px); left: 0; right: 0; min-width: 0; overflow-y: auto; overscroll-behavior: contain; padding: 7px; border: 1px solid #d4dfcc; border-radius: 12px; background: white; box-shadow: 0 12px 32px #16211a24; }
+.project-editor .editor-select-panel[data-above="true"] { top: auto; bottom: calc(100% + 6px); }
+.project-editor .editor-select-panel [role="listbox"] { display: grid; gap: 3px; }
+.project-editor .editor-select-panel [role="option"] { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px; width: 100%; border-radius: 8px; font-size: 14px; line-height: 1.5; text-align: left; overflow-wrap: anywhere; }
+.project-editor .editor-select-panel [role="option"]:hover, .project-editor .editor-select-panel [role="option"]:focus-visible { background: #f0f5e9; }
+.project-editor .editor-select-panel [aria-selected="true"] { color: #36581d; background: #eaf3df; font-weight: 600; }
+.admin-space .project-editor .editor-select-search { margin-bottom: 8px; width: 100%; min-height: 44px; padding: 10px; border: 1px solid #dce4d7; border-radius: 8px; font-size: 16px; }
+.project-editor .editor-select-done { width: 100%; border-top: 1px solid #dce4d7; color: #4b7728; font-size: 13px; font-weight: 600; }
+.project-editor .editor-selected-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.project-editor .editor-selected-tags > span { display: inline-flex; align-items: center; gap: 6px; padding-left: 10px; border-radius: 9px; background: #edf3e6; color: #36581d; font-size: 12px; max-width: 100%; overflow-wrap: anywhere; }
+.project-editor .editor-selected-tags button { width: 44px; flex: 0 0 44px; font-size: 18px; }
+.project-editor .editor-period { min-width: 0; border: 0; padding: 0; margin: 0; }
+.project-editor .editor-period legend { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+.project-editor .editor-period-dates { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+.project-editor .editor-period-dates label { display: block; margin-bottom: 6px; color: #657260; font-size: 12px; }
+.project-editor .editor-period-pair { display: grid; grid-template-columns: minmax(0,1fr) 80px; gap: 7px; }
+.admin-space .project-editor .editor-period-pair > input { border: 1px solid #dce4d7; border-radius: 10px; padding: 10px; min-width: 0; width: 100%; font-size: 16px; }
+.project-editor .editor-period .editor-help { margin-top: 8px; }
+.project-editor .editor-ongoing { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 6px; font-size: 13px; cursor: pointer; }
+.admin-space .project-editor .editor-ongoing input { appearance: none; width: 20px; min-width: 20px; height: 20px; min-height: 20px; padding: 0; border: 1px solid #8a9b81; border-radius: 5px; background: white; cursor: pointer; }
+.admin-space .project-editor .editor-ongoing input:checked { background: #4b7728; border-color: #4b7728; box-shadow: inset 0 0 0 4px white; }
+.project-editor .editor-period-mode { display: block; text-align: left; min-height: 44px; color: #4b7728; font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
+.project-editor .editor-period-error { color: #a32929; font-size: 12px; line-height: 1.6; margin-top: 8px; }
+@media (max-width: 719px) {
+  .admin-space .project-editor .editor-select-trigger { font-size: 16px; }
+  .project-editor .editor-period-dates { grid-template-columns: minmax(0,1fr); }
+  .project-editor .editor-period-pair { grid-template-columns: minmax(0,1fr) 90px; }
+}
+@media (min-width: 1200px) and (max-width: 1450px) { .project-editor .editor-period-dates { grid-template-columns: minmax(0,1fr); } }
+
+.project-editor .editor-select-control { position: relative; }

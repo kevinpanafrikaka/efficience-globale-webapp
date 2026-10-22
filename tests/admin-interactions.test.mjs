@@ -50,7 +50,7 @@ async function harness(path, props = {}, { fail = false, network = false } = {})
   const cache = new Map();
   async function load(name) {
     if (imports[name]) return new vm.SyntheticModule(Object.keys(imports[name]), function () { for (const [k,v] of Object.entries(imports[name])) this.setExport(k,v); }, { context });
-    const file = name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name;
+    const file = name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name;
     if (!cache.has(file)) {
       const source = await readFile(new URL("../" + file, import.meta.url), "utf8");
       const { code } = transformSync(source, { filename: file, jsc: { target: "es2022", parser: { syntax: "ecmascript", jsx: true }, transform: { react: { runtime: "automatic" } } }, module: { type: "es6" } });
@@ -257,4 +257,43 @@ test("Project editor keeps a failed save on the page and requires an image befor
     await h.render().props.onSubmit({ preventDefault() {} });
     assert.equal(h.requests.length, 2);
   }
+});
+
+
+test("Custom menus select with native buttons and close on Escape or outside click", async () => {
+  let chosen;
+  const h = await harness("src/components/admin/EditorSelect.jsx", { id: "sector", value: "sante", options: [{ value: "sante", label: "Santé publique" }, { value: "ia", label: "Intelligence artificielle" }], onChange: v => { chosen = v; } });
+  const trigger = () => find(h.render(), n => n.props?.id === "sector");
+  trigger().props.onClick();
+  assert.equal(trigger().props["aria-expanded"], true);
+  find(h.render(), n => n.props?.role === "option" && n.props["aria-selected"] === false).props.onClick();
+  assert.equal(chosen, "ia"); assert.equal(trigger().props["aria-expanded"], false);
+  trigger().props.onClick(); h.render().props.onKeyDown({ key: "Escape", preventDefault() {} });
+  assert.equal(trigger().props["aria-expanded"], false);
+  trigger().props.onClick(); h.render(); h.dispatch("pointerdown", { target: {} });
+  assert.equal(trigger().props["aria-expanded"], false);
+});
+
+test("Organisation selection preserves old names, searches without accents, adds and removes names", async () => {
+  const props = { id: "partners", value: ["MSHP"], options: [{ value: "Gavi", label: "Gavi" }, { value: "École", label: "École" }], multiple: true, searchable: true, allowCustom: true, onChange: values => { props.value = values; } };
+  const h = await harness("src/components/admin/EditorSelect.jsx", props);
+  const open = () => find(h.render(), n => n.props?.id === "partners").props.onClick();
+  const search = () => find(h.render(), n => n.type === "input");
+  open(); search().props.onChange({ target: { value: "ecole" } });
+  const school = find(h.render(), n => n.props?.role === "option");
+  school.props.onClick(); assert.deepEqual([...props.value], ["MSHP", "École"]);
+  search().props.onChange({ target: { value: "Organisation locale" } });
+  find(h.render(), n => n.props?.role === "option").props.onClick();
+  assert.ok(props.value.includes("Organisation locale"));
+  find(h.render(), n => n.props?.["aria-label"] === "Retirer MSHP").props.onClick();
+  assert.equal(props.value.includes("MSHP"), false);
+});
+
+test("The project form blocks an incomplete period before any network write", async () => {
+  const h = await harness("src/components/admin/ProjetForm.jsx", { projet: { id: "a", titre: "Projet", photo_url: "/uploads/test.png", resultats: [] } });
+  const period = find(h.render(), n => n.type?.name === "ProjectPeriodField");
+  period.props.onValidityChange("La fin précède le début.");
+  await h.render().props.onSubmit({ preventDefault() {} });
+  assert.equal(h.requests.length, 0);
+  assert.match(find(h.render(), n => n.props?.role === "alert").props.children, /fin précède/);
 });

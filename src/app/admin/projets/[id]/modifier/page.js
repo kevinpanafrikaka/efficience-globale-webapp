@@ -1,6 +1,6 @@
 import { adminPageAllowed } from "@/lib/admin-page";
 import { notFound } from "next/navigation";
-import { getProjetById } from "@/lib/db";
+import { getProjetById, getAllPartenaires } from "@/lib/db";
 import ProjetForm from "@/components/admin/ProjetForm";
 
 export default async function AdminModifierProjetPage({ params }) {
@@ -9,5 +9,6 @@ export default async function AdminModifierProjetPage({ params }) {
   const projet = await getProjetById(id);
   if (!projet) notFound();
 
-  return <ProjetForm projet={projet} />;
+  const partenaires = await getAllPartenaires();
+  return <ProjetForm projet={projet} partenaires={partenaires} />;
 }

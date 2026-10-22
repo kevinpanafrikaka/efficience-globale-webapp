@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/admin/ImageUpload";
 import AdminImage from "@/components/admin/AdminImage";
 import "./project-editor.css";
+import EditorSelect from "./EditorSelect";
+import ProjectPeriodField from "./ProjectPeriodField";
 
 const SECTEURS = [
   { value: "sante", label: "Santé publique" },
@@ -26,7 +28,7 @@ function Field({ label, id, hint, children, wide = false }) {
   return <div className={`editor-field ${wide ? "editor-field-wide" : ""}`}><label htmlFor={id}>{label}</label>{children}{hint && <p className="editor-help">{hint}</p>}</div>;
 }
 
-export default function ProjetForm({ projet }) {
+export default function ProjetForm({ projet, partenaires = [] }) {
   const router = useRouter();
   const isEdit = !!projet;
 
@@ -45,6 +47,7 @@ export default function ProjetForm({ projet }) {
     ordre_affichage: projet?.ordre_affichage ?? 0,
   });
   const [error, setError] = useState("");
+  const [periodError, setPeriodError] = useState("");
   const [loading, setLoading] = useState(false);
   const saving = useRef(false);
   const [uploading, setUploading] = useState(false);
@@ -57,6 +60,8 @@ export default function ProjetForm({ projet }) {
     e.preventDefault();
     if (saving.current || uploading) return;
     setError("");
+
+    if (periodError) { setError(periodError); return; }
 
     if (!form.photo_url) {
       setError("Une image est requise.");
@@ -110,9 +115,9 @@ export default function ProjetForm({ projet }) {
       <div className="editor-general"><EditorSection title="Informations générales" name="general">
         <div className="editor-fields">
           <Field label="Titre du projet" id="projetform-1" wide><input id="projetform-1" value={form.titre} onChange={e => update("titre", e.target.value)} required placeholder="Nom du projet" /></Field>
-          <Field label="Secteur" id="projetform-4"><select id="projetform-4" value={form.secteur} onChange={e => update("secteur", e.target.value)}>{SECTEURS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}</select></Field>
-          <Field label="Client / bailleur / partenaire" id="projetform-6"><input id="projetform-6" value={form.client} onChange={e => update("client", e.target.value)} placeholder="Ex. Gavi · MSHP" /></Field>
-          <Field label="Période" id="projetform-7" wide><input id="projetform-7" value={form.periode} onChange={e => update("periode", e.target.value)} placeholder="Ex. Mars 2024 – Octobre 2025" /></Field>
+          <Field label="Secteur" id="projetform-4"><EditorSelect id="projetform-4" value={form.secteur} options={SECTEURS.map(s => ({ value: s.value, label: s.label }))} onChange={v => update("secteur",v)} disabled={loading} /></Field>
+          <Field label="Client / bailleur / partenaire" id="projetform-6"><EditorSelect id="projetform-6" value={form.client.split(/\s*·\s*/).map(s => s.trim()).filter(Boolean)} options={partenaires.filter(p => p.nom).map(p => ({ value: p.nom, label: p.nom }))} onChange={v => update("client",v.join(" · "))} multiple searchable allowCustom placeholder="Choisir des organisations…" disabled={loading} /></Field>
+          <div className="editor-field-wide"><ProjectPeriodField value={form.periode} onChange={v => update("periode",v)} onValidityChange={setPeriodError} disabled={loading} /></div>
         </div>
       </EditorSection></div>
       <div className="editor-presentation"><EditorSection title="Présentation" name="presentation" collapsible>
@@ -132,7 +137,7 @@ export default function ProjetForm({ projet }) {
         <p className="editor-help">Une image au format paysage convient aux cartes du site.</p>
       </EditorSection></div>
       <div className="editor-publication"><EditorSection title="Publication" name="publication">
-        <Field label="Statut" id="projetform-5"><select id="projetform-5" value={form.statut} onChange={e => update("statut", e.target.value)}><option value="brouillon">Brouillon</option><option value="publie">Publié</option></select></Field>
+        <Field label="Statut" id="projetform-5"><EditorSelect id="projetform-5" value={form.statut} options={[{ value: "brouillon", label: "Brouillon" }, { value: "publie", label: "Publié" }]} onChange={v => update("statut",v)} disabled={loading} /></Field>
         <p className={`editor-status-help ${form.statut === "publie" ? "is-published" : ""}`}>{form.statut === "publie" ? "Publié : visible sur le site public après enregistrement." : "Brouillon : visible uniquement dans l’administration."}</p>
       </EditorSection></div>
       <div className="editor-preview"><EditorSection title="Aperçu de la carte" name="preview" collapsible>
