@@ -2,7 +2,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { isAdminRequest } from "@/lib/adminAuth";
 import { moveItem } from "@/lib/db";
 
-const TABLES = ["projets", "membres", "partenaires"];
+const TABLES = ["membres", "partenaires"];
 
 export async function POST(request) {
   const { env } = await getCloudflareContext({ async: true });

@@ -44,7 +44,6 @@ export default function ProjetForm({ projet, partenaires = [] }) {
     resultats: projet?.resultats?.join("\n") || "",
     photo_url: projet?.photo_url || "",
     statut: projet?.statut || "brouillon",
-    ordre_affichage: projet?.ordre_affichage ?? 0,
   });
   const [error, setError] = useState("");
   const [periodError, setPeriodError] = useState("");
@@ -73,7 +72,6 @@ export default function ProjetForm({ projet, partenaires = [] }) {
 
     const payload = {
       ...form,
-      ordre_affichage: Number(form.ordre_affichage) || 0,
       resultats: form.resultats.split("\n").map((s) => s.trim()).filter(Boolean),
     };
 
@@ -130,7 +128,6 @@ export default function ProjetForm({ projet, partenaires = [] }) {
       <div className="editor-advanced"><details className="editor-panel editor-advanced-panel"><summary>Options avancées<span aria-hidden="true">+</span></summary><div className="editor-advanced-content">
         {isEdit && <Field label="Adresse de la page" id="projetform-2" hint={`Le lien public sera /realisations/${form.slug || "…"}. Modifier ce champ change l’adresse de la page.`}><input id="projetform-2" value={form.slug} onChange={e => update("slug", e.target.value)} /></Field>}
         <Field label="Mot en italique (optionnel)" id="projetform-3" hint="Recopiez exactement le mot ou l’expression du titre à mettre en italique."><input id="projetform-3" value={form.titre_accent} onChange={e => update("titre_accent", e.target.value)} /></Field>
-        <Field label="Ordre d’affichage" id="projetform-11"><input id="projetform-11" type="number" value={form.ordre_affichage} onChange={e => update("ordre_affichage", e.target.value)} /></Field>
       </div></details></div>
       </div><div className="editor-side-column"><div className="editor-image"><EditorSection title="Image du projet" name="image">
         <ImageUpload value={form.photo_url} onChange={url => update("photo_url", url)} onUploadingChange={setUploading} disabled={loading} required />

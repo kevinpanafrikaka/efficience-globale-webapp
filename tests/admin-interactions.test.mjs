@@ -217,16 +217,6 @@ test("Projects combine sector and accent-insensitive search, keep all statuses a
   assert.equal(find(h.render(), n => n.props?.id === "projects-search").props.hidden, true);
 });
 
-test("Project ordering uses actual neighbors even when the sector filter hides them", async () => {
-  const projets = [{ id: "a", titre: "A", secteur: "sante" }, { id: "b", titre: "B", secteur: "ia" }, { id: "c", titre: "C", secteur: "sante" }];
-  const h = await harness("src/components/admin/AdminProjetsGrid.jsx", { projets, secteurs: {} });
-  find(h.render(), n => n.type === "button" && n.props.children === "Santé publique").props.onClick({ currentTarget: {} });
-  const options = find(h.render(), n => n.type?.name === "ProjectOptions" && n.props.project.id === "c");
-  assert.equal(options.props.prevId, "b");
-  assert.equal(options.props.nextId, undefined);
-});
-
-
 test("Project editor preserves existing details and synchronizes the preview with edits before saving", async () => {
   const projet = { id: "pev", titre: "Ancien titre", slug: "pev", titre_accent: "titre", secteur: "sante", client: "Gavi", periode: "2024", resume: "Résumé", description: "Description", resultats: ["Un", "Deux"], photo_url: "/uploads/pev.png", statut: "publie", ordre_affichage: 4 };
   const h = await harness("src/components/admin/ProjetForm.jsx", { projet });
@@ -241,7 +231,7 @@ test("Project editor preserves existing details and synchronizes the preview wit
   const data = JSON.parse(request.options.body);
   assert.equal(data.titre, "Nouveau titre");
   assert.deepEqual(data.resultats, ["Premier résultat", "Deuxième résultat"]);
-  for (const key of ["slug", "titre_accent", "secteur", "client", "periode", "resume", "description", "photo_url", "statut", "ordre_affichage"]) assert.equal(data[key], projet[key], key);
+  for (const key of ["slug", "titre_accent", "secteur", "client", "periode", "resume", "description", "photo_url", "statut"]) assert.equal(data[key], projet[key], key);
 });
 
 test("Project editor keeps a failed save on the page and requires an image before creation", async () => {

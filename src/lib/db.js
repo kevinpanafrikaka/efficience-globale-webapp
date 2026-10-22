@@ -1,3 +1,4 @@
+import { sortProjectsByEnd } from "@/lib/project-period.mjs";
 import { expertiseTags } from "@/lib/member-expertises.mjs";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { equipeStats as equipeStatsParDefaut } from "@/data/team";
@@ -17,23 +18,18 @@ export async function getProjets({ secteur } = {}) {
     secteur && secteur !== "all"
       ? db
           .prepare(
-            "SELECT * FROM projets WHERE statut = 'publie' AND secteur = ? ORDER BY ordre_affichage ASC"
+            "SELECT * FROM projets WHERE statut = 'publie' AND secteur = ?"
           )
           .bind(secteur)
       : db.prepare(
-          "SELECT * FROM projets WHERE statut = 'publie' ORDER BY ordre_affichage ASC"
+          "SELECT * FROM projets WHERE statut = 'publie'"
         );
   const { results } = await query.all();
-  return results.map(parseProjet);
+  return sortProjectsByEnd(results.map(parseProjet));
 }
 
 export async function getProjetsRecents(limit = 6) {
-  const db = await getDB();
-  const { results } = await db
-    .prepare("SELECT * FROM projets WHERE statut = 'publie' ORDER BY cree_le DESC LIMIT ?")
-    .bind(limit)
-    .all();
-  return results.map(parseProjet);
+  return (await getProjets()).slice(0, limit);
 }
 
 // Projets publiés : `total` (tout) et `realises` (hors partenariats).
@@ -88,8 +84,8 @@ async function uniqueId(db, table, base, column = "id") {
 
 export async function getAllProjets() {
   const db = await getDB();
-  const { results } = await db.prepare("SELECT * FROM projets ORDER BY ordre_affichage ASC").all();
-  return results.map(parseProjet);
+  const { results } = await db.prepare("SELECT * FROM projets").all();
+  return sortProjectsByEnd(results.map(parseProjet));
 }
 
 export async function getProjetById(id) {
@@ -120,7 +116,7 @@ export async function createProjet(data) {
       JSON.stringify(data.resultats || []),
       data.photo_url || null,
       data.statut || "brouillon",
-      data.ordre_affichage ?? 0
+      0
     )
     .run();
   return id;
@@ -139,7 +135,7 @@ export async function updateProjet(id, data) {
   }
   await db
     .prepare(
-      `UPDATE projets SET slug = COALESCE(?, slug), titre = ?, titre_accent = ?, secteur = ?, client = ?, periode = ?, resume = ?, description = ?, resultats = ?, photo_url = ?, statut = ?, ordre_affichage = ?, maj_le = datetime('now')
+      `UPDATE projets SET slug = COALESCE(?, slug), titre = ?, titre_accent = ?, secteur = ?, client = ?, periode = ?, resume = ?, description = ?, resultats = ?, photo_url = ?, statut = ?, maj_le = datetime('now')
        WHERE id = ?`
     )
     .bind(
@@ -154,7 +150,6 @@ export async function updateProjet(id, data) {
       JSON.stringify(data.resultats || []),
       data.photo_url || null,
       data.statut || "brouillon",
-      data.ordre_affichage ?? 0,
       id
     )
     .run();
@@ -441,7 +436,7 @@ export async function saveReglages(values) {
 
 // ===== Ordre d'affichage =====
 
-const ORDERABLE_TABLES = ["projets", "membres", "partenaires"];
+const ORDERABLE_TABLES = ["membres", "partenaires"];
 
 // Place `id` à la position de `targetId` dans l'ordre global de `table`, puis renumérote 0..n-1.
 export async function moveItem(table, id, targetId) {

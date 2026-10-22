@@ -23,7 +23,7 @@ export function validateAdminContent(kind, data) {
   const statut = data.statut ?? "brouillon";
   if (!["brouillon", "publie"].includes(statut)) throw new AdminInputError("Statut invalide.");
   const result = { statut };
-  if (kind !== "annonces") {
+  if (kind === "membres" || kind === "partenaires") {
     const order = data.ordre_affichage ?? 0;
     if (order === "" || !Number.isInteger(Number(order)) || Number(order) < 0 || Number(order) > 100000) throw new AdminInputError("L’ordre d’affichage doit être un entier positif ou nul.");
     result.ordre_affichage = Number(order);

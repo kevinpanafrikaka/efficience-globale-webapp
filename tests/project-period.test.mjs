@@ -7,13 +7,15 @@ test("Existing periods parse without rewriting free text or losing abbreviated m
   const range = parseProjectPeriod("Mars 2024 – Oct. 2025");
   assert.equal(range.startMonth, "3"); assert.equal(range.endMonth, "10");
   assert.equal(projectPeriodResult(range).value, "Mars 2024 – Octobre 2025");
-  assert.equal(projectPeriodResult(parseProjectPeriod("Août 2024 – En cours")).value, "Août 2024 – En cours");
+  assert.equal(parseProjectPeriod("Août 2024 – En cours"), null);
+  assert.equal(parseProjectPeriod("Sept. – Nov. 2025").startYear, "2025");
+  assert.equal(parseProjectPeriod("Mai – Juil. 2024").endMonth, "7");
   assert.equal(projectPeriodResult(parseProjectPeriod("")).error, "");
 });
-test("Partial and reversed ranges are rejected; same-month and ongoing ranges remain valid", () => {
-  const base = { startMonth: "3", startYear: "2024", endMonth: "2", endYear: "2024", ongoing: false };
+test("Partial and reversed ranges are rejected; same-month ranges remain valid and missing end dates are rejected", () => {
+  const base = { startMonth: "3", startYear: "2024", endMonth: "2", endYear: "2024" };
   assert.ok(projectPeriodResult(base).error);
   assert.ok(projectPeriodResult({ ...base, endYear: "20" }).error);
   assert.equal(projectPeriodResult({ ...base, endMonth: "3" }).value, "Mars 2024 – Mars 2024");
-  assert.equal(projectPeriodResult({ ...base, endMonth: "", endYear: "", ongoing: true }).value, "Mars 2024 – En cours");
+  assert.ok(projectPeriodResult({ ...base, endMonth: "", endYear: "" }).error);
 });

@@ -1,18 +1,14 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AdminImage from "@/components/admin/AdminImage";
 import DeleteButton from "@/components/admin/DeleteButton";
-import useAdminAction from "./useAdminAction";
 import "./admin-projects.css";
 
 const FILTERS = [["all", "Tous les secteurs"], ["sante", "Santé publique"], ["ia", "Intelligence Artificielle"], ["education", "Éducation"], ["gouvernance", "Gouvernance"], ["local", "Développement local"], ["partenariat", "Partenariat"]];
 function normalize(value) { return String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); }
 
-function ProjectOptions({ project, prevId, nextId }) {
-  const router = useRouter();
-  const { run, loading, error } = useAdminAction();
+function ProjectOptions({ project }) {
   const [open, setOpen] = useState(false);
   const root = useRef(null), trigger = useRef(null);
   useEffect(() => {
@@ -23,17 +19,9 @@ function ProjectOptions({ project, prevId, nextId }) {
     document.addEventListener("keydown", escape);
     return () => { document.removeEventListener("pointerdown", outside); document.removeEventListener("keydown", escape); };
   }, [open]);
-  async function move(targetId) {
-    if (!targetId) return;
-    await run("/api/admin/reorder", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ table: "projets", id: project.id, targetId }) }, () => { setOpen(false); router.refresh(); });
-  }
   return <div className="project-options" ref={root}>
     <button type="button" ref={trigger} className="eg-button eg-button--secondary eg-button--icon" aria-label={`Options pour ${project.titre}`} aria-expanded={open} onClick={() => setOpen(!open)}>···</button>
     {open && <div className="project-options-panel" role="group" aria-label="Actions du projet">
-      <p>Ordre sur le site</p>
-      <button type="button" disabled={!prevId || loading} aria-busy={loading} onClick={() => move(prevId)}>Placer avant le précédent</button>
-      <button type="button" disabled={!nextId || loading} aria-busy={loading} onClick={() => move(nextId)}>Placer après le suivant</button>
-      {error && <span role="alert">{error}</span>}
       <DeleteButton endpoint={`/api/admin/projets/${project.id}`} confirmMessage={`Supprimer « ${project.titre} » définitivement ?`} />
     </div>}
   </div>;
@@ -65,13 +53,12 @@ export default function AdminProjetsGrid({ projets, secteurs }) {
     </div>
     {filtered.length === 0 ? <div className="admin-empty" role="status"><h2>{projets.length ? "Aucun projet correspondant" : "Votre première réalisation"}</h2><p>{projets.length ? "Essayez un autre secteur ou une autre recherche." : "Ajoutez un projet pour présenter les réalisations du cabinet."}</p>{projets.length > 0 && <button type="button" className="eg-button eg-button--secondary" onClick={() => { setSector("all"); setQuery(""); }}>Réinitialiser les filtres</button>}</div> : <div className="projects-grid">
       {filtered.map(p => {
-        const index = projets.findIndex(item => item.id === p.id);
         return <article key={p.id} className="project-card">
           <div className="project-photo">{p.photo_url ? <AdminImage src={p.photo_url} alt="" className="project-photo-image" /> : <div className="project-photo-empty">Aucune image</div>}</div>
           <div className="project-card-body">
             <div className="project-metadata"><span className={`project-status ${p.statut === "publie" ? "is-published" : "is-draft"}`}>{p.statut === "publie" ? "Publié" : "Brouillon"}</span><span>{secteurs[p.secteur]?.label || p.secteur}</span>{p.client && <span className="project-client">{p.client}</span>}</div>
             <h2>{p.titre}</h2>
-            <div className="project-card-actions"><Link href={`/admin/projets/${p.id}/modifier`} className="eg-button eg-button--secondary eg-button--compact">Modifier</Link><ProjectOptions project={p} prevId={projets[index - 1]?.id} nextId={projets[index + 1]?.id} /></div>
+            <div className="project-card-actions"><Link href={`/admin/projets/${p.id}/modifier`} className="eg-button eg-button--secondary eg-button--compact">Modifier</Link><ProjectOptions project={p} /></div>
           </div>
         </article>;
       })}
