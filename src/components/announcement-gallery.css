@@ -1,8 +1,7 @@
 .public-site .announcement-gallery { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--line); }
 .public-site .announcement-gallery-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
 .public-site .announcement-gallery-heading h2 { font-size: clamp(28px,3vw,38px); line-height: 1.25; }
-.public-site .announcement-gallery-heading > span, .public-site .announcement-gallery-help { color: #657260; font-size: 13px; line-height: 1.6; }
-.public-site .announcement-gallery-help { margin-bottom: 20px; }
+.public-site .announcement-gallery-heading > span { color: #657260; font-size: 13px; line-height: 1.6; }
 .public-site .announcement-photo-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 20px; }
 .public-site .announcement-photo-grid > figure { min-width: 0; }
 .public-site .announcement-photo-tile { display: grid; grid-template: minmax(0,1fr)/minmax(0,1fr); width: 100%; aspect-ratio: 4/3; position: relative; overflow: hidden; border-radius: 12px; background: #edf3e6; cursor: zoom-in; }
