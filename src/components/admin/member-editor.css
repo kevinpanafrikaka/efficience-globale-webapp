@@ -16,15 +16,9 @@
 .member-editor .editor-panel { min-width: 0; }
 .member-editor .editor-error { position: static; }
 @media (min-width: 1200px) {
-  .member-editor .editor-layout { grid-template-areas: "identity photo" "biography photo" "publication publication"; align-items: stretch; }
-  .member-editor .editor-layout > .editor-main-column, .member-editor .editor-layout > .editor-side-column { display: contents; }
-  .member-editor .member-identity { grid-area: identity; }
-  .member-editor .member-biography { grid-area: biography; display: flex; flex-direction: column; }
-  .member-editor .member-biography > .editor-field { flex: 1; }
-  .member-editor .member-biography textarea { flex: 1; }
-  .member-editor .member-photo { grid-area: photo; }
-  .member-editor .member-publication { grid-area: publication; display: grid; grid-template-columns: minmax(0,1fr) minmax(200px,280px) minmax(0,1.5fr); gap: 24px; align-items: center; }
-  .member-editor .member-publication h2, .member-editor .member-publication .editor-status-help { margin: 0; }
+  .member-editor .editor-layout { align-items: start; }
+  .member-editor .editor-layout > .editor-main-column,
+  .member-editor .editor-layout > .editor-side-column { display: flex; flex-direction: column; gap: 20px; }
 }
 @media (max-width: 719px) { .admin-space .member-editor .member-expertise-row input { font-size: 16px; } }
 @media (max-width: 1199px) {
