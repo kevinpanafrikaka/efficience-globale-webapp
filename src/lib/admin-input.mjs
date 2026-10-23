@@ -1,3 +1,4 @@
+import { ANNOUNCEMENT_TYPES, announcementActionUrl } from "./announcements.mjs";
 export class AdminInputError extends Error {}
 
 function text(data, key, max = 500, required = false) {
@@ -45,6 +46,17 @@ export function validateAdminContent(kind, data) {
     result.date = text(data, "date", 10, true);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(result.date) || Number.isNaN(Date.parse(result.date)) || new Date(result.date).toISOString().slice(0, 10) !== result.date) throw new AdminInputError("Date de publication invalide.");
     result.image_url = image(data, "image_url");
+    result.categorie = text(data, "categorie", 40) || "vie";
+    if (!ANNOUNCEMENT_TYPES.some(type => type.value === result.categorie)) throw new AdminInputError("Type d’annonce invalide.");
+    result.resume = text(data, "resume", 500);
+    result.lieu = text(data, "lieu", 300);
+    result.echeance = text(data, "echeance", 10);
+    if (result.echeance && (!/^\d{4}-\d{2}-\d{2}$/.test(result.echeance) || Number.isNaN(Date.parse(result.echeance)) || new Date(result.echeance).toISOString().slice(0,10) !== result.echeance)) throw new AdminInputError("Date limite invalide.");
+    result.action_url = text(data, "action_url", 2000);
+    result.action_label = text(data, "action_label", 100);
+    if (result.action_url && !announcementActionUrl(result.action_url)) throw new AdminInputError("Le lien doit commencer par https://, http:// ou mailto:.");
+    if (Boolean(result.action_url) !== Boolean(result.action_label)) throw new AdminInputError("Renseignez le libellé et le lien du bouton ensemble.");
+
   } else if (kind === "membres") {
     result.nom = text(data, "nom", 200, true);
     result.role = text(data, "role", 300);

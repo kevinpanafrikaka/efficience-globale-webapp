@@ -1,0 +1,15 @@
+.announcement-editor .announcement-preview { margin-bottom: 16px; }
+.announcement-editor .announcement-preview .project-card h2 { font-size: 22px; margin-bottom: 12px; }
+.announcement-editor .announcement-preview .announcement-card-summary { margin-bottom: 0; }
+.announcement-editor .announcement-image > .flex > .eg-button { width: 100%; }
+.announcement-editor .announcement-image > .editor-help { margin-top: 12px; }
+.announcement-editor .editor-error { position: static; }
+.announcement-editor .announcement-format-tools { display: flex; gap: 8px; flex-wrap: wrap; }
+.announcement-editor .announcement-format-tools .eg-button { min-height: 44px; font-size: 12px; padding: 8px 12px; }
+.announcement-editor .announcement-extra { margin-top: 20px !important; }
+.announcement-editor .announcement-extra > .editor-help { margin-bottom: 18px; }
+.announcement-date { min-width: 0; border: 0; padding: 0; margin: 0 0 18px; }
+.announcement-date legend { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+.announcement-date-fields { display: grid; grid-template-columns: 66px minmax(0,1fr) 82px; gap: 7px; }
+.admin-space .announcement-date-fields input { width: 100%; padding: 11px 8px; border: 1px solid #dce4d7; font-size: 16px; line-height: 1.5; min-height: 46px; }
+@media (max-width: 719px) { .announcement-editor .announcement-format-tools .eg-button { width: auto; } }

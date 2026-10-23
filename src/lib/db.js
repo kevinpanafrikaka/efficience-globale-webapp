@@ -212,58 +212,68 @@ export async function deleteMembre(id) {
   await db.prepare("DELETE FROM membres WHERE id = ?").bind(id).run();
 }
 
+// Idempotent bootstrap keeps existing D1 databases compatible with this deployment.
+async function announcementDB() {
+  const db = await getDB();
+  await db.prepare(`CREATE TABLE IF NOT EXISTS annonce_details (
+    annonce_id TEXT PRIMARY KEY REFERENCES annonces(id) ON DELETE CASCADE,
+    categorie TEXT NOT NULL DEFAULT 'vie', resume TEXT NOT NULL DEFAULT '',
+    lieu TEXT NOT NULL DEFAULT '', echeance TEXT NOT NULL DEFAULT '',
+    action_url TEXT NOT NULL DEFAULT '', action_label TEXT NOT NULL DEFAULT ''
+  )`).run();
+  return db;
+}
+const ANNOUNCEMENT_SELECT = `SELECT a.*, COALESCE(d.categorie, 'vie') AS categorie,
+  COALESCE(d.resume, '') AS resume, COALESCE(d.lieu, '') AS lieu,
+  COALESCE(d.echeance, '') AS echeance, COALESCE(d.action_url, '') AS action_url,
+  COALESCE(d.action_label, '') AS action_label
+  FROM annonces a LEFT JOIN annonce_details d ON d.annonce_id = a.id`;
+function announcementDetailsStatement(db, id, data) {
+  return db.prepare(`INSERT INTO annonce_details (annonce_id,categorie,resume,lieu,echeance,action_url,action_label)
+    VALUES (?,?,?,?,?,?,?) ON CONFLICT(annonce_id) DO UPDATE SET categorie=excluded.categorie,
+    resume=excluded.resume,lieu=excluded.lieu,echeance=excluded.echeance,
+    action_url=excluded.action_url,action_label=excluded.action_label`)
+    .bind(id,data.categorie || "vie",data.resume || "",data.lieu || "",data.echeance || "",data.action_url || "",data.action_label || "");
+}
 export async function getAnnonces() {
-  const db = await getDB();
-  const { results } = await db
-    .prepare(
-      "SELECT * FROM annonces WHERE statut = 'publie' ORDER BY date DESC"
-    )
-    .all();
+  const db = await announcementDB();
+  const { results } = await db.prepare(`${ANNOUNCEMENT_SELECT} WHERE a.statut = 'publie' ORDER BY a.date DESC, a.cree_le DESC, a.id ASC`).all();
   return results;
 }
-
 export async function getAnnonceBySlug(slug) {
-  const db = await getDB();
-  return db.prepare("SELECT * FROM annonces WHERE slug = ? AND statut = 'publie'").bind(slug).first();
+  const db = await announcementDB();
+  return db.prepare(`${ANNOUNCEMENT_SELECT} WHERE a.slug = ? AND a.statut = 'publie'`).bind(slug).first();
 }
-
-// ===== Admin : annonces (tous statuts) =====
-
 export async function getAllAnnonces() {
-  const db = await getDB();
-  const { results } = await db.prepare("SELECT * FROM annonces ORDER BY date DESC").all();
+  const db = await announcementDB();
+  const { results } = await db.prepare(`${ANNOUNCEMENT_SELECT} ORDER BY a.date DESC, a.cree_le DESC, a.id ASC`).all();
   return results;
 }
-
 export async function getAnnonceById(id) {
-  const db = await getDB();
-  return db.prepare("SELECT * FROM annonces WHERE id = ?").bind(id).first();
+  const db = await announcementDB();
+  return db.prepare(`${ANNOUNCEMENT_SELECT} WHERE a.id = ?`).bind(id).first();
 }
-
 export async function createAnnonce(data) {
-  const db = await getDB();
+  const db = await announcementDB();
   const id = await uniqueId(db, "annonces", slugify(data.titre));
-  await db
-    .prepare(
-      `INSERT INTO annonces (id, slug, titre, texte, image_url, date, statut)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`
-    )
-    .bind(id, id, data.titre, data.texte, data.image_url || null, data.date, data.statut || "brouillon")
-    .run();
+  await db.batch([
+    db.prepare(`INSERT INTO annonces (id,slug,titre,texte,image_url,date,statut) VALUES (?,?,?,?,?,?,?)`)
+      .bind(id,id,data.titre,data.texte,data.image_url || null,data.date,data.statut || "brouillon"),
+    announcementDetailsStatement(db,id,data),
+  ]);
   return id;
 }
-
 export async function updateAnnonce(id, data) {
-  const db = await getDB();
-  await db
-    .prepare(`UPDATE annonces SET titre = ?, texte = ?, image_url = ?, date = ?, statut = ? WHERE id = ?`)
-    .bind(data.titre, data.texte, data.image_url || null, data.date, data.statut || "brouillon", id)
-    .run();
+  const db = await announcementDB();
+  await db.batch([
+    db.prepare(`UPDATE annonces SET titre=?,texte=?,image_url=?,date=?,statut=? WHERE id=?`)
+      .bind(data.titre,data.texte,data.image_url || null,data.date,data.statut || "brouillon",id),
+    announcementDetailsStatement(db,id,data),
+  ]);
 }
-
 export async function deleteAnnonce(id) {
-  const db = await getDB();
-  await db.prepare("DELETE FROM annonces WHERE id = ?").bind(id).run();
+  const db = await announcementDB();
+  await db.batch([db.prepare("DELETE FROM annonce_details WHERE annonce_id = ?").bind(id),db.prepare("DELETE FROM annonces WHERE id = ?").bind(id)]);
 }
 
 // ===== Partenaires =====

@@ -13,6 +13,7 @@ async function harness(path, props = {}, { fail = false, network = false } = {})
   let pendingEffects = [];
   let cursor = 0;
   const context = vm.createContext({
+    URL,
     fetch: async (url, options) => { requests.push({ url, options }); if (network) throw Error("offline"); return Response.json(fail ? { error: "Échec de test" } : { success: true }, { status: fail ? 401 : 200 }); },
     window: {
       confirm: () => true, innerHeight: 700,
@@ -44,6 +45,11 @@ async function harness(path, props = {}, { fail = false, network = false } = {})
     "./admin-team.css": {},
     "./project-editor.css": {},
     "./member-editor.css": {},
+    "./admin-announcements.css": {},
+    "./announcement-editor.css": {},
+    "./announcements.css": {},
+    "@/components/AnnouncementCover": { default: function AnnouncementCover() {} },
+    "./AnnouncementCover": { default: function AnnouncementCover() {} },
     "@/components/admin/AdminImage": { default: function AdminImage() {} },
     "@/components/admin/DeleteButton": { default: function DeleteButton() {} },
     "next/navigation": { useRouter: () => ({ push: value => navigations.push(value), refresh() {} }) },
@@ -52,7 +58,7 @@ async function harness(path, props = {}, { fail = false, network = false } = {})
   const cache = new Map();
   async function load(name) {
     if (imports[name]) return new vm.SyntheticModule(Object.keys(imports[name]), function () { for (const [k,v] of Object.entries(imports[name])) this.setExport(k,v); }, { context });
-    const file = name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./MemberCard" ? "src/components/admin/MemberCard.jsx" : name === "./MemberOptions" ? "src/components/admin/MemberOptions.jsx" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name === "@/lib/member-expertises.mjs" ? "src/lib/member-expertises.mjs" : name;
+    const file = name === "./EditorDate" ? "src/components/admin/EditorDate.jsx" : name === "./AdminAnnouncementCard" ? "src/components/admin/AdminAnnouncementCard.jsx" : name === "./AnnouncementOptions" ? "src/components/admin/AnnouncementOptions.jsx" : name === "./AnnouncementCard" ? "src/components/AnnouncementCard.jsx" : name === "@/lib/announcements.mjs" ? "src/lib/announcements.mjs" : name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./MemberCard" ? "src/components/admin/MemberCard.jsx" : name === "./MemberOptions" ? "src/components/admin/MemberOptions.jsx" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name === "@/lib/member-expertises.mjs" ? "src/lib/member-expertises.mjs" : name;
     if (!cache.has(file)) {
       const source = await readFile(new URL("../" + file, import.meta.url), "utf8");
       const { code } = transformSync(source, { filename: file, jsc: { target: "es2022", parser: { syntax: "ecmascript", jsx: true }, transform: { react: { runtime: "automatic" } } }, module: { type: "es6" } });
@@ -420,4 +426,46 @@ test("Team options persist a single correct reorder request, report failure and 
     h.render(); h.dispatch("keydown", { key: "Escape" });
     assert.equal(trigger().props["aria-expanded"], false);
   }
+});
+
+test("Announcement filters combine publication, category and accent-insensitive search on the same toolbar",async()=>{
+ const annonces=[{id:"a",titre:"Évaluation",texte:"Terrain",categorie:"mission",statut:"publie"},{id:"b",titre:"Stage",texte:"Candidature",categorie:"recrutement",statut:"brouillon"}];
+ const h=await harness("src/components/admin/AdminAnnoncesGrid.jsx",{annonces});
+ const card=id=>find(h.render(),n=>n.type?.name==="AdminAnnouncementCard"&&n.props.annonce.id===id);
+ assert.ok(card("a"));assert.ok(card("b"));
+ find(h.render(),n=>n.type==="button"&&n.props.children==="Publiées").props.onClick({currentTarget:{}});
+ assert.ok(card("a"));assert.equal(card("b"),null);
+ find(h.render(),n=>n.props?.id==="announcement-type-filter").props.onChange("recrutement");assert.equal(card("a"),null);
+ find(h.render(),n=>n.props?.id==="announcement-type-filter").props.onChange("mission");
+ find(h.render(),n=>n.props?.["aria-controls"]==="announcements-search").props.onClick();
+ assert.equal(find(h.render(),n=>n.props?.className==="projects-browse").props.hidden,true);
+ const field=()=>find(h.render(),n=>n.props?.id==="announcements-query");field().props.onChange({target:{value:"evaluation"}});assert.ok(card("a"));
+ field().props.onKeyDown({key:"Escape"});assert.equal(field().props.value,"");assert.ok(card("a"));assert.equal(card("b"),null);
+});
+
+test("Public category filters keep real links' records together and reset an empty selection",async()=>{
+ const h=await harness("src/components/AnnouncementsGrid.jsx",{annonces:[{id:"a",titre:"Stage",categorie:"recrutement"},{id:"b",titre:"Actualité existante"}]});
+ const card=id=>find(h.render(),n=>n.type?.name==="AnnouncementCard"&&n.props.annonce.id===id);
+ find(h.render(),n=>n.type==="button"&&n.props.children==="Recrutement").props.onClick({currentTarget:{}});assert.ok(card("a"));assert.equal(card("b"),null);
+ find(h.render(),n=>n.type==="button"&&n.props.children==="Publications").props.onClick({currentTarget:{}});assert.equal(card("a"),null);assert.ok(find(h.render(),n=>n.props?.role==="status"));
+ find(h.render(),n=>n.type==="button"&&n.props.children==="Toutes les annonces").props.onClick();assert.ok(card("a"));assert.ok(card("b"));
+});
+
+test("Announcement editor preserves dates and optional metadata, blocks partial actions, and retains failed edits",async()=>{
+ const annonce={id:"stage",titre:"Stage",texte:"Contenu existant",date:"2026-10-21",statut:"publie",categorie:"recrutement",resume:"Résumé existant",lieu:"Conakry",echeance:"2026-12-30",action_url:"https://example.org/postuler",action_label:"Postuler",image_url:"/uploads/stage.png"};
+ const h=await harness("src/components/admin/AnnonceForm.jsx",{annonce});
+ find(h.render(),n=>n.type==="input"&&n.props.id==="annonceform-1").props.onChange({target:{value:"Stage de fin d’études"}});
+ await h.render().props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,1);const payload=JSON.parse(h.requests[0].options.body);
+ for(const key of ["texte","date","statut","categorie","resume","lieu","echeance","action_url","action_label","image_url"])assert.equal(payload[key],annonce[key],key);
+ assert.equal(payload.titre,"Stage de fin d’études");assert.equal(h.requests[0].options.method,"PUT");
+ const invalid=await harness("src/components/admin/AnnonceForm.jsx",{annonce:{...annonce,action_url:""}});await invalid.render().props.onSubmit({preventDefault(){}});assert.equal(invalid.requests.length,0);assert.ok(find(invalid.render(),n=>n.props?.role==="alert"));
+ const failed=await harness("src/components/admin/AnnonceForm.jsx",{annonce},{network:true});await failed.render().props.onSubmit({preventDefault(){}});assert.equal(failed.navigations.length,0);assert.equal(find(failed.render(),n=>n.type==="input"&&n.props.id==="annonceform-1").props.value,"Stage");
+});
+
+test("Custom announcement date clamps month ends and a partial year cannot be submitted",async()=>{
+ const props={id:"date",label:"Date",value:"2026-01-31",onChange:v=>{props.value=v;}};
+ const h=await harness("src/components/admin/EditorDate.jsx",props);
+ find(h.render(),n=>n.props?.id==="date-month").props.onChange("02");assert.equal(props.value,"2026-02-28");
+ const form=await harness("src/components/admin/AnnonceForm.jsx",{annonce:{id:"a",titre:"Titre",texte:"Texte",date:"2026-10-21"}});
+ find(form.render(),n=>n.type?.name==="EditorDate").props.onChange("202-10-21");await form.render().props.onSubmit({preventDefault(){}});assert.equal(form.requests.length,0);assert.ok(find(form.render(),n=>n.props?.role==="alert"));
 });

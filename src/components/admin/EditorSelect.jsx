@@ -23,7 +23,7 @@ export default function EditorSelect({ id, value, options, onChange, placeholder
       if (!rect) return;
       const viewport = window.visualViewport;
       const bottom = viewport ? viewport.height + viewport.offsetTop : window.innerHeight;
-      const header = document.querySelector?.(".editor-header")?.getBoundingClientRect?.();
+      const header = document.querySelector?.(".editor-header, .admin-topbar")?.getBoundingClientRect?.();
       const top = Math.max(viewport?.offsetTop || 0, header?.bottom || 0);
       const footer = document.querySelector?.(".editor-mobile-actions")?.getBoundingClientRect?.();
       const limit = footer?.height ? Math.min(bottom, footer.top) : bottom;
