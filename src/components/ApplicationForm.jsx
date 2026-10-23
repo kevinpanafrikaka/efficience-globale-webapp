@@ -37,7 +37,7 @@ export default function ApplicationForm({slug}){
   <fieldset className="application-dossier" disabled={busy}><legend>Votre dossier</legend><div className="application-documents"><DocumentField kind="cv" label="CV" required file={cv} onChange={file=>choose("cv",file)} disabled={busy}/><DocumentField kind="lettre" label="Lettre de motivation" file={letter} onChange={file=>choose("lettre",file)} disabled={busy}/></div></fieldset>
   <div className="application-message"><label htmlFor="application-message">Message (facultatif)</label><textarea id="application-message" name="message" rows={3} maxLength={5000} disabled={busy}/></div>
   <div className="application-honeypot" aria-hidden="true"><label htmlFor="application-website">Site web</label><input id="application-website" name="site_web" tabIndex={-1} autoComplete="off"/></div>
-  <div className="application-submit"><p className="application-retention">Votre dossier est transmis au cabinet par email.<br/>Les copies sur le site sont conservées 30 jours.</p>
+  <div className="application-submit"><p className="application-retention">Votre dossier est transmis au cabinet par email.</p>
   <button type="submit" className="eg-button eg-button--primary" disabled={busy}>{busy?"Envoi de la candidature…":"Envoyer ma candidature"}</button></div>
  </form>;
 }
