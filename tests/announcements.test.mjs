@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { renderToStaticMarkup } from "react-dom/server";
 import { adminRuntime } from "./helpers/admin-runtime.mjs";
 import { validateAdminContent } from "../src/lib/admin-input.mjs";
+import { announcementArticleContent } from "../src/lib/announcements.mjs";
 const req=body=>new Request("https://example.org/admin/annonces",{method:"POST",headers:{origin:"https://example.org","Content-Type":"application/json"},body:JSON.stringify(body)});
 
 test("Existing announcements acquire editorial defaults without a manual database migration or content loss",async()=>{
@@ -39,7 +40,7 @@ test("Public announcement articles render safe headings and lists and close expi
  const id=await db.createAnnonce({titre:"Postuler",texte:"## Les missions\n\n- Conseil\n- Analyse\n\n<script>alert(1)</script>",date:"2026-10-21",statut:"publie",categorie:"recrutement",resume:"Introduction",lieu:"Conakry",echeance:"2099-12-01",action_url:"https://example.org/postuler",action_label:"Envoyer ma candidature"});
  const {default:Page}=await r.module("src/app/(public)/annonces/[slug]/page.js");
  const html=renderToStaticMarkup(await Page({params:Promise.resolve({slug:id})}));
- assert.match(html,/<h2>Les missions<\/h2>/);assert.match(html,/<li>Conseil<\/li>/);assert.doesNotMatch(html,/<script>/);assert.match(html,/href="https:\/\/example.org\/postuler"/);assert.match(html,/Introduction/);
+ assert.match(html,/<h2\b[^>]*>Les missions<\/h2>/);assert.match(html,/<li>Conseil<\/li>/);assert.doesNotMatch(html,/<script>/);assert.match(html,/href="https:\/\/example.org\/postuler"/);assert.match(html,/Introduction/);
  r.sqlite.prepare("UPDATE annonce_details SET echeance=? WHERE annonce_id=?").run("2000-01-01",id);
  const closed=renderToStaticMarkup(await Page({params:Promise.resolve({slug:id})}));assert.match(closed,/date limite est dépassée/);assert.doesNotMatch(closed,/href="https:\/\/example.org\/postuler"/);
  }finally{r.close();}
@@ -87,4 +88,29 @@ test("Gallery validation rejects unsafe or oversized data and deduplicates photo
  const base={titre:"Annonce",texte:"Contenu",date:"2026-10-23"};
  for(const galerie of [null,{},[null],[{url:"javascript:alert(1)"}],[{url:""}],[{url:"/a.jpg",legende:"a".repeat(301)}],Array.from({length:51},()=>({url:"/a.jpg"}))])assert.throws(()=>validateAdminContent("annonces",{...base,galerie}));
  const result=validateAdminContent("annonces",{...base,galerie:[{url:"/a.jpg",legende:"Première"},{url:"/b.jpg"},{url:"/a.jpg"}]});assert.equal(result.galerie.length,2);assert.equal(result.galerie[0].legende,"Première");
+});
+
+test("Editorial grouping preserves author content and only avoids an exact repeated introduction",()=>{
+ const body="Introduction complète.\n\nParagraphe à conserver.\n\n## Vos missions\n\n- Analyse\n- Conseil\n\n## Profil recherché\n\nVotre expérience.\n\n## Modalités\n\nDernière information.";
+ const parsed=announcementArticleContent(body,"Introduction complète.");
+ assert.equal(parsed.lead,"Introduction complète.");assert.equal(parsed.preamble[0].text,"Paragraphe à conserver.");assert.deepEqual(parsed.sections.map(s=>s.title),["Vos missions","Profil recherché","Modalités"]);assert.deepEqual(parsed.sections[0].blocks[0].items,["Analyse","Conseil"]);assert.equal(parsed.sections[2].blocks[0].text,"Dernière information.");
+ const different=announcementArticleContent(body,"Un résumé différent.");assert.equal(different.preamble[0].text,"Introduction complète.");
+ const plain=announcementArticleContent("Premier paragraphe.\n\nDeuxième paragraphe.");assert.equal(plain.lead,"Premier paragraphe.");assert.equal(plain.preamble[0].text,"Deuxième paragraphe.");assert.equal(plain.sections.length,0);
+ const headings=announcementArticleContent("## Premier titre\n\n## Second titre\n\nTexte");assert.equal(headings.sections.length,2);assert.equal(headings.sections[0].blocks.length,0);
+});
+
+test("Full-width article renders custom headings for every announcement type with one safe action",async()=>{
+ const r=await adminRuntime();try{
+ const db=await r.module("src/lib/db.js"),{default:Page}=await r.module("src/app/(public)/annonces/[slug]/page.js");
+ for(const categorie of ["recrutement","formation","mission","publication","vie"]){
+  const id=await db.createAnnonce({titre:`Détail ${categorie}`,texte:"Résumé identique.\n\n## Découvrir\n\n- Premier élément\n- Deuxième élément\n\n## Approfondir\n\nTexte unique.\n\n## Participer\n\nDernier paragraphe.",resume:"Résumé identique.",date:"2026-10-23",statut:"publie",categorie,lieu:"Conakry",echeance:"2099-12-01",action_url:"mailto:contact@example.org",action_label:"Envoyer ma demande"});
+  const html=renderToStaticMarkup(await Page({params:Promise.resolve({slug:id})}));
+  const body=html.split('aria-label="Contenu de l’annonce"')[1].split('class="announcement-detail-return"')[0];
+  for(const text of ["Découvrir","Premier élément","Approfondir","Texte unique.","Participer","Dernier paragraphe."])assert.ok(body.includes(text),text);
+  assert.equal((body.match(/Résumé identique\./g)||[]).length,1);assert.equal((body.match(/Envoyer ma demande/g)||[]).length,1);
+  assert.match(body,/<dt>Lieu<\/dt><dd>Conakry<\/dd>/);assert.match(body,/href="mailto:contact@example.org"/);assert.doesNotMatch(body,/À propos de l’annonce|announcement-article-layout|[↗→←]/);
+ }
+ const id=await db.createAnnonce({titre:"Simple",texte:"Un texte sans sous-titres.",date:"2026-10-23",statut:"publie",categorie:"publication"});
+ const simple=renderToStaticMarkup(await Page({params:Promise.resolve({slug:id})}));assert.match(simple,/Un texte sans sous-titres\./);assert.doesNotMatch(simple,/class="announcement-practical"/);
+ }finally{r.close();}
 });

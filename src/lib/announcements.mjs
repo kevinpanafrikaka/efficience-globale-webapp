@@ -33,3 +33,21 @@ export function announcementExcerpt(value, length = 180) {
   const lastSpace = cut.lastIndexOf(" ");
   return `${cut.slice(0, lastSpace > 0 ? lastSpace : length).trimEnd()}…`;
 }
+
+// Group the author's headings without rewriting the saved article.
+export function announcementArticleContent(value, summary = "") {
+  const blocks = announcementBlocks(value);
+  let lead = String(summary || "").trim();
+  const sameText = text => text.replace(/\s+/gu, " ").trim();
+  if (blocks[0]?.type === "paragraph") {
+    if (!lead) lead = blocks.shift().text;
+    else if (sameText(blocks[0].text) === sameText(lead)) blocks.shift();
+  }
+  const preamble = [], sections = [];
+  for (const block of blocks) {
+    if (block.type === "heading") sections.push({ title: block.text, blocks: [] });
+    else if (sections.length) sections.at(-1).blocks.push(block);
+    else preamble.push(block);
+  }
+  return { lead, preamble, sections };
+}

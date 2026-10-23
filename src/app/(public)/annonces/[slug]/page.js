@@ -2,10 +2,11 @@ import Link from "next/link";
 import Image from "@/components/PublicImage";
 import { notFound } from "next/navigation";
 import { getAnnonceBySlug, getAnnonces } from "@/lib/db";
-import { announcementDate, announcementSummary, announcementType, announcementBlocks, announcementActionUrl } from "@/lib/announcements.mjs";
+import { announcementDate, announcementSummary, announcementType, announcementActionUrl } from "@/lib/announcements.mjs";
 import ProjectPageEntry from "@/components/ProjectPageEntry";
 import AnnouncementCard from "@/components/AnnouncementCard";
 import AnnouncementGallery from "@/components/AnnouncementGallery";
+import AnnouncementArticle from "@/components/AnnouncementArticle";
 import "@/components/announcements.css";
 export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }) {
@@ -34,13 +35,8 @@ export default async function AnnonceDetailPage({ params }) {
         <div className="announcement-hero-meta"><span>{announcementType(annonce.categorie).label}</span><time dateTime={annonce.date}>{announcementDate(annonce.date)}</time></div>
       </div></div>
     </section>
-    <section className="eg-container eg-section announcement-detail-body" aria-labelledby="announcement-presentation-title">
-      <div className="announcement-article-layout"><div className="announcement-main-content">
-        <h2 id="announcement-presentation-title" className="announcement-presentation-heading">À propos de l’annonce</h2>
-        {annonce.resume && <p className="announcement-detail-intro">{annonce.resume}</p>}
-        <div className="eg-news-detail-text">{announcementBlocks(annonce.texte).map((block,i) => block.type === "heading" ? <h2 key={i}>{block.text}</h2> : block.type === "list" ? <ul key={i}>{block.items.map((text,j) => <li key={j}>{text}</li>)}</ul> : <p key={i}>{block.text}</p>)}</div>
-      </div>
-      {(annonce.lieu || annonce.echeance || (action && annonce.action_label)) && <aside className="announcement-practical" aria-labelledby="announcement-practical-title"><h2 id="announcement-practical-title">Informations utiles</h2>{annonce.lieu && <div><span>Lieu</span><p>{annonce.lieu}</p></div>}{annonce.echeance && <div><span>Date limite</span><p><time dateTime={annonce.echeance}>{announcementDate(annonce.echeance)}</time></p></div>}{expired ? <p className="announcement-expired">La date limite est dépassée.</p> : action && annonce.action_label && <a href={action} className="eg-button eg-button--primary" rel="noopener noreferrer">{annonce.action_label}</a>}</aside>}</div>
+    <section className="eg-container eg-section announcement-detail-body" aria-label="Contenu de l’annonce">
+      <AnnouncementArticle annonce={annonce} action={action} expired={expired}/>
       {annonce.galerie?.length > 0 && <AnnouncementGallery photos={annonce.galerie} title={annonce.titre} />}
       <div className="announcement-detail-return"><Link href="/annonces" className="eg-button eg-button--secondary">Revenir aux annonces</Link></div>
     </section>
