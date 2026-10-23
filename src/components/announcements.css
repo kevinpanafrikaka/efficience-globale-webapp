@@ -27,3 +27,20 @@
 .public-site .announcement-expired { color: #657260; padding-top: 14px; border-top: 1px solid #dce4d7; }
 @media (min-width: 960px) { .public-site .announcement-article-layout:has(.announcement-practical) { grid-template-columns: minmax(0,1fr) 300px; gap: 48px; } }
 @media (max-width: 639px) { .announcement-filters { margin-bottom: 18px; } .announcement-filters > button { font-size: 12px; } }
+
+/* Announcement articles share the project detail page's hero and reading rhythm. */
+.public-site .announcement-hero-pattern { position: absolute; inset: 0; display: flex; align-items: center; justify-content: flex-end; overflow: hidden; padding-right: 7vw; background: radial-gradient(ellipse at 90% 10%,#537449 0%,#243b2d 45%,#16211a 85%); }
+.public-site .announcement-hero-pattern > span { font-family: var(--font-head),Georgia,serif; font-size: clamp(140px,25vw,340px); color: #c6dea51c; line-height: 1; }
+.public-site .announcement-hero-meta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 18px; font-size: 13.5px; line-height: 1.6; color: #ffffffe0; }
+.public-site .announcement-hero-meta > time { border-left: 1px solid #ffffff50; padding-left: 18px; }
+.public-site .announcement-detail-body .announcement-article-layout { margin-top: 0; }
+.public-site .announcement-main-content { min-width: 0; }
+.public-site .announcement-presentation-heading { font-size: clamp(28px,3vw,38px); margin-bottom: 22px; line-height: 1.2; }
+.public-site .announcement-detail-intro { margin-bottom: 28px; max-width: 850px; font-size: 18px; line-height: 1.8; color: #4f6349; }
+.public-site .announcement-detail-body .eg-news-detail-text { max-width: 850px; }
+.public-site .announcement-detail-body .eg-news-detail-text > :first-child { margin-top: 0; }
+.public-site .announcement-detail-return { margin-top: 40px; padding-top: 28px; border-top: 1px solid var(--line); }
+.public-site .announcement-detail-return .eg-button { width: 100%; }
+.public-site .announcement-related { padding-block: 64px; background: #f5f7f2; }
+.public-site .announcement-related h2 { font-size: clamp(26px,3vw,34px); margin-bottom: 30px; line-height: 1.25; }
+@media (min-width: 640px) { .public-site .announcement-related { padding-block: 80px; } }

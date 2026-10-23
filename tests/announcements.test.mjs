@@ -44,3 +44,18 @@ test("Public announcement articles render safe headings and lists and close expi
  const closed=renderToStaticMarkup(await Page({params:Promise.resolve({slug:id})}));assert.match(closed,/date limite est dépassée/);assert.doesNotMatch(closed,/href="https:\/\/example.org\/postuler"/);
  }finally{r.close();}
 });
+
+test("Announcement details recommend published records of the same type without exposing drafts",async()=>{
+ const r=await adminRuntime();try{
+ const db=await r.module("src/lib/db.js");
+ const main=await db.createAnnonce({titre:"Annonce principale",texte:"Contenu principal",date:"2026-10-23",statut:"publie",categorie:"mission"});
+ const related=await db.createAnnonce({titre:"Mission associée",texte:"Autre mission",date:"2026-10-22",statut:"publie",categorie:"mission"});
+ const other=await db.createAnnonce({titre:"Formation distincte",texte:"Formation",date:"2026-10-23",statut:"publie",categorie:"formation"});
+ const draft=await db.createAnnonce({titre:"Mission confidentielle",texte:"Privé",date:"2026-10-23",statut:"brouillon",categorie:"mission"});
+ const {default:Page}=await r.module("src/app/(public)/annonces/[slug]/page.js");
+ const html=renderToStaticMarkup(await Page({params:Promise.resolve({slug:main})}));
+ assert.match(html,new RegExp(`href="/annonces/${related}"`));
+ assert.ok(!html.includes(`href="/annonces/${other}"`));assert.ok(!html.includes(`href="/annonces/${draft}"`));assert.doesNotMatch(html,/Mission confidentielle|[↗→←]/);
+ assert.equal((html.match(/<h1\b/g)||[]).length,1);
+ }finally{r.close();}
+});
