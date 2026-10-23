@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import vm from "node:vm";
+import { webcrypto } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import * as jsx from "react/jsx-runtime";
@@ -13,7 +14,7 @@ async function harness(path, props = {}, { fail = false, network = false, respon
   let pendingEffects = [];
   let cursor = 0;
   const context = vm.createContext({
-    URL, FormData, File,
+    URL, FormData, File, crypto: webcrypto,
     fetch: async (url, options) => { requests.push({ url, options }); if (respond) return respond(url, options); if (network) throw Error("offline"); return Response.json(fail ? { error: "Échec de test" } : { success: true }, { status: fail ? 401 : 200 }); },
     window: {
       confirm: () => true, innerHeight: 700,
@@ -503,4 +504,21 @@ test("Public photo viewer cycles and closes with Escape while restoring focus",a
  find(tree,n=>n.type==="button"&&n.props.children==="Suivante").props.onClick();
  tree=h.render();assert.equal(find(tree,n=>n.type?.name==="PublicImage"&&n.props.className==="announcement-viewer-image").props.src,"/b.jpg");
  find(tree,n=>n.type==="dialog").props.onCancel({preventDefault(){}});h.render();assert.equal(modal.open,false);assert.equal(focused,true);
+});
+
+test("Application form requires a CV, prevents double submissions and sends PDFs with a stable retry identifier",async()=>{
+ let finish;const pending=new Promise(resolve=>{finish=resolve;});
+ const h=await harness("src/components/ApplicationForm.jsx",{slug:"stage"},{respond:()=>pending});
+ await h.render().props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,0);assert.ok(find(h.render(),n=>n.props?.role==="alert"));
+ const file=new File(["%PDF-1.4\n%%EOF"],"cv.pdf",{type:"application/pdf"});
+ find(h.render(),n=>n.type?.name==="DocumentField"&&n.props.kind==="cv").props.onChange(file);
+ const tree=h.render(),first=tree.props.onSubmit({preventDefault(){}});await tree.props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,1);assert.equal(h.requests[0].url,"/api/candidatures/stage");assert.equal(h.requests[0].options.body.get("cv").name,"cv.pdf");assert.match(h.requests[0].options.body.get("request_id"),/^[a-f0-9-]{36}$/);
+ finish(Response.json({success:true}));await first;assert.ok(find(h.render(),n=>n.props?.role==="status"));
+});
+
+test("Application form retains selected documents and the request identifier after a failed send",async()=>{
+ const h=await harness("src/components/ApplicationForm.jsx",{slug:"offre"},{respond:async()=>Response.json({error:"Réessayez"},{status:503})});
+ const file=new File(["%PDF-1.4\n%%EOF"],"cv.pdf",{type:"application/pdf"});find(h.render(),n=>n.type?.name==="DocumentField"&&n.props.kind==="cv").props.onChange(file);
+ await h.render().props.onSubmit({preventDefault(){}});assert.ok(find(h.render(),n=>n.props?.role==="alert"));assert.equal(find(h.render(),n=>n.type?.name==="DocumentField"&&n.props.kind==="cv").props.file.name,"cv.pdf");
+ await h.render().props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,2);assert.equal(h.requests[0].options.body.get("request_id"),h.requests[1].options.body.get("request_id"));
 });

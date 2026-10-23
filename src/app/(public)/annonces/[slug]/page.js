@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "@/components/PublicImage";
 import { notFound } from "next/navigation";
 import { getAnnonceBySlug, getAnnonces } from "@/lib/db";
-import { announcementDate, announcementSummary, announcementType, announcementActionUrl } from "@/lib/announcements.mjs";
+import { announcementDate, announcementSummary, announcementType, announcementActionUrl, announcementApplicationPath } from "@/lib/announcements.mjs";
 import ProjectPageEntry from "@/components/ProjectPageEntry";
 import AnnouncementCard from "@/components/AnnouncementCard";
 import AnnouncementGallery from "@/components/AnnouncementGallery";
@@ -18,7 +18,9 @@ export default async function AnnonceDetailPage({ params }) {
   const { slug } = await params;
   const annonce = await getAnnonceBySlug(slug);
   if (!annonce) notFound();
-  const action = announcementActionUrl(annonce.action_url);
+  const applicationPath = announcementApplicationPath(annonce);
+  const action = applicationPath || announcementActionUrl(annonce.action_url);
+  const displayAnnonce = applicationPath ? { ...annonce, action_label: "Envoyer ma candidature" } : annonce;
   const expired = annonce.echeance && annonce.echeance < new Date().toISOString().slice(0,10);
   const others = (await getAnnonces()).filter(a => a.slug !== slug);
   const sameType = others.filter(a => a.categorie === annonce.categorie);
@@ -36,7 +38,7 @@ export default async function AnnonceDetailPage({ params }) {
       </div></div>
     </section>
     <section className="eg-container eg-section announcement-detail-body" aria-label="Contenu de l’annonce">
-      <AnnouncementArticle annonce={annonce} action={action} expired={expired}/>
+      <AnnouncementArticle annonce={displayAnnonce} action={action} expired={expired}/>
       {annonce.galerie?.length > 0 && <AnnouncementGallery photos={annonce.galerie} title={annonce.titre} />}
       <div className="announcement-detail-return"><Link href="/annonces" className="eg-button eg-button--secondary">Revenir aux annonces</Link></div>
     </section>

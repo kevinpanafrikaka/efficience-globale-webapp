@@ -51,3 +51,16 @@ export function announcementArticleContent(value, summary = "") {
   }
   return { lead, preamble, sections };
 }
+
+// A cabinet contact link on a recruitment offer becomes the dedicated application form.
+// Explicit links to external recruitment tools keep their original destination.
+export function announcementApplicationPath(annonce) {
+  if (annonce.categorie !== "recrutement") return "";
+  const path=`/annonces/${encodeURIComponent(annonce.slug)}/postuler`;
+  if (!annonce.action_url?.trim()) return path;
+  try {
+    const url=new URL(annonce.action_url);
+    const local=["portfolio.efficienceglobale.workers.dev","efficienceglobale.com","www.efficienceglobale.com"].includes(url.hostname);
+    return local && ["/contact",path].includes(url.pathname.replace(/\/$/,"")) ? path : "";
+  } catch { return ""; }
+}

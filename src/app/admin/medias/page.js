@@ -20,7 +20,7 @@ export default async function AdminMediasPage() {
   let cursor;
   do {
     const page = await env.UPLOADS.list({ cursor, limit: 500 });
-    objects.push(...page.objects);
+    objects.push(...page.objects.filter(object => !object.key.startsWith("private-applications/")));
     cursor = page.truncated ? page.cursor : undefined;
   } while (cursor);
   objects.sort((a, b) => new Date(b.uploaded) - new Date(a.uploaded));

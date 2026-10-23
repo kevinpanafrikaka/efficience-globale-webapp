@@ -11,7 +11,7 @@ const require = createRequire(import.meta.url);
 const { transformSync } = require("next/dist/build/swc");
 const root = resolve(dirname(new URL(import.meta.url).pathname), "../..");
 
-export async function adminRuntime({ authenticated = true } = {}) {
+export async function adminRuntime({ authenticated = true, fetcher = async () => { throw new Error("Unexpected network in test"); } } = {}) {
   const sqlite = new DatabaseSync(":memory:");
   sqlite.exec(await readFile(resolve(root, "schema.sql"), "utf8"));
   const files = new Map();
@@ -32,7 +32,8 @@ export async function adminRuntime({ authenticated = true } = {}) {
   };
   const env = { DB, ADMIN_PASSWORD: "test-password-only", UPLOADS: {
     async put(key, value) { files.set(key, value); },
-    async delete(key) { files.delete(key); },
+    async delete(key) { for (const item of Array.isArray(key) ? key : [key]) files.delete(item); },
+    async get(key) { const value=files.get(key); if(value===undefined)return null;const bytes=Buffer.from(value);return {size:bytes.byteLength,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),body:bytes,httpMetadata:{contentType:"application/octet-stream"},httpEtag:"test"}; },
     async list() { return { objects: [...files.keys()].map(key => ({ key, size: 100, uploaded: new Date() })), truncated: false }; },
   } };
   const router = { push() {}, refresh() {} };
@@ -44,7 +45,7 @@ export async function adminRuntime({ authenticated = true } = {}) {
     "next/image": { default: ({ fill, priority, ...props }) => react.createElement("img", props) },
     "next/navigation": { notFound() { throw new Error("NOT_FOUND"); }, useRouter: () => router, usePathname: () => "/admin" },
   };
-  const context = vm.createContext({ Response, Request, Headers, FormData, File, URL, URLSearchParams, AbortSignal, TextEncoder, TextDecoder, Buffer, Date, Intl, crypto: webcrypto, console });
+  const context = vm.createContext({ Response, Request, Headers, FormData, File, URL, URLSearchParams, AbortSignal, TextEncoder, TextDecoder, Buffer, Date, Intl, crypto: webcrypto, fetch: fetcher, console });
   const cache = new Map();
   const linking = new Map();
   async function load(specifier, parent = root + "/index.js") {

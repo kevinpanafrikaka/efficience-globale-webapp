@@ -1,3 +1,4 @@
+import { emailAttachments } from "./email-attachments.mjs";
 // Server-side only: never import this module from a client component.
 export const GMAIL_OWNER = "kevinkandet05@gmail.com";
 export const GMAIL_RECIPIENT = "oumar.camara@efficienceglobale.com";
@@ -70,7 +71,7 @@ export async function isGmailConnected(env) {
   return configured(env) && Boolean(await connection(env));
 }
 
-export function buildMime({ nom, email, sujet, message }) {
+export function buildMime({ nom, email, sujet, message, attachments = [] }) {
   // All user content in headers is encoded or strictly validated against CR/LF.
   if (!/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email)) throw new Error("Invalid reply address");
   const subject = sujet ? `Nouveau message : ${sujet}` : "Nouveau message depuis le site";
@@ -81,11 +82,19 @@ export function buildMime({ nom, email, sujet, message }) {
   }
   const encodedSubject = chunks.map(part => `=?UTF-8?B?${Buffer.from(part, "utf8").toString("base64")}?=`).join("\r\n ");
   const body = Buffer.from(`De : ${nom} (${email})\n\n${message}`, "utf8").toString("base64").match(/.{1,76}/g).join("\r\n");
-  return [
+  const files = emailAttachments(attachments);
+  const headers = [
     `From: Site Efficience Globale <${GMAIL_OWNER}>`,
     `To: ${GMAIL_RECIPIENT}`, `Reply-To: ${email}`,
-    `Subject: ${encodedSubject}`, "MIME-Version: 1.0", "Content-Type: text/plain; charset=UTF-8",
-    "Content-Transfer-Encoding: base64", "", body,
+    `Subject: ${encodedSubject}`, "MIME-Version: 1.0",
+  ];
+  if (!files.length) return [...headers, "Content-Type: text/plain; charset=UTF-8", "Content-Transfer-Encoding: base64", "", body].join("\r\n");
+  const boundary = `eg_${crypto.randomUUID()}`;
+  return [...headers, `Content-Type: multipart/mixed; boundary="${boundary}"`, "",
+    `--${boundary}`, "Content-Type: text/plain; charset=UTF-8", "Content-Transfer-Encoding: base64", "", body,
+    ...files.flatMap(file => [`--${boundary}`, `Content-Type: application/pdf; name="${file.name}"`,
+      `Content-Disposition: attachment; filename="${file.name}"`, "Content-Transfer-Encoding: base64", "", file.content.match(/.{1,76}/g).join("\r\n")]),
+    `--${boundary}--`, "",
   ].join("\r\n");
 }
 
@@ -101,5 +110,6 @@ export async function sendGmail(env, message) {
   if (!response.ok) throw new Error("Gmail delivery failed");
   const result = await response.json();
   if (!result.id) throw new Error("Gmail delivery not confirmed");
+  return result.id;
 }
 

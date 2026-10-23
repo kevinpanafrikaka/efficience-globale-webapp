@@ -1,3 +1,4 @@
+import { emailAttachments } from "./email-attachments.mjs";
 const EMAIL_RE = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
 const RECIPIENT = "oumar.camara@efficienceglobale.com";
 
@@ -6,10 +7,11 @@ export function isBrevoConfigured(env) {
   return Boolean(env.BREVO_API_KEY?.trim() && EMAIL_RE.test(env.BREVO_SENDER_EMAIL?.trim() || ""));
 }
 
-export async function sendBrevo(env, { nom, email, sujet, message }) {
+export async function sendBrevo(env, { nom, email, sujet, message, attachments = [] }) {
   if (!isBrevoConfigured(env)) throw new Error("Brevo configuration incomplete");
   if (!EMAIL_RE.test(email)) throw new Error("Invalid reply address");
 
+  const files = emailAttachments(attachments);
   const response = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
     headers: {
@@ -24,7 +26,8 @@ export async function sendBrevo(env, { nom, email, sujet, message }) {
       replyTo: { email, name: nom },
       subject: sujet ? `Nouveau message : ${sujet}` : "Nouveau message depuis le site",
       textContent: `De : ${nom} (${email})\n\n${message}`,
-      tags: ["formulaire-contact"],
+      tags: [attachments.length ? "candidature" : "formulaire-contact"],
+      ...(files.length ? { attachment: files } : {}),
     }),
   });
 

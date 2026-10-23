@@ -9,7 +9,7 @@ import DashboardCreateMenu from "./DashboardCreateMenu";
 const NAV = [
   ["/admin", "Tableau de bord", "◫"], ["/admin/projets", "Projets", "▤"],
   ["/admin/membres", "Équipe", "♧"], ["/admin/annonces", "Annonces", "◷"],
-  ["/admin/partenaires", "Partenaires", "◇"], ["/admin/messages", "Messages", "✉"],
+  ["/admin/candidatures", "Candidatures", "▤"], ["/admin/partenaires", "Partenaires", "◇"], ["/admin/messages", "Messages", "✉"],
   ["/admin/medias", "Médiathèque", "▧"], ["/admin/reglages", "Réglages", "⚙"],
 ];
 
