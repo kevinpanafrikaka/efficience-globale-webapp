@@ -20,13 +20,13 @@ export default function AnnouncementGalleryUpload({photos,onChange,onAdd,onUploa
     try{const body=new FormData();body.append("file",file);const res=await fetch("/api/admin/upload",{method:"POST",body});const data=await res.json();if(!res.ok||typeof data.url!=="string"||!data.url){failures.push(`${file.name} : échec de l’envoi, réessayez.`);continue;}onAdd([{url:data.url,legende:""}]);}
     catch{failures.push(`${file.name} : connexion interrompue, réessayez.`);}
    }
-   setErrors(failures);setProgress(failures.length?"Envoi terminé. Certaines photos n’ont pas été ajoutées.":"Les photos ont été ajoutées. Enregistrez l’annonce pour les conserver.");
+   setErrors(failures);setProgress(failures.length?"Envoi terminé. Certaines photos n’ont pas été ajoutées.":"Photos ajoutées.");
   }finally{busy.current=false;setUploading(false);onUploadingChange?.(false);}
  }
  function move(index,offset){const target=index+offset;if(target<0||target>=photos.length||disabled||uploading)return;const next=[...photos];[next[index],next[target]]=[next[target],next[index]];onChange(next);}
  return <div className="announcement-gallery-editor" aria-busy={uploading}>
   <div className="gallery-editor-toolbar"><input type="file" ref={input} multiple accept="image/jpeg,image/png,image/webp,image/gif" className="admin-upload-input" aria-label="Choisir plusieurs photos pour la galerie" disabled={disabled||uploading||photos.length>=MAX_PHOTOS} onChange={choose}/><button type="button" className="eg-button eg-button--secondary" disabled={disabled||uploading||photos.length>=MAX_PHOTOS} onClick={()=>input.current?.click()}>{uploading?"Envoi des photos…":"+ Ajouter des photos"}</button><span>{photos.length} photo{photos.length>1?"s":""}</span></div>
-  <p className="editor-help">Sélectionnez plusieurs fichiers à la fois. JPG, PNG, WebP ou GIF · 8 Mo par photo · 50 photos maximum.</p>
+  <p className="editor-help">JPG, PNG, WebP ou GIF · 8 Mo par photo · 50 photos maximum.</p>
   {progress&&<p className="gallery-upload-progress" role="status">{progress}</p>}
   {errors.length>0&&<ul className="gallery-upload-errors" role="alert">{errors.map((error,i)=><li key={i}>{error}</li>)}</ul>}
   {photos.length>0&&<div className="gallery-editor-grid">{photos.map((photo,index)=><div className="gallery-editor-photo" key={photo.url}>

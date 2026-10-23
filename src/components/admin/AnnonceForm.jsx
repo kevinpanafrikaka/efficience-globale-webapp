@@ -11,7 +11,7 @@ import "./project-editor.css";
 import "./admin-projects.css";
 import "./admin-announcements.css";
 import "./announcement-editor.css";
-function Field({id,label,hint,children}){return <div className="editor-field"><label htmlFor={id}>{label}</label>{children}{hint&&<p className="editor-help">{hint}</p>}</div>;}
+function Field({id,label,children}){return <div className="editor-field"><label htmlFor={id}>{label}</label>{children}</div>;}
 function validDate(value){return /^\d{4}-\d{2}-\d{2}$/.test(value)&&!Number.isNaN(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value;}
 export default function AnnonceForm({annonce}){
   const router=useRouter(),isEdit=!!annonce;
@@ -30,21 +30,47 @@ export default function AnnonceForm({annonce}){
     saving.current=true;setLoading(true);
     try{const res=await fetch(isEdit?`/api/admin/annonces/${annonce.id}`:"/api/admin/annonces",{method:isEdit?"PUT":"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(form)});const data=await res.json();if(!res.ok){setError(data.error||"Une erreur est survenue.");setLoading(false);return;}router.push("/admin/annonces");router.refresh();}catch{setError("Impossible d’enregistrer. Vérifiez votre connexion.");setLoading(false);}finally{saving.current=false;}
   }
-  const busy=loading||uploading,saveLabel=uploading?"Envoi de l’image…":loading?"Enregistrement…":isEdit?"Enregistrer les modifications":"Créer l’annonce";
+  const busy=loading||uploading,saveLabel=uploading?"Envoi des images…":loading?"Enregistrement…":isEdit?"Enregistrer les modifications":"Créer l’annonce";
   const practical=["recrutement","formation"].includes(form.categorie)||form.lieu||form.echeance||form.action_url||form.action_label;
   function Actions({mobile=false}){return <div className={mobile?"editor-mobile-actions":"editor-header-actions"}><a href="/admin/annonces" className="eg-button eg-button--secondary" aria-disabled={busy} onClick={e=>{if(busy)e.preventDefault();}}>Annuler</a><button type="submit" className="eg-button eg-button--primary" disabled={busy} aria-busy={busy}>{mobile&&isEdit&&!busy?"Enregistrer":saveLabel}</button></div>;}
-  return <form onSubmit={handleSubmit} className="project-editor announcement-editor"><header className="editor-header"><div><h1>{isEdit?"Modifier l’annonce":"Nouvelle annonce"}</h1><p>{isEdit?"Mettez à jour cette actualité du cabinet.":"Partagez une actualité, une opportunité ou un rendez-vous."}</p></div><Actions/></header>
-  {error&&<div className="editor-error" role="alert" ref={errorRef} tabIndex={-1}>{error}</div>}
-  <div className="editor-layout"><div className="editor-main-column"><section className="editor-panel"><h2>Contenu de l’annonce</h2>
-    <Field id="annonceform-1" label="Titre"><input id="annonceform-1" value={form.titre} onChange={e=>update("titre",e.target.value)} required maxLength={300} disabled={loading} placeholder="Le titre de votre annonce"/></Field>
-    <Field id="announcement-category" label="Type d’annonce"><EditorSelect id="announcement-category" value={form.categorie} options={ANNOUNCEMENT_TYPES} onChange={v=>update("categorie",v)} disabled={loading}/></Field>
-    <Field id="announcement-summary" label="Résumé" hint="Facultatif. Une introduction courte pour la carte et la page de l’annonce."><textarea id="announcement-summary" value={form.resume} onChange={e=>update("resume",e.target.value)} maxLength={500} disabled={loading} rows={2} placeholder="L’essentiel en quelques phrases…"/></Field>
-    <div className="editor-field announcement-writing"><label htmlFor="annonceform-2">Texte de l’annonce</label><div className="announcement-format-tools" role="group" aria-label="Structurer le texte"><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={loading} onClick={()=>format("heading")}>Sous-titre</button><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={loading} onClick={()=>format("list")}>Liste</button></div><textarea id="annonceform-2" ref={textRef} value={form.texte} onChange={e=>update("texte",e.target.value)} rows={8} required maxLength={20000} disabled={loading} placeholder="Rédigez votre annonce…"/><p className="editor-help">Séparez les paragraphes par une ligne vide. Utilisez Sous-titre et Liste pour organiser le contenu.</p></div>
-  </section></div>
-  <div className="editor-side-column"><section className="editor-panel announcement-image"><h2>Couverture et aperçu</h2><div className="admin-projects admin-announcements announcement-preview"><AdminAnnouncementCard annonce={form} preview/></div><ImageUpload value={form.image_url} onChange={url=>update("image_url",url)} onUploadingChange={setCoverUploading} allowRemove showPreview={false} disabled={loading||uploading}/><p className="editor-help">Sans image, une composition aux couleurs du cabinet prend le relais.</p></section>
-  <section className="editor-panel"><h2>Publication</h2><EditorDate id="announcement-date" label="Date de l’annonce" value={form.date} onChange={v=>update("date",v)} disabled={loading}/><Field id="annonceform-4" label="Statut"><EditorSelect id="annonceform-4" value={form.statut} options={[{value:"brouillon",label:"Brouillon"},{value:"publie",label:"Publié"}]} onChange={v=>update("statut",v)} disabled={loading}/></Field><p className={`editor-status-help ${form.statut==="publie"?"is-published":""}`}>{form.statut==="publie"?"Visible sur le site public après enregistrement.":"Visible uniquement dans l’administration."}</p></section></div></div>
-  {practical&&<section className="editor-panel announcement-extra"><h2>Informations utiles</h2><p className="editor-help">Facultatif. Précisez les modalités de participation ou de candidature.</p><div className="editor-fields"><Field id="announcement-location" label="Lieu"><input id="announcement-location" value={form.lieu} onChange={e=>update("lieu",e.target.value)} disabled={loading} maxLength={300} placeholder="Ex. Conakry ou en ligne"/></Field><EditorDate id="announcement-deadline" label="Date limite" value={form.echeance} onChange={v=>update("echeance",v)} optional disabled={loading}/><Field id="announcement-action-label" label="Texte du bouton"><input id="announcement-action-label" value={form.action_label} onChange={e=>update("action_label",e.target.value)} disabled={loading} maxLength={100} placeholder={form.categorie==="recrutement"?"Envoyer ma candidature":"M’inscrire"}/></Field><Field id="announcement-action-url" label="Lien du bouton" hint="Lien du formulaire, d’un site ou adresse mail précédée de mailto:."><input id="announcement-action-url" value={form.action_url} onChange={e=>update("action_url",e.target.value)} disabled={loading} maxLength={2000} placeholder="https://… ou mailto:…"/></Field></div></section>}
-  <section className="editor-panel announcement-gallery-panel"><h2>Galerie de photos</h2><p className="editor-help">Ces photos apparaîtront dans la page de détail, dans l’ordre choisi ci-dessous. La couverture reste indépendante.</p><AnnouncementGalleryUpload photos={form.galerie} onChange={photos=>update("galerie",photos)} onAdd={photos=>setForm(f=>({...f,galerie:[...f.galerie,...photos].slice(0,50)}))} onUploadingChange={setGalleryUploading} disabled={loading||coverUploading}/></section>
-  <Actions mobile/>
+  return <form onSubmit={handleSubmit} className="project-editor announcement-editor">
+    <header className="editor-header"><h1>{isEdit?"Modifier l’annonce":"Nouvelle annonce"}</h1><Actions/></header>
+    {error&&<div className="editor-error" role="alert" ref={errorRef} tabIndex={-1}>{error}</div>}
+    <div className="announcement-editor-grid">
+      <section className="editor-panel announcement-content" aria-labelledby="announcement-content-title">
+        <h2 id="announcement-content-title">Contenu de l’annonce</h2>
+        <Field id="annonceform-1" label="Titre"><input id="annonceform-1" value={form.titre} onChange={e=>update("titre",e.target.value)} required maxLength={300} disabled={loading} placeholder="Le titre de votre annonce"/></Field>
+        <Field id="announcement-category" label="Type d’annonce"><EditorSelect id="announcement-category" value={form.categorie} options={ANNOUNCEMENT_TYPES} onChange={v=>update("categorie",v)} disabled={loading}/></Field>
+        <Field id="announcement-summary" label="Résumé (facultatif)"><textarea id="announcement-summary" value={form.resume} onChange={e=>update("resume",e.target.value)} maxLength={500} disabled={loading} rows={2} placeholder="L’essentiel en quelques phrases…"/></Field>
+        <div className="editor-field announcement-writing">
+          <div className="announcement-writing-toolbar"><label htmlFor="annonceform-2">Texte de l’annonce</label><div className="announcement-format-tools" role="group" aria-label="Structurer le texte"><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={loading} onClick={()=>format("heading")}>Sous-titre</button><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={loading} onClick={()=>format("list")}>Liste</button></div></div>
+          <textarea id="annonceform-2" ref={textRef} value={form.texte} onChange={e=>update("texte",e.target.value)} rows={12} required maxLength={20000} disabled={loading} placeholder="Rédigez votre annonce…"/>
+        </div>
+      </section>
+      <section className="editor-panel announcement-image" aria-labelledby="announcement-cover-title">
+        <h2 id="announcement-cover-title">Couverture et aperçu</h2>
+        <div className="admin-projects admin-announcements announcement-preview"><AdminAnnouncementCard annonce={form} preview/></div>
+        <ImageUpload value={form.image_url} onChange={url=>update("image_url",url)} onUploadingChange={setCoverUploading} allowRemove showPreview={false} disabled={loading||uploading}/>
+      </section>
+      <section className="editor-panel announcement-publication" aria-labelledby="announcement-publication-title">
+        <h2 id="announcement-publication-title">Publication</h2>
+        <EditorDate id="announcement-date" label="Date de l’annonce" value={form.date} onChange={v=>update("date",v)} disabled={loading}/>
+        <Field id="annonceform-4" label="Statut"><EditorSelect id="annonceform-4" value={form.statut} options={[{value:"brouillon",label:"Brouillon"},{value:"publie",label:"Publié"}]} onChange={v=>update("statut",v)} disabled={loading}/></Field>
+      </section>
+      {practical&&<section className="editor-panel announcement-extra" aria-labelledby="announcement-extra-title">
+        <h2 id="announcement-extra-title">Informations utiles</h2>
+        <div className="editor-fields">
+          <Field id="announcement-location" label="Lieu"><input id="announcement-location" value={form.lieu} onChange={e=>update("lieu",e.target.value)} disabled={loading} maxLength={300} placeholder="Conakry ou en ligne"/></Field>
+          <EditorDate id="announcement-deadline" label="Date limite" value={form.echeance} onChange={v=>update("echeance",v)} optional disabled={loading}/>
+          <Field id="announcement-action-label" label="Texte du bouton"><input id="announcement-action-label" value={form.action_label} onChange={e=>update("action_label",e.target.value)} disabled={loading} maxLength={100} placeholder={form.categorie==="recrutement"?"Envoyer ma candidature":"M’inscrire"}/></Field>
+          <Field id="announcement-action-url" label="Lien du bouton"><input id="announcement-action-url" value={form.action_url} onChange={e=>update("action_url",e.target.value)} disabled={loading} maxLength={2000} placeholder="https://… ou mailto:…"/></Field>
+        </div>
+      </section>}
+      <section className="editor-panel announcement-gallery-panel" aria-labelledby="announcement-gallery-panel-title">
+        <h2 id="announcement-gallery-panel-title">Galerie de photos</h2>
+        <AnnouncementGalleryUpload photos={form.galerie} onChange={photos=>update("galerie",photos)} onAdd={photos=>setForm(f=>({...f,galerie:[...f.galerie,...photos].slice(0,50)}))} onUploadingChange={setGalleryUploading} disabled={loading||coverUploading}/>
+      </section>
+    </div>
+    <Actions mobile/>
   </form>;
 }
