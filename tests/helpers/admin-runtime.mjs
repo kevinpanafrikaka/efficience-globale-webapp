@@ -46,6 +46,7 @@ export async function adminRuntime({ authenticated = true } = {}) {
   };
   const context = vm.createContext({ Response, Request, Headers, FormData, File, URL, URLSearchParams, AbortSignal, TextEncoder, TextDecoder, Buffer, Date, Intl, crypto: webcrypto, console });
   const cache = new Map();
+  const linking = new Map();
   async function load(specifier, parent = root + "/index.js") {
     if (externals[specifier]) {
       if (!cache.has(specifier)) {
@@ -66,8 +67,11 @@ export async function adminRuntime({ authenticated = true } = {}) {
         module = new vm.SourceTextModule(code, { context, identifier: path });
       }
       cache.set(path, module);
-      await module.link(name => load(name, path));
+      const linked = module.link(name => load(name, path));
+      linking.set(path, linked);
+      await linked;
     }
+    await linking.get(path);
     return cache.get(path);
   }
   return {

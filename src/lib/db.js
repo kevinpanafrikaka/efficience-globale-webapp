@@ -212,6 +212,24 @@ export async function deleteMembre(id) {
   await db.prepare("DELETE FROM membres WHERE id = ?").bind(id).run();
 }
 
+async function ensureAnnouncementPhotos(db) {
+  await db.prepare(`CREATE TABLE IF NOT EXISTS annonce_photos (
+    annonce_id TEXT NOT NULL REFERENCES annonces(id) ON DELETE CASCADE,
+    position INTEGER NOT NULL, url TEXT NOT NULL, legende TEXT NOT NULL DEFAULT '',
+    PRIMARY KEY (annonce_id, position)
+  )`).run();
+}
+function galleryStatements(db, id, photos) {
+  if (photos === undefined) return [];
+  return [db.prepare("DELETE FROM annonce_photos WHERE annonce_id = ?").bind(id),
+    ...photos.map((photo,i) => db.prepare("INSERT INTO annonce_photos(annonce_id,position,url,legende) VALUES(?,?,?,?)").bind(id,i,photo.url,photo.legende || ""))];
+}
+async function withAnnouncementGallery(db, row) {
+  if (!row) return null;
+  const { results } = await db.prepare("SELECT url,legende FROM annonce_photos WHERE annonce_id = ? ORDER BY position ASC").bind(row.id).all();
+  return { ...row, galerie: results };
+}
+
 // Idempotent bootstrap keeps existing D1 databases compatible with this deployment.
 async function announcementDB() {
   const db = await getDB();
@@ -221,6 +239,7 @@ async function announcementDB() {
     lieu TEXT NOT NULL DEFAULT '', echeance TEXT NOT NULL DEFAULT '',
     action_url TEXT NOT NULL DEFAULT '', action_label TEXT NOT NULL DEFAULT ''
   )`).run();
+  await ensureAnnouncementPhotos(db);
   return db;
 }
 const ANNOUNCEMENT_SELECT = `SELECT a.*, COALESCE(d.categorie, 'vie') AS categorie,
@@ -242,7 +261,7 @@ export async function getAnnonces() {
 }
 export async function getAnnonceBySlug(slug) {
   const db = await announcementDB();
-  return db.prepare(`${ANNOUNCEMENT_SELECT} WHERE a.slug = ? AND a.statut = 'publie'`).bind(slug).first();
+  return withAnnouncementGallery(db, await db.prepare(`${ANNOUNCEMENT_SELECT} WHERE a.slug = ? AND a.statut = 'publie'`).bind(slug).first());
 }
 export async function getAllAnnonces() {
   const db = await announcementDB();
@@ -251,7 +270,7 @@ export async function getAllAnnonces() {
 }
 export async function getAnnonceById(id) {
   const db = await announcementDB();
-  return db.prepare(`${ANNOUNCEMENT_SELECT} WHERE a.id = ?`).bind(id).first();
+  return withAnnouncementGallery(db, await db.prepare(`${ANNOUNCEMENT_SELECT} WHERE a.id = ?`).bind(id).first());
 }
 export async function createAnnonce(data) {
   const db = await announcementDB();
@@ -260,6 +279,7 @@ export async function createAnnonce(data) {
     db.prepare(`INSERT INTO annonces (id,slug,titre,texte,image_url,date,statut) VALUES (?,?,?,?,?,?,?)`)
       .bind(id,id,data.titre,data.texte,data.image_url || null,data.date,data.statut || "brouillon"),
     announcementDetailsStatement(db,id,data),
+    ...galleryStatements(db,id,data.galerie),
   ]);
   return id;
 }
@@ -269,11 +289,12 @@ export async function updateAnnonce(id, data) {
     db.prepare(`UPDATE annonces SET titre=?,texte=?,image_url=?,date=?,statut=? WHERE id=?`)
       .bind(data.titre,data.texte,data.image_url || null,data.date,data.statut || "brouillon",id),
     announcementDetailsStatement(db,id,data),
+    ...galleryStatements(db,id,data.galerie),
   ]);
 }
 export async function deleteAnnonce(id) {
   const db = await announcementDB();
-  await db.batch([db.prepare("DELETE FROM annonce_details WHERE annonce_id = ?").bind(id),db.prepare("DELETE FROM annonces WHERE id = ?").bind(id)]);
+  await db.batch([db.prepare("DELETE FROM annonce_photos WHERE annonce_id = ?").bind(id),db.prepare("DELETE FROM annonce_details WHERE annonce_id = ?").bind(id),db.prepare("DELETE FROM annonces WHERE id = ?").bind(id)]);
 }
 
 // ===== Partenaires =====
@@ -510,10 +531,12 @@ export async function getDashboardStats() {
 // Ensemble des URLs d'images référencées en base (pour repérer les médias inutilisés).
 export async function getUsedMediaUrls({ strict = false } = {}) {
   const db = await getDB();
+  await ensureAnnouncementPhotos(db);
   const queries = [
     "SELECT photo_url AS u FROM projets",
     "SELECT photo_url AS u FROM membres",
     "SELECT image_url AS u FROM annonces",
+    "SELECT url AS u FROM annonce_photos",
     "SELECT logo_url AS u FROM partenaires",
   ];
   const used = new Set();

@@ -5,6 +5,7 @@ import { getAnnonceBySlug, getAnnonces } from "@/lib/db";
 import { announcementDate, announcementSummary, announcementType, announcementBlocks, announcementActionUrl } from "@/lib/announcements.mjs";
 import ProjectPageEntry from "@/components/ProjectPageEntry";
 import AnnouncementCard from "@/components/AnnouncementCard";
+import AnnouncementGallery from "@/components/AnnouncementGallery";
 import "@/components/announcements.css";
 export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }) {
@@ -40,6 +41,7 @@ export default async function AnnonceDetailPage({ params }) {
         <div className="eg-news-detail-text">{announcementBlocks(annonce.texte).map((block,i) => block.type === "heading" ? <h2 key={i}>{block.text}</h2> : block.type === "list" ? <ul key={i}>{block.items.map((text,j) => <li key={j}>{text}</li>)}</ul> : <p key={i}>{block.text}</p>)}</div>
       </div>
       {(annonce.lieu || annonce.echeance || (action && annonce.action_label)) && <aside className="announcement-practical" aria-labelledby="announcement-practical-title"><h2 id="announcement-practical-title">Informations utiles</h2>{annonce.lieu && <div><span>Lieu</span><p>{annonce.lieu}</p></div>}{annonce.echeance && <div><span>Date limite</span><p><time dateTime={annonce.echeance}>{announcementDate(annonce.echeance)}</time></p></div>}{expired ? <p className="announcement-expired">La date limite est dépassée.</p> : action && annonce.action_label && <a href={action} className="eg-button eg-button--primary" rel="noopener noreferrer">{annonce.action_label}</a>}</aside>}</div>
+      {annonce.galerie?.length > 0 && <AnnouncementGallery photos={annonce.galerie} title={annonce.titre} />}
       <div className="announcement-detail-return"><Link href="/annonces" className="eg-button eg-button--secondary">Revenir aux annonces</Link></div>
     </section>
     {related.length > 0 && <section className="announcement-related" aria-labelledby="announcement-related-title"><div className="eg-container"><h2 id="announcement-related-title">À lire également</h2><div className="eg-news-grid">{related.map(a => <AnnouncementCard key={a.id} annonce={a} />)}</div></div></section>}

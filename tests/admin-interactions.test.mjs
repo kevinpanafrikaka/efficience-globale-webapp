@@ -7,20 +7,20 @@ import * as jsx from "react/jsx-runtime";
 const require = createRequire(import.meta.url);
 const { transformSync } = require("next/dist/build/swc");
 
-async function harness(path, props = {}, { fail = false, network = false } = {}) {
+async function harness(path, props = {}, { fail = false, network = false, respond } = {}) {
   const state = [], requests = [], navigations = [];
   const listeners = new Map();
   let pendingEffects = [];
   let cursor = 0;
   const context = vm.createContext({
-    URL,
-    fetch: async (url, options) => { requests.push({ url, options }); if (network) throw Error("offline"); return Response.json(fail ? { error: "Échec de test" } : { success: true }, { status: fail ? 401 : 200 }); },
+    URL, FormData, File,
+    fetch: async (url, options) => { requests.push({ url, options }); if (respond) return respond(url, options); if (network) throw Error("offline"); return Response.json(fail ? { error: "Échec de test" } : { success: true }, { status: fail ? 401 : 200 }); },
     window: {
       confirm: () => true, innerHeight: 700,
       addEventListener(type, callback) { if (!listeners.has(type)) listeners.set(type, new Set()); listeners.get(type).add(callback); },
       removeEventListener(type, callback) { listeners.get(type)?.delete(callback); },
     },
-    document: {
+    document: { body: { style: { overflow: "" } },
       addEventListener(type, callback) { if (!listeners.has(type)) listeners.set(type, new Set()); listeners.get(type).add(callback); },
       removeEventListener(type, callback) { listeners.get(type)?.delete(callback); },
     },
@@ -48,6 +48,8 @@ async function harness(path, props = {}, { fail = false, network = false } = {})
     "./admin-announcements.css": {},
     "./announcement-editor.css": {},
     "./announcements.css": {},
+    "./announcement-gallery.css": {},
+    "@/components/PublicImage": { default: function PublicImage() {} },
     "@/components/AnnouncementCover": { default: function AnnouncementCover() {} },
     "./AnnouncementCover": { default: function AnnouncementCover() {} },
     "@/components/admin/AdminImage": { default: function AdminImage() {} },
@@ -58,7 +60,7 @@ async function harness(path, props = {}, { fail = false, network = false } = {})
   const cache = new Map();
   async function load(name) {
     if (imports[name]) return new vm.SyntheticModule(Object.keys(imports[name]), function () { for (const [k,v] of Object.entries(imports[name])) this.setExport(k,v); }, { context });
-    const file = name === "./EditorDate" ? "src/components/admin/EditorDate.jsx" : name === "./AdminAnnouncementCard" ? "src/components/admin/AdminAnnouncementCard.jsx" : name === "./AnnouncementOptions" ? "src/components/admin/AnnouncementOptions.jsx" : name === "./AnnouncementCard" ? "src/components/AnnouncementCard.jsx" : name === "@/lib/announcements.mjs" ? "src/lib/announcements.mjs" : name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./MemberCard" ? "src/components/admin/MemberCard.jsx" : name === "./MemberOptions" ? "src/components/admin/MemberOptions.jsx" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name === "@/lib/member-expertises.mjs" ? "src/lib/member-expertises.mjs" : name;
+    const file = name === "./AnnouncementGalleryUpload" ? "src/components/admin/AnnouncementGalleryUpload.jsx" : name === "./EditorDate" ? "src/components/admin/EditorDate.jsx" : name === "./AdminAnnouncementCard" ? "src/components/admin/AdminAnnouncementCard.jsx" : name === "./AnnouncementOptions" ? "src/components/admin/AnnouncementOptions.jsx" : name === "./AnnouncementCard" ? "src/components/AnnouncementCard.jsx" : name === "@/lib/announcements.mjs" ? "src/lib/announcements.mjs" : name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./MemberCard" ? "src/components/admin/MemberCard.jsx" : name === "./MemberOptions" ? "src/components/admin/MemberOptions.jsx" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name === "@/lib/member-expertises.mjs" ? "src/lib/member-expertises.mjs" : name;
     if (!cache.has(file)) {
       const source = await readFile(new URL("../" + file, import.meta.url), "utf8");
       const { code } = transformSync(source, { filename: file, jsc: { target: "es2022", parser: { syntax: "ecmascript", jsx: true }, transform: { react: { runtime: "automatic" } } }, module: { type: "es6" } });
@@ -468,4 +470,37 @@ test("Custom announcement date clamps month ends and a partial year cannot be su
  find(h.render(),n=>n.props?.id==="date-month").props.onChange("02");assert.equal(props.value,"2026-02-28");
  const form=await harness("src/components/admin/AnnonceForm.jsx",{annonce:{id:"a",titre:"Titre",texte:"Texte",date:"2026-10-21"}});
  find(form.render(),n=>n.type?.name==="EditorDate").props.onChange("202-10-21");await form.render().props.onSubmit({preventDefault(){}});assert.equal(form.requests.length,0);assert.ok(find(form.render(),n=>n.props?.role==="alert"));
+});
+
+test("Announcement gallery upload preserves successful photos when another file fails",async()=>{
+ const added=[],flags=[];
+ const h=await harness("src/components/admin/AnnouncementGalleryUpload.jsx",{photos:[],onAdd:photos=>added.push(...photos),onChange(){},onUploadingChange:flag=>flags.push(flag)},{respond:async()=>Response.json({url:"/uploads/success.jpg"})});
+ const input=find(h.render(),n=>n.type==="input"&&n.props.type==="file");
+ await input.props.onChange({target:{files:[new File(["image"],"photo.jpg",{type:"image/jpeg"}),new File(["bad"],"document.pdf",{type:"application/pdf"})],value:""}});
+ assert.equal(added.length,1);assert.equal(added[0].url,"/uploads/success.jpg");assert.deepEqual(flags,[true,false]);assert.equal(h.requests.length,1);
+ assert.ok(find(h.render(),n=>n.props?.role==="alert"));
+});
+
+test("Gallery ordering and removal are explicit and saving waits for photo uploads",async()=>{
+ const photos=[{url:"/a.jpg",legende:"A"},{url:"/b.jpg",legende:"B"}];let changed;
+ const h=await harness("src/components/admin/AnnouncementGalleryUpload.jsx",{photos,onChange:value=>changed=value,onAdd(){}});
+ find(h.render(),n=>n.props?.["aria-label"]==="Placer la photo 1 après la suivante").props.onClick();assert.equal(changed[0].url,"/b.jpg");
+ find(h.render(),n=>n.props?.["aria-label"]==="Retirer la photo 1 de la galerie").props.onClick();assert.equal(changed.length,1);assert.equal(changed[0].url,"/b.jpg");
+ const editor=await harness("src/components/admin/AnnonceForm.jsx",{annonce:{id:"test",titre:"Annonce",texte:"Contenu",date:"2026-10-23",image_url:"/cover.jpg",galerie:photos}});
+ let tree=editor.render();find(tree,n=>n.type?.name==="AnnouncementGalleryUpload").props.onUploadingChange(true);
+ tree=editor.render();await find(tree,n=>n.type==="form").props.onSubmit({preventDefault(){}});assert.equal(editor.requests.length,0);
+ find(tree,n=>n.type?.name==="AnnouncementGalleryUpload").props.onUploadingChange(false);
+ tree=editor.render();await find(tree,n=>n.type==="form").props.onSubmit({preventDefault(){}});
+ const payload=JSON.parse(editor.requests[0].options.body);assert.equal(payload.image_url,"/cover.jpg");assert.equal(payload.galerie.length,2);
+});
+
+test("Public photo viewer cycles and closes with Escape while restoring focus",async()=>{
+ const h=await harness("src/components/AnnouncementGallery.jsx",{title:"Atelier",photos:[{url:"/a.jpg",legende:"A"},{url:"/b.jpg",legende:"B"}]});
+ let tree=h.render(),focused=false;const modal={open:false,showModal(){this.open=true;},close(){this.open=false;}};
+ find(tree,n=>n.type==="dialog").props.ref.current=modal;
+ find(tree,n=>n.props?.["aria-label"]==="Agrandir la photo 1 : A").props.onClick({currentTarget:{focus(){focused=true;}}});
+ tree=h.render();assert.equal(modal.open,true);
+ find(tree,n=>n.type==="button"&&n.props.children==="Suivante").props.onClick();
+ tree=h.render();assert.equal(find(tree,n=>n.type?.name==="PublicImage"&&n.props.className==="announcement-viewer-image").props.src,"/b.jpg");
+ find(tree,n=>n.type==="dialog").props.onCancel({preventDefault(){}});h.render();assert.equal(modal.open,false);assert.equal(focused,true);
 });

@@ -46,6 +46,16 @@ export function validateAdminContent(kind, data) {
     result.date = text(data, "date", 10, true);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(result.date) || Number.isNaN(Date.parse(result.date)) || new Date(result.date).toISOString().slice(0, 10) !== result.date) throw new AdminInputError("Date de publication invalide.");
     result.image_url = image(data, "image_url");
+    if (data.galerie !== undefined) {
+      if (!Array.isArray(data.galerie) || data.galerie.length > 50) throw new AdminInputError("La galerie peut contenir jusqu’à 50 photos.");
+      const seen = new Set();
+      result.galerie = data.galerie.map(photo => {
+        if (!photo || typeof photo !== "object" || Array.isArray(photo)) throw new AdminInputError("Photo de galerie invalide.");
+        const url = image(photo, "url");
+        if (!url) throw new AdminInputError("L’adresse de chaque photo est requise.");
+        return { url, legende: text(photo, "legende", 300) };
+      }).filter(photo => { if (seen.has(photo.url)) return false; seen.add(photo.url); return true; });
+    }
     result.categorie = text(data, "categorie", 40) || "vie";
     if (!ANNOUNCEMENT_TYPES.some(type => type.value === result.categorie)) throw new AdminInputError("Type d’annonce invalide.");
     result.resume = text(data, "resume", 500);

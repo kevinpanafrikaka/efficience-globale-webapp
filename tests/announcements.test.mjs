@@ -59,3 +59,32 @@ test("Announcement details recommend published records of the same type without 
  assert.equal((html.match(/<h1\b/g)||[]).length,1);
  }finally{r.close();}
 });
+
+test("Gallery photos persist in order, protect media, preserve older edits and remain private until publication",async()=>{
+ const r=await adminRuntime();try{
+ r.sqlite.exec("DROP TABLE annonce_photos");
+ const route=await r.module("src/app/api/admin/annonces/route.js"),item=await r.module("src/app/api/admin/annonces/[id]/route.js"),db=await r.module("src/lib/db.js");
+ const photos=[{url:"/uploads/first.jpg",legende:"Atelier"},{url:"/uploads/second.jpg",legende:"Échanges"}];
+ const data={titre:"Galerie",texte:"Une rencontre",date:"2026-10-23",statut:"brouillon",image_url:"/uploads/cover.jpg",galerie:photos};
+ const response=await route.POST(req(data));assert.equal(response.status,200);const {id}=await response.json();
+ assert.equal(await db.getAnnonceBySlug(id),null);
+ assert.deepEqual(JSON.parse(JSON.stringify((await db.getAnnonceById(id)).galerie)),photos);
+ assert.ok((await db.getUsedMediaUrls()).has(photos[0].url));
+ const {galerie,...legacy}=data;
+ await item.PUT(req({...legacy,statut:"publie"}),{params:Promise.resolve({id})});
+ const published=await db.getAnnonceBySlug(id);assert.equal(published.galerie.length,2);assert.equal(published.image_url,data.image_url);
+ const {default:Page}=await r.module("src/app/(public)/annonces/[slug]/page.js");
+ const html=renderToStaticMarkup(await Page({params:Promise.resolve({slug:id})}));
+ assert.match(html,/En images/);assert.match(html,/Agrandir la photo 2/);assert.match(html,/Atelier/);
+ await item.PUT(req({...data,galerie:[photos[1]],statut:"publie"}),{params:Promise.resolve({id})});
+ assert.equal((await db.getAnnonceById(id)).galerie[0].url,photos[1].url);assert.ok(!(await db.getUsedMediaUrls()).has(photos[0].url));
+ await item.PUT(req({...data,galerie:[]}),{params:Promise.resolve({id})});assert.equal((await db.getAnnonceById(id)).galerie.length,0);
+ await item.DELETE(req({}),{params:Promise.resolve({id})});assert.equal(r.sqlite.prepare("SELECT count(*) n FROM annonce_photos").get().n,0);
+ }finally{r.close();}
+});
+
+test("Gallery validation rejects unsafe or oversized data and deduplicates photos without changing their order",()=>{
+ const base={titre:"Annonce",texte:"Contenu",date:"2026-10-23"};
+ for(const galerie of [null,{},[null],[{url:"javascript:alert(1)"}],[{url:""}],[{url:"/a.jpg",legende:"a".repeat(301)}],Array.from({length:51},()=>({url:"/a.jpg"}))])assert.throws(()=>validateAdminContent("annonces",{...base,galerie}));
+ const result=validateAdminContent("annonces",{...base,galerie:[{url:"/a.jpg",legende:"Première"},{url:"/b.jpg"},{url:"/a.jpg"}]});assert.equal(result.galerie.length,2);assert.equal(result.galerie[0].legende,"Première");
+});
