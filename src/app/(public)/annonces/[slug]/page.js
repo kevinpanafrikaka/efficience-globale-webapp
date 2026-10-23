@@ -21,7 +21,7 @@ export default async function AnnonceDetailPage({ params }) {
   const applicationPath = announcementApplicationPath(annonce);
   const action = applicationPath || announcementActionUrl(annonce.action_url);
   const displayAnnonce = applicationPath ? { ...annonce, action_label: "Envoyer ma candidature" } : annonce;
-  const expired = annonce.echeance && annonce.echeance < new Date().toISOString().slice(0,10);
+  const expired = ["recrutement","formation"].includes(annonce.categorie) && annonce.echeance && annonce.echeance < new Date().toISOString().slice(0,10);
   const others = (await getAnnonces()).filter(a => a.slug !== slug);
   const sameType = others.filter(a => a.categorie === annonce.categorie);
   const related = (sameType.length ? sameType : others).slice(0,3);

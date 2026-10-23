@@ -1,0 +1,6 @@
+"use client";
+import EditorSelect from "./EditorSelect";
+export default function EditorTime({id,label,value,onChange,disabled=false}){
+ const [hour,minute]=(value||"09:00").split(":");
+ return <fieldset className="announcement-time"><legend>{label}</legend>{!value?<button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={disabled} onClick={()=>onChange("09:00")}>Ajouter un horaire</button>:<><div className="announcement-time-fields"><div><label htmlFor={`${id}-hour`} className="sr-only">Heures · {label}</label><EditorSelect id={`${id}-hour`} value={hour} options={Array.from({length:24},(_,i)=>({value:String(i).padStart(2,"0"),label:`${String(i).padStart(2,"0")} h`}))} onChange={v=>onChange(`${v}:${minute}`)} disabled={disabled}/></div><div><label htmlFor={`${id}-minute`} className="sr-only">Minutes · {label}</label><EditorSelect id={`${id}-minute`} value={minute} options={Array.from({length:60},(_,i)=>({value:String(i).padStart(2,"0"),label:String(i).padStart(2,"0")}))} onChange={v=>onChange(`${hour}:${v}`)} disabled={disabled}/></div></div><button type="button" className="eg-button eg-button--quiet eg-button--compact" disabled={disabled} onClick={()=>onChange("")}>Retirer l’horaire</button></>}</fieldset>;
+}

@@ -63,3 +63,7 @@
  .public-site .announcement-article-section.is-wide .announcement-prose li { break-inside: avoid; }
  .public-site .announcement-article-section.is-closing { padding: 32px; }
 }
+.public-site .announcement-practical dd { white-space: pre-line; }
+.public-site .announcement-outcome { margin-top: 36px; padding: 24px; border-left: 3px solid #7cb342; border-radius: 0 14px 14px 0; background: #f4f7ef; }
+.public-site .announcement-outcome h2 { color: #263c2e; font-size: clamp(25px,2.5vw,32px); line-height: 1.25; margin-bottom: 18px; }
+.public-site .announcement-outcome p { color: #56654f; white-space: pre-line; font-size: 16px; line-height: 1.85; overflow-wrap: anywhere; }

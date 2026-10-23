@@ -5,7 +5,7 @@ export async function GET(request, { params }) {
   const { key } = await params;
   const objectKey = key.join("/");
 
-  if (objectKey.startsWith("private-applications/")) return new Response("Introuvable", { status: 404, headers: { "Cache-Control": "no-store" } });
+  if ((objectKey.startsWith("private-applications/") || objectKey.startsWith("publication-documents/"))) return new Response("Introuvable", { status: 404, headers: { "Cache-Control": "no-store" } });
   const object = await env.UPLOADS.get(objectKey);
   if (!object) {
     return new Response("Introuvable", { status: 404 });

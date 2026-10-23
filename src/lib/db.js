@@ -226,10 +226,14 @@ function galleryStatements(db, id, photos) {
   return [db.prepare("DELETE FROM annonce_photos WHERE annonce_id = ?").bind(id),
     ...photos.map((photo,i) => db.prepare("INSERT INTO annonce_photos(annonce_id,position,url,legende) VALUES(?,?,?,?)").bind(id,i,photo.url,photo.legende || ""))];
 }
-async function withAnnouncementGallery(db, row) {
+function announcementInformation(row,all=false){
+  const stored=row.informations?JSON.parse(row.informations):{};
+  return all?stored:{[announcementCategory(row.categorie)]:stored[announcementCategory(row.categorie)]||{}};
+}
+async function withAnnouncementGallery(db, row,allInfo=true) {
   if (!row) return null;
   const { results } = await db.prepare("SELECT url,legende FROM annonce_photos WHERE annonce_id = ? ORDER BY position ASC").bind(row.id).all();
-  return { ...row, categorie:announcementCategory(row.categorie), documents_candidature: applicationRequirements(row.documents_candidature), galerie: results };
+  return { ...row, categorie:announcementCategory(row.categorie), documents_candidature: applicationRequirements(row.documents_candidature), informations:announcementInformation(row,allInfo), galerie: results };
 }
 
 // Idempotent bootstrap keeps existing D1 databases compatible with this deployment.
@@ -242,14 +246,19 @@ async function announcementDB() {
     action_url TEXT NOT NULL DEFAULT '', action_label TEXT NOT NULL DEFAULT ''
   )`).run();
   await db.prepare(`CREATE TABLE IF NOT EXISTS annonce_dossiers (annonce_id TEXT PRIMARY KEY REFERENCES annonces(id) ON DELETE CASCADE, documents_json TEXT NOT NULL)`).run();
+  await db.prepare(`CREATE TABLE IF NOT EXISTS annonce_informations (annonce_id TEXT PRIMARY KEY REFERENCES annonces(id) ON DELETE CASCADE, donnees_json TEXT NOT NULL)`).run();
   await ensureAnnouncementPhotos(db);
   return db;
 }
 const ANNOUNCEMENT_SELECT = `SELECT a.*, COALESCE(d.categorie, 'actualite') AS categorie,
   COALESCE(d.resume, '') AS resume, COALESCE(d.lieu, '') AS lieu,
   COALESCE(d.echeance, '') AS echeance, COALESCE(d.action_url, '') AS action_url,
-  COALESCE(d.action_label, '') AS action_label, ad.documents_json AS documents_candidature
-  FROM annonces a LEFT JOIN annonce_details d ON d.annonce_id = a.id LEFT JOIN annonce_dossiers ad ON ad.annonce_id = a.id`;
+  COALESCE(d.action_label, '') AS action_label, ad.documents_json AS documents_candidature, ai.donnees_json AS informations
+  FROM annonces a LEFT JOIN annonce_details d ON d.annonce_id = a.id LEFT JOIN annonce_dossiers ad ON ad.annonce_id = a.id LEFT JOIN annonce_informations ai ON ai.annonce_id=a.id`;
+function announcementInfoStatements(db,id,data) {
+  if(data.informations===undefined)return [];
+  return [db.prepare("INSERT INTO annonce_informations(annonce_id,donnees_json) VALUES(?,?) ON CONFLICT(annonce_id) DO UPDATE SET donnees_json=json_patch(annonce_informations.donnees_json,excluded.donnees_json)").bind(id,JSON.stringify(data.informations))];
+}
 function announcementDocumentStatements(db,id,data) {
   if(data.documents_candidature===undefined)return [];
   return [db.prepare("INSERT INTO annonce_dossiers(annonce_id,documents_json) VALUES(?,?) ON CONFLICT(annonce_id) DO UPDATE SET documents_json=excluded.documents_json").bind(id,JSON.stringify(applicationRequirements(data.documents_candidature)))];
@@ -264,16 +273,16 @@ function announcementDetailsStatement(db, id, data) {
 export async function getAnnonces() {
   const db = await announcementDB();
   const { results } = await db.prepare(`${ANNOUNCEMENT_SELECT} WHERE a.statut = 'publie' ORDER BY a.date DESC, a.cree_le DESC, a.id ASC`).all();
-  return results.map(row=>({...row,categorie:announcementCategory(row.categorie),documents_candidature:applicationRequirements(row.documents_candidature)}));
+  return results.map(row=>({...row,categorie:announcementCategory(row.categorie),documents_candidature:applicationRequirements(row.documents_candidature),informations:announcementInformation(row)}));
 }
 export async function getAnnonceBySlug(slug) {
   const db = await announcementDB();
-  return withAnnouncementGallery(db, await db.prepare(`${ANNOUNCEMENT_SELECT} WHERE a.slug = ? AND a.statut = 'publie'`).bind(slug).first());
+  return withAnnouncementGallery(db, await db.prepare(`${ANNOUNCEMENT_SELECT} WHERE a.slug = ? AND a.statut = 'publie'`).bind(slug).first(),false);
 }
 export async function getAllAnnonces() {
   const db = await announcementDB();
   const { results } = await db.prepare(`${ANNOUNCEMENT_SELECT} ORDER BY a.date DESC, a.cree_le DESC, a.id ASC`).all();
-  return results.map(row=>({...row,categorie:announcementCategory(row.categorie),documents_candidature:applicationRequirements(row.documents_candidature)}));
+  return results.map(row=>({...row,categorie:announcementCategory(row.categorie),documents_candidature:applicationRequirements(row.documents_candidature),informations:announcementInformation(row,true)}));
 }
 export async function getAnnonceById(id) {
   const db = await announcementDB();
@@ -287,6 +296,7 @@ export async function createAnnonce(data) {
       .bind(id,id,data.titre,data.texte,data.image_url || null,data.date,data.statut || "brouillon"),
     announcementDetailsStatement(db,id,data),
     ...announcementDocumentStatements(db,id,data),
+    ...announcementInfoStatements(db,id,data),
     ...galleryStatements(db,id,data.galerie),
   ]);
   return id;
@@ -298,12 +308,13 @@ export async function updateAnnonce(id, data) {
       .bind(data.titre,data.texte,data.image_url || null,data.date,data.statut || "brouillon",id),
     announcementDetailsStatement(db,id,data),
     ...announcementDocumentStatements(db,id,data),
+    ...announcementInfoStatements(db,id,data),
     ...galleryStatements(db,id,data.galerie),
   ]);
 }
 export async function deleteAnnonce(id) {
   const db = await announcementDB();
-  await db.batch([db.prepare("DELETE FROM annonce_dossiers WHERE annonce_id = ?").bind(id),db.prepare("DELETE FROM annonce_photos WHERE annonce_id = ?").bind(id),db.prepare("DELETE FROM annonce_details WHERE annonce_id = ?").bind(id),db.prepare("DELETE FROM annonces WHERE id = ?").bind(id)]);
+  await db.batch([db.prepare("DELETE FROM annonce_informations WHERE annonce_id=?").bind(id),db.prepare("DELETE FROM annonce_dossiers WHERE annonce_id = ?").bind(id),db.prepare("DELETE FROM annonce_photos WHERE annonce_id = ?").bind(id),db.prepare("DELETE FROM annonce_details WHERE annonce_id = ?").bind(id),db.prepare("DELETE FROM annonces WHERE id = ?").bind(id)]);
 }
 
 // ===== Partenaires =====
@@ -541,8 +552,10 @@ export async function getDashboardStats() {
 export async function getUsedMediaUrls({ strict = false } = {}) {
   const db = await getDB();
   await db.prepare(`CREATE TABLE IF NOT EXISTS annonce_dossiers (annonce_id TEXT PRIMARY KEY REFERENCES annonces(id) ON DELETE CASCADE, documents_json TEXT NOT NULL)`).run();
+  await db.prepare(`CREATE TABLE IF NOT EXISTS annonce_informations (annonce_id TEXT PRIMARY KEY REFERENCES annonces(id) ON DELETE CASCADE, donnees_json TEXT NOT NULL)`).run();
   await ensureAnnouncementPhotos(db);
   const queries = [
+    "SELECT json_extract(donnees_json, '$.publication.fichier_url') AS u FROM annonce_informations",
     "SELECT photo_url AS u FROM projets",
     "SELECT photo_url AS u FROM membres",
     "SELECT image_url AS u FROM annonces",
@@ -567,3 +580,8 @@ export const secteurs = {
   local: { label: "Développement local", color: "#B7C233" },
   partenariat: { label: "Partenariat", color: "#6B4EA6" },
 };
+
+export async function publishedAnnouncementDocument(url) {
+  const db=await announcementDB();
+  return db.prepare(`SELECT a.id FROM annonces a JOIN annonce_details d ON d.annonce_id=a.id JOIN annonce_informations i ON i.annonce_id=a.id WHERE a.statut='publie' AND d.categorie='publication' AND json_extract(i.donnees_json,'$.publication.support')='pdf' AND json_extract(i.donnees_json,'$.publication.fichier_url')=? LIMIT 1`).bind(url).first();
+}

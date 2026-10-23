@@ -138,3 +138,8 @@ CREATE TABLE IF NOT EXISTS candidature_dossiers (
  candidature_id TEXT PRIMARY KEY REFERENCES candidatures(id) ON DELETE CASCADE,
  documents_json TEXT NOT NULL
 );
+-- Informations propres à chaque type d’annonce, sans modifier les textes existants.
+CREATE TABLE IF NOT EXISTS annonce_informations (
+ annonce_id TEXT PRIMARY KEY REFERENCES annonces(id) ON DELETE CASCADE,
+ donnees_json TEXT NOT NULL
+);

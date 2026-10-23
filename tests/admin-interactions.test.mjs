@@ -58,15 +58,16 @@ async function harness(path, props = {}, { fail = false, network = false, respon
     "next/navigation": { useRouter: () => ({ push: value => navigations.push(value), refresh() {} }) },
     "@/components/admin/ImageUpload": { default: function ImageUpload() {} },
   };
-  const cache = new Map();
+  const cache = new Map(),linking=new Map();
   async function load(name) {
     if (imports[name]) return new vm.SyntheticModule(Object.keys(imports[name]), function () { for (const [k,v] of Object.entries(imports[name])) this.setExport(k,v); }, { context });
-    const file = name === "@/lib/application-documents.mjs" ? "src/lib/application-documents.mjs" : name === "./AnnouncementGalleryUpload" ? "src/components/admin/AnnouncementGalleryUpload.jsx" : name === "./EditorDate" ? "src/components/admin/EditorDate.jsx" : name === "./AdminAnnouncementCard" ? "src/components/admin/AdminAnnouncementCard.jsx" : name === "./AnnouncementOptions" ? "src/components/admin/AnnouncementOptions.jsx" : name === "./AnnouncementCard" ? "src/components/AnnouncementCard.jsx" : name === "@/lib/announcements.mjs" ? "src/lib/announcements.mjs" : name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./MemberCard" ? "src/components/admin/MemberCard.jsx" : name === "./MemberOptions" ? "src/components/admin/MemberOptions.jsx" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name === "@/lib/member-expertises.mjs" ? "src/lib/member-expertises.mjs" : name;
+    const file = name === "@/lib/announcement-fields.mjs" ? "src/lib/announcement-fields.mjs" : name === "./announcement-fields.mjs" ? "src/lib/announcement-fields.mjs" : name === "./announcements.mjs" ? "src/lib/announcements.mjs" : name === "./EditorTime" ? "src/components/admin/EditorTime.jsx" : name === "./PublicationPdfUpload" ? "src/components/admin/PublicationPdfUpload.jsx" : name === "@/lib/application-documents.mjs" ? "src/lib/application-documents.mjs" : name === "./AnnouncementGalleryUpload" ? "src/components/admin/AnnouncementGalleryUpload.jsx" : name === "./EditorDate" ? "src/components/admin/EditorDate.jsx" : name === "./AdminAnnouncementCard" ? "src/components/admin/AdminAnnouncementCard.jsx" : name === "./AnnouncementOptions" ? "src/components/admin/AnnouncementOptions.jsx" : name === "./AnnouncementCard" ? "src/components/AnnouncementCard.jsx" : name === "@/lib/announcements.mjs" ? "src/lib/announcements.mjs" : name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./MemberCard" ? "src/components/admin/MemberCard.jsx" : name === "./MemberOptions" ? "src/components/admin/MemberOptions.jsx" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name === "@/lib/member-expertises.mjs" ? "src/lib/member-expertises.mjs" : name;
     if (!cache.has(file)) {
       const source = await readFile(new URL("../" + file, import.meta.url), "utf8");
       const { code } = transformSync(source, { filename: file, jsc: { target: "es2022", parser: { syntax: "ecmascript", jsx: true }, transform: { react: { runtime: "automatic" } } }, module: { type: "es6" } });
-      const module = new vm.SourceTextModule(code, { context }); cache.set(file, module); await module.link(load);
+      const module = new vm.SourceTextModule(code, { context }); cache.set(file, module); const linked=module.link(load);linking.set(file,linked);await linked;
     }
+    await linking.get(file);
     return cache.get(file);
   }
   const module = await load(path); await module.evaluate();
@@ -559,4 +560,46 @@ test("The announcement editor offers the five new categories and opens older new
  assert.equal(select().props.value,"actualite");assert.deepEqual(Array.from(select().props.options,o=>o.label),["Recrutement","Formations","Événements","Actualités","Publications"]);
  select().props.onChange("evenement");assert.ok(find(h.render(),n=>n.props?.id==="announcement-location"));
  await h.render().props.onSubmit({preventDefault(){}});assert.equal(JSON.parse(h.requests[0].options.body).categorie,"evenement");
+});
+
+test("Announcement fields follow the selected type without leaking recruitment or enrollment fields into reports",async()=>{
+ const h=await harness("src/components/admin/AnnonceForm.jsx",{annonce:{id:"adaptive",titre:"Annonce",texte:"Texte",date:"2026-10-23",categorie:"formation"}});
+ const category=()=>find(h.render(),n=>n.type?.name==="EditorSelect"&&n.props.id==="announcement-category");
+ const element=id=>find(h.render(),n=>n.props?.id===id);
+ assert.ok(element("training-audience"));assert.ok(element("training-start"));assert.ok(element("announcement-deadline"));assert.equal(element("event-outcome"),null);
+ find(h.render(),n=>n.type==="input"&&n.props.id==="announcement-location").props.onChange({target:{value:"Lieu de formation"}});
+ find(h.render(),n=>n.type==="textarea"&&n.props.id==="training-audience").props.onChange({target:{value:"Associations"}});
+ find(h.render(),n=>n.type==="input"&&n.props.id==="announcement-action-label").props.onChange({target:{value:"M’inscrire"}});
+ find(h.render(),n=>n.type==="input"&&n.props.id==="announcement-action-url").props.onChange({target:{value:"https://example.org/register"}});
+ category().props.onChange("evenement");assert.ok(element("event-date"));assert.ok(element("event-outcome"));assert.equal(element("training-audience"),null);assert.equal(element("announcement-deadline"),null);assert.equal(element("announcement-action-url"),null);
+ find(h.render(),n=>n.type==="input"&&n.props.id==="announcement-location").props.onChange({target:{value:"Lieu de l’événement"}});
+ category().props.onChange("formation");assert.equal(find(h.render(),n=>n.type==="input"&&n.props.id==="announcement-location").props.value,"Lieu de formation");assert.equal(find(h.render(),n=>n.type==="textarea"&&n.props.id==="training-audience").props.value,"Associations");assert.equal(find(h.render(),n=>n.type==="input"&&n.props.id==="announcement-action-label").props.value,"M’inscrire");
+ category().props.onChange("actualite");assert.ok(element("news-people"));assert.equal(element("announcement-location"),null);assert.equal(element("announcement-action-url"),null);
+ category().props.onChange("publication");assert.ok(element("publication-authors"));assert.ok(element("publication-document-date"));assert.ok(find(h.render(),n=>n.type?.name==="PublicationPdfUpload"));assert.equal(element("news-people"),null);
+ category().props.onChange("recrutement");assert.ok(element("announcement-job"));assert.ok(element("announcement-deadline"));assert.ok(element("announcement-documents-title"));assert.equal(element("publication-authors"),null);
+});
+
+test("Training dates and times persist separately from publication and invalid ranges block a save",async()=>{
+ const h=await harness("src/components/admin/AnnonceForm.jsx",{annonce:{id:"training",titre:"Formation",texte:"Texte",date:"2026-10-23",categorie:"formation"}});
+ const date=id=>find(h.render(),n=>n.type?.name==="EditorDate"&&n.props.id===id);
+ date("training-start").props.onChange("2026-11-20");date("training-end").props.onChange("2026-11-19");await h.render().props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,0);assert.ok(find(h.render(),n=>n.props?.role==="alert"));
+ date("training-end").props.onChange("2026-11-20");find(h.render(),n=>n.type?.name==="EditorTime"&&n.props.id==="training-start-time").props.onChange("09:30");
+ await h.render().props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,1);const data=JSON.parse(h.requests[0].options.body);assert.equal(data.date,"2026-10-23");assert.equal(data.informations.formation.date_debut,"2026-11-20");assert.equal(data.informations.formation.heure_debut,"09:30");assert.equal(data.practicalDrafts,undefined);
+});
+
+test("Publication editing locks saving during PDF uploads and saves the selected file or consultation link",async()=>{
+ const h=await harness("src/components/admin/AnnonceForm.jsx",{annonce:{id:"publication",titre:"Guide",texte:"Texte",date:"2026-10-23",categorie:"publication"}});
+ const pdf=()=>find(h.render(),n=>n.type?.name==="PublicationPdfUpload");
+ pdf().props.onUploadingChange(true);await h.render().props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,0);assert.equal(find(h.render(),n=>n.type?.name==="EditorSelect"&&n.props.id==="announcement-category").props.disabled,true);
+ pdf().props.onChange("/documents/12345678-1234-4234-8234-123456789abc","Guide.pdf");pdf().props.onUploadingChange(false);
+ await h.render().props.onSubmit({preventDefault(){}});const data=JSON.parse(h.requests[0].options.body);assert.equal(data.informations.publication.fichier_nom,"Guide.pdf");assert.match(data.informations.publication.fichier_url,/^\/documents\//);
+});
+
+test("PDF upload errors keep the previously selected document and duplicate selection cannot trigger parallel sends",async()=>{
+ let done;const pending=new Promise(resolve=>{done=resolve;});const changes=[],uploads=[];
+ const h=await harness("src/components/admin/PublicationPdfUpload.jsx",{value:"/documents/existing",filename:"Ancien.pdf",onChange:(...args)=>changes.push(args),onUploadingChange:value=>uploads.push(value)},{respond:()=>pending});
+ const input=()=>find(h.render(),n=>n.type==="input"&&n.props.type==="file");
+ const event=()=>({target:{files:[new File(["%PDF-1.4\n%%EOF"],"Nouveau.pdf",{type:"application/pdf"})],value:"selected"}});
+ const first=input().props.onChange(event());await input().props.onChange(event());assert.equal(h.requests.length,1);
+ done(Response.json({error:"Échec du stockage"},{status:503}));await first;assert.equal(changes.length,0);assert.equal(uploads.at(-1),false);assert.ok(find(h.render(),n=>n.props?.role==="alert"));assert.ok(find(h.render(),n=>n.type==="a"&&n.props.children==="Ancien.pdf"));
 });

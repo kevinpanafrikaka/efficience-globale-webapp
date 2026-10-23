@@ -1,3 +1,4 @@
+import { validateAnnouncementInfo } from "./announcement-fields.mjs";
 import { validateApplicationDocuments } from "./application-documents.mjs";
 import { ANNOUNCEMENT_TYPES, announcementActionUrl, announcementCategory } from "./announcements.mjs";
 export class AdminInputError extends Error {}
@@ -71,6 +72,7 @@ export function validateAdminContent(kind, data) {
     result.action_label = text(data, "action_label", 100);
     if (result.action_url && !announcementActionUrl(result.action_url)) throw new AdminInputError("Le lien doit commencer par https://, http:// ou mailto:.");
     if (Boolean(result.action_url) !== Boolean(result.action_label)) throw new AdminInputError("Renseignez le libellé et le lien du bouton ensemble.");
+    if(data.informations!==undefined){try{result.informations=validateAnnouncementInfo(result.categorie,data.informations,result.echeance);}catch(error){throw new AdminInputError(error.message);}}
 
   } else if (kind === "membres") {
     result.nom = text(data, "nom", 200, true);

@@ -108,7 +108,7 @@ test("Full-width article renders custom headings for every announcement type wit
   const body=html.split('aria-label="Contenu de l’annonce"')[1].split('class="announcement-detail-return"')[0];
   for(const text of ["Découvrir","Premier élément","Approfondir","Texte unique.","Participer","Dernier paragraphe."])assert.ok(body.includes(text),text);
   assert.equal((body.match(/Résumé identique\./g)||[]).length,1);assert.equal((body.match(/Envoyer ma demande/g)||[]).length,1);
-  assert.match(body,/<dt>Lieu<\/dt><dd>Conakry<\/dd>/);assert.match(body,/href="mailto:contact@example.org"/);assert.doesNotMatch(body,/À propos de l’annonce|announcement-article-layout|[↗→←]/);
+  if(categorie!=="publication")assert.match(body,/<dt>Lieu<\/dt><dd>Conakry<\/dd>/);assert.match(body,/href="mailto:contact@example.org"/);assert.doesNotMatch(body,/À propos de l’annonce|announcement-article-layout|[↗→←]/);
  }
  const id=await db.createAnnonce({titre:"Simple",texte:"Un texte sans sous-titres.",date:"2026-10-23",statut:"publie",categorie:"publication"});
  const simple=renderToStaticMarkup(await Page({params:Promise.resolve({slug:id})}));assert.match(simple,/Un texte sans sous-titres\./);assert.doesNotMatch(simple,/class="announcement-practical"/);

@@ -1,4 +1,5 @@
-import { announcementArticleContent, announcementDate } from "@/lib/announcements.mjs";
+import { announcementFacts,announcementResource,announcementInfos } from "@/lib/announcement-fields.mjs";
+import { announcementArticleContent } from "@/lib/announcements.mjs";
 
 function Blocks({ blocks }) {
   return <div className="announcement-prose">{blocks.map((block,i) => block.type === "list"
@@ -8,18 +9,19 @@ function Blocks({ blocks }) {
 
 export default function AnnouncementArticle({ annonce, action, expired }) {
   const { lead, preamble, sections } = announcementArticleContent(annonce.texte, annonce.resume);
-  const hasFacts = Boolean(annonce.lieu || annonce.echeance);
-  const hasAction = Boolean(action && annonce.action_label);
+  const facts=announcementFacts(annonce),resource=announcementResource(annonce);
+  const chosenAction=resource||{url:action,label:annonce.action_label};
+  const hasFacts = facts.length>0,hasAction=Boolean(chosenAction.url&&chosenAction.label);
+  const bilan=annonce.categorie==="evenement"?announcementInfos(annonce.informations).evenement.bilan:"";
   return <>
     {lead && <p className="announcement-detail-intro">{lead}</p>}
     {(hasFacts || hasAction) && <aside className="announcement-practical" aria-label="Informations utiles">
       {hasFacts && <dl>
-        {annonce.lieu && <div><dt>Lieu</dt><dd>{annonce.lieu}</dd></div>}
-        {annonce.echeance && <div><dt>Date limite</dt><dd><time dateTime={annonce.echeance}>{announcementDate(annonce.echeance)}</time></dd></div>}
+        {facts.map(fact=><div key={fact.label}><dt>{fact.label}</dt><dd>{fact.date?<time dateTime={fact.date}>{fact.value}</time>:fact.value}</dd></div>)}
       </dl>}
       {(expired || hasAction) && <div className="announcement-practical-action">{expired
         ? <p className="announcement-expired">La date limite est dépassée.</p>
-        : <a href={action} className="eg-button eg-button--primary" rel="noopener noreferrer">{annonce.action_label}</a>}</div>}
+        : <a href={chosenAction.url} className="eg-button eg-button--primary" rel="noopener noreferrer" download={resource?.pdf?"":undefined}>{chosenAction.label}</a>}</div>}
     </aside>}
     {preamble.length > 0 && <div className="announcement-preamble"><Blocks blocks={preamble}/></div>}
     {sections.length > 0 && <div className="announcement-sections">{sections.map((section,i) => {
@@ -30,5 +32,6 @@ export default function AnnouncementArticle({ annonce, action, expired }) {
         <Blocks blocks={section.blocks}/>
       </section>;
     })}</div>}
+    {bilan&&<section className="announcement-outcome"><h2>Bilan et points à retenir</h2><p>{bilan}</p></section>}
   </>;
 }
