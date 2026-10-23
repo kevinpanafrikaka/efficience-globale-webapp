@@ -11,8 +11,8 @@ import "./admin-projects.css";
 import "./admin-team.css";
 import "./member-editor.css";
 
-function Field({ label, id, hint, children }) {
-  return <div className="editor-field"><label htmlFor={id}>{label}</label>{children}{hint && <p className="editor-help">{hint}</p>}</div>;
+function Field({ label, id, children }) {
+  return <div className="editor-field"><label htmlFor={id}>{label}</label>{children}</div>;
 }
 
 export default function MembreForm({ membre }) {
@@ -62,18 +62,18 @@ export default function MembreForm({ membre }) {
     </div>;
   }
   return <form onSubmit={handleSubmit} className="project-editor member-editor">
-    <header className="editor-header"><div><h1>{isEdit ? "Modifier le membre" : "Nouveau membre"}</h1><p>{isEdit ? "Mettez à jour le profil et sa présentation." : "Présentez un membre de l’équipe du cabinet."}</p></div><Actions /></header>
+    <header className="editor-header"><h1>{isEdit ? "Modifier le membre" : "Nouveau membre"}</h1><Actions /></header>
     {error && <div className="editor-error" role="alert" ref={errorRef} tabIndex={-1}>{error}</div>}
     <div className="editor-layout">
       <div className="editor-main-column">
         <section className="editor-panel member-identity" aria-labelledby="member-identity-title">
           <h2 id="member-identity-title">Identité et fonction</h2>
           <Field label="Nom complet" id="membreform-1"><input id="membreform-1" value={form.nom} onChange={e => update("nom", e.target.value)} required maxLength={200} disabled={loading} autoComplete="name" placeholder="Prénom et nom du membre" /></Field>
-          <Field label="Fonction au cabinet" id="membreform-2" hint="Visible sous le nom sur le site public."><input id="membreform-2" value={form.role} onChange={e => update("role", e.target.value)} maxLength={300} disabled={loading} autoComplete="organization-title" placeholder="Ex. Consultant en santé publique" /></Field>
+          <Field label="Fonction au cabinet" id="membreform-2"><input id="membreform-2" value={form.role} onChange={e => update("role", e.target.value)} maxLength={300} disabled={loading} autoComplete="organization-title" placeholder="Ex. Consultant en santé publique" /></Field>
         </section>
         <section className="editor-panel member-biography" aria-labelledby="member-biography-title">
           <h2 id="member-biography-title">Parcours et expertises</h2>
-          <Field label="Biographie" id="membreform-3" hint="Présentez le parcours, l’expérience et la contribution du membre au cabinet."><textarea id="membreform-3" value={form.bio} onChange={e => update("bio", e.target.value)} maxLength={10000} disabled={loading} rows={6} placeholder="Quelques phrases pour présenter son parcours…" /></Field>
+          <Field label="Biographie" id="membreform-3"><textarea id="membreform-3" value={form.bio} onChange={e => update("bio", e.target.value)} maxLength={10000} disabled={loading} rows={6} placeholder="Quelques phrases pour présenter son parcours…" /></Field>
           <fieldset className="member-expertises" aria-describedby="member-expertises-help">
             <legend>Expertises <span className="member-expertise-count" aria-label={`${expertiseCount} expertises sur 3 renseignées`}>{expertiseCount}/3</span></legend>
             <div className="member-expertise-fields">{form.expertises.map((text, index) => <div className="member-expertise-row" key={index}>
@@ -81,7 +81,7 @@ export default function MembreForm({ membre }) {
               <input id={`member-expertise-${index}`} value={text} onChange={e => updateExpertise(index, e.target.value)} maxLength={50} disabled={loading} placeholder={["Ex. Gouvernance", "Ex. Suivi-évaluation", "Ex. Gestion de projet"][index]} aria-describedby="member-expertises-help" />
               <button type="button" className="member-expertise-clear" disabled={loading || !text} aria-label={`Effacer l’expertise ${index + 1}`} onClick={() => updateExpertise(index, "")}>×</button>
             </div>)}</div>
-            <p id="member-expertises-help" className="editor-help">Facultatif. Une expertise par champ, 50 caractères maximum.</p>
+            <p id="member-expertises-help" className="editor-help">50 caractères maximum par expertise.</p>
           </fieldset>
         </section>
       </div>
@@ -90,12 +90,10 @@ export default function MembreForm({ membre }) {
           <h2 id="member-photo-title">Photo et aperçu</h2>
           <div className="admin-projects admin-team member-card-preview"><MemberCard membre={{ ...form, nom: form.nom.trim() || "Nom du membre" }} preview /></div>
           <ImageUpload value={form.photo_url} onChange={url => update("photo_url", url)} onUploadingChange={setUploading} allowRemove showPreview={false} disabled={loading || uploading} />
-          <p className="editor-help member-photo-help">L’aperçu suit votre saisie. Choisissez un portrait au visage bien visible, puis enregistrez le profil.</p>
         </section>
         <section className="editor-panel member-publication" aria-labelledby="member-publication-title">
           <h2 id="member-publication-title">Publication</h2>
           <Field label="Statut du profil" id="membreform-4"><EditorSelect id="membreform-4" value={form.statut} options={[{ value: "brouillon", label: "Brouillon" }, { value: "publie", label: "Publié" }]} onChange={value => update("statut", value)} disabled={loading} /></Field>
-          <p className={`editor-status-help ${form.statut === "publie" ? "is-published" : ""}`}>{form.statut === "publie" ? "Le profil sera visible sur le site public après enregistrement." : "Le brouillon reste visible uniquement dans l’administration."}</p>
         </section>
       </div>
     </div>

@@ -1,6 +1,6 @@
 .admin-space .admin-main form.project-editor { max-width: none; border: 0; background: transparent; padding: 0; border-radius: 0; box-shadow: none; }
 .project-editor .editor-header { position: sticky; top: 0; z-index: 40; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 22px 20px; margin: -28px -20px 28px; border-bottom: 1px solid var(--line); background: white; }
-.project-editor .editor-header h1 { margin: 0 0 6px; font-size: clamp(26px,2.5vw,32px); line-height: 1.15; }
+.project-editor .editor-header h1 { margin: 0; font-size: clamp(26px,2.5vw,32px); line-height: 1.15; }
 .project-editor .editor-header p { color: var(--ink-soft); font-size: 13px; line-height: 1.6; margin: 0; }
 .project-editor .editor-header-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .project-editor .editor-header-actions .eg-button { min-height: 46px; border-radius: 10px; font-size: 13px; }

@@ -41,11 +41,11 @@ export default function AdminShell({ children, unread }) {
     </aside>
     <div className="admin-workspace">
       {!projectEditor && !memberEditor && !announcementEditor && <header className={`admin-topbar ${dashboard || projects || team || announcements ? "is-dashboard" : ""}${projects ? " is-projects" : team ? " is-team" : announcements ? " is-announcements" : ""}`}>
-        {dashboard || projects || team || announcements ? <div className="admin-topbar-title"><h1>{announcements ? "Annonces" : team ? "Équipe" : projects ? "Projets" : "Tableau de bord"}</h1><p>{announcements ? "Gérez les actualités du cabinet." : team ? "Gérez les profils du cabinet." : projects ? "Gérez les réalisations du cabinet." : "Vos contenus, vos échanges et les prochaines actions du cabinet."}</p></div> : <span>Administration <span aria-hidden="true">/</span> <strong>{current}</strong></span>}
+        {dashboard || projects || team || announcements ? <div className="admin-topbar-title"><h1>{announcements ? "Annonces" : team ? "Équipe" : projects ? "Projets" : "Tableau de bord"}</h1></div> : <span>Administration <span aria-hidden="true">/</span> <strong>{current}</strong></span>}
         <div className="admin-topbar-actions"><a href="/admin/messages" aria-label={`${unread} message${unread > 1 ? "s" : ""} non lu${unread > 1 ? "s" : ""}`}>Messages <span className="admin-unread-count">{unread}</span></a>{dashboard && <DashboardCreateMenu />}{projects && <a href="/admin/projets/nouveau" className="eg-button eg-button--primary">+ Nouveau projet</a>}{team && <a href="/admin/membres/nouveau" className="eg-button eg-button--primary">+ Nouveau membre</a>}{announcements && <a href="/admin/annonces/nouveau" className="eg-button eg-button--primary">+ Nouvelle annonce</a>}</div>
       </header>}
       <main id="admin-main" className="admin-main" tabIndex={-1}>{children}</main>
-      <footer className="admin-footer">Efficience Globale <span>Votre contenu, à votre rythme.</span></footer>
+      <footer className="admin-footer">Efficience Globale</footer>
     </div>
   </div>;
 }

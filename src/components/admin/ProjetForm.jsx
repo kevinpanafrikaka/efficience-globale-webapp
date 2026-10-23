@@ -146,22 +146,22 @@ export default function ProjetForm({ projet, partenaires = [] }) {
     </div>;
   }
   return <form onSubmit={handleSubmit} className="project-editor">
-    <header className="editor-header"><div><h1>{isEdit ? "Modifier le projet" : "Nouveau projet"}</h1><p>{isEdit ? "Mettez à jour votre réalisation." : "Présentez une réalisation du cabinet."}</p></div><Actions /></header>
+    <header className="editor-header"><h1>{isEdit ? "Modifier le projet" : "Nouveau projet"}</h1><Actions /></header>
     {error && <div className="editor-error" role="alert">{error}</div>}
     <div className="editor-layout">
       <div className="editor-main-column">
       <div className="editor-general"><EditorSection title="Informations générales" name="general">
         <div className="editor-fields">
           <Field label="Titre du projet" id="projetform-1" wide><input id="projetform-1" value={form.titre} onChange={e => update("titre", e.target.value)} required placeholder="Nom du projet" /></Field>
-          {isEdit && <Field label="Adresse de la page" id="projetform-2" wide hint={`Le lien public sera /realisations/${form.slug || "…"}. Modifier ce champ change l’adresse de la page.`}><input id="projetform-2" value={form.slug} onChange={e => update("slug", e.target.value)} /></Field>}
+          {isEdit && <Field label="Adresse de la page" id="projetform-2" wide hint={`Lien public : /realisations/${form.slug || "…"}`}><input id="projetform-2" value={form.slug} onChange={e => update("slug", e.target.value)} /></Field>}
           <Field label="Secteur" id="projetform-4"><EditorSelect id="projetform-4" value={form.secteur} options={SECTEURS.map(s => ({ value: s.value, label: s.label }))} onChange={v => update("secteur",v)} disabled={loading} /></Field>
           <Field label="Client / bailleur / partenaire" id="projetform-6"><EditorSelect id="projetform-6" value={form.client.split(/\s*·\s*/).map(s => s.trim()).filter(Boolean)} options={partenaires.filter(p => p.nom).map(p => ({ value: p.nom, label: p.nom }))} onChange={v => update("client",v.join(" · "))} multiple searchable allowCustom placeholder="Choisir des organisations…" disabled={loading} /></Field>
           <div className="editor-field-wide"><ProjectPeriodField value={form.periode} onChange={v => update("periode",v)} onValidityChange={setPeriodError} disabled={loading} /></div>
         </div>
       </EditorSection></div>
       <div className="editor-presentation"><EditorSection title="Présentation" name="presentation" collapsible>
-        <Field label="Résumé" id="projetform-8" hint="Visible sur les cartes du site."><textarea id="projetform-8" value={form.resume} onChange={e => update("resume", e.target.value)} rows={3} placeholder="Un résumé concis du projet…" /></Field>
-        <Field label="Description" id="projetform-9" hint="Visible sur la page du projet."><textarea id="projetform-9" value={form.description} onChange={e => update("description", e.target.value)} rows={6} placeholder="Présentez le contexte, les objectifs et votre intervention…" /></Field>
+        <Field label="Résumé" id="projetform-8"><textarea id="projetform-8" value={form.resume} onChange={e => update("resume", e.target.value)} rows={3} placeholder="Un résumé concis du projet…" /></Field>
+        <Field label="Description" id="projetform-9"><textarea id="projetform-9" value={form.description} onChange={e => update("description", e.target.value)} rows={6} placeholder="Présentez le contexte, les objectifs et votre intervention…" /></Field>
       </EditorSection></div>
       <div className="editor-results"><EditorSection title={<span className="editor-results-title">Résultats obtenus<span className="editor-result-count" aria-label={`${resultCount} résultats renseignés`}>{resultCount}</span></span>} name="results" collapsible onExpand={fitResults}>
         <div className="editor-results-list">
@@ -180,18 +180,16 @@ export default function ProjetForm({ projet, partenaires = [] }) {
       </EditorSection></div>
       <div className="editor-publication"><EditorSection title="Publication" name="publication">
         <Field label="Statut" id="projetform-5"><EditorSelect id="projetform-5" value={form.statut} options={[{ value: "brouillon", label: "Brouillon" }, { value: "publie", label: "Publié" }]} onChange={v => update("statut",v)} disabled={loading} /></Field>
-        <p className={`editor-status-help ${form.statut === "publie" ? "is-published" : ""}`}>{form.statut === "publie" ? "Publié : visible sur le site public après enregistrement." : "Brouillon : visible uniquement dans l’administration."}</p>
       </EditorSection></div>
 
       <div className="editor-preview"><EditorSection title="Aperçu de la carte" name="preview" collapsible>
         <div className="editor-preview-card">
-          <div className="editor-preview-image">{form.photo_url ? <AdminImage src={form.photo_url} alt="Aperçu du projet" className="editor-preview-photo" /> : <span>Votre image apparaîtra ici</span>}</div>
+          <div className="editor-preview-image">{form.photo_url ? <AdminImage src={form.photo_url} alt="Aperçu du projet" className="editor-preview-photo" /> : <span>Aucune image</span>}</div>
           <div className="editor-preview-body"><div className="editor-preview-meta"><span>{statusLabel}</span><span>{SECTEURS.find(s => s.value === form.secteur)?.label}</span>{form.client && <span>{form.client}</span>}</div><h3>{form.titre || "Titre du projet"}</h3>{form.resume && <p>{form.resume}</p>}</div>
         </div>
-        <p className="editor-help">L’aperçu se met à jour pendant la saisie.</p>
       </EditorSection></div>
       <div className="editor-advanced"><EditorSection title="Italique du titre" name="title-style">
-        <Field label="Mot ou expression à mettre en italique" id="projetform-3" hint="Optionnel. Recopiez exactement le passage du titre."><input id="projetform-3" value={form.titre_accent} onChange={e => update("titre_accent", e.target.value)} placeholder="Ex. Vaccination" /></Field>
+        <Field label="Passage du titre (facultatif)" id="projetform-3"><input id="projetform-3" value={form.titre_accent} onChange={e => update("titre_accent", e.target.value)} placeholder="Ex. Vaccination" /></Field>
       </EditorSection></div>
       </div>
     </div>

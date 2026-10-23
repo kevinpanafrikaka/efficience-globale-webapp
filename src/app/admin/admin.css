@@ -31,7 +31,7 @@
 .admin-topbar-actions > a { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; flex-shrink: 0; }
 .admin-topbar.is-dashboard { min-height: 112px; padding-block: 22px; gap: 24px; }
 .admin-topbar-title { min-width: 0; }
-.admin-topbar-title h1 { margin: 0 0 7px; color: var(--dark); font-size: clamp(26px,2.5vw,32px); line-height: 1.15; letter-spacing: -.025em; }
+.admin-topbar-title h1 { margin: 0; color: var(--dark); font-size: clamp(26px,2.5vw,32px); line-height: 1.15; letter-spacing: -.025em; }
 .admin-topbar-title p { margin: 0; max-width: 580px; color: var(--ink-soft); font-size: 13px; line-height: 1.6; }
 .admin-main { scroll-margin-top: 150px; }
 .admin-unread-count { display: grid; place-items: center; min-width: 25px; height: 25px; padding-inline: 5px; border-radius: 8px; background: #edf3e6; color: #4b7728; font-size: 12px; font-weight: 700; }

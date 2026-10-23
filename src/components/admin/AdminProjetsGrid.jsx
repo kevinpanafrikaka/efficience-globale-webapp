@@ -51,7 +51,7 @@ export default function AdminProjetsGrid({ projets, secteurs }) {
       <div><input id="project-query" ref={input} type="search" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === "Escape") closeSearch(); }} placeholder="Rechercher un projet…" /><button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={closeSearch}>Fermer</button></div>
     </div>
     </div>
-    {filtered.length === 0 ? <div className="admin-empty" role="status"><h2>{projets.length ? "Aucun projet correspondant" : "Votre première réalisation"}</h2><p>{projets.length ? "Essayez un autre secteur ou une autre recherche." : "Ajoutez un projet pour présenter les réalisations du cabinet."}</p>{projets.length > 0 && <button type="button" className="eg-button eg-button--secondary" onClick={() => { setSector("all"); setQuery(""); }}>Réinitialiser les filtres</button>}</div> : <div className="projects-grid">
+    {filtered.length === 0 ? <div className="admin-empty" role="status"><h2>{projets.length ? "Aucun projet correspondant" : "Aucun projet"}</h2>{projets.length > 0 && <button type="button" className="eg-button eg-button--secondary" onClick={() => { setSector("all"); setQuery(""); }}>Réinitialiser les filtres</button>}</div> : <div className="projects-grid">
       {filtered.map(p => {
         return <article key={p.id} className="project-card">
           <div className="project-photo">{p.photo_url ? <AdminImage src={p.photo_url} alt="" className="project-photo-image" /> : <div className="project-photo-empty">Aucune image</div>}</div>

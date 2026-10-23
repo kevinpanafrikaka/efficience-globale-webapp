@@ -19,10 +19,7 @@ export default async function AdminReglagesPage() {
 
   return (
     <div>
-      <h1 className="text-[24px] mb-2">Réglages du site</h1>
-      <p className="text-[14px] text-ink-soft mb-6">
-        Coordonnées et réseaux sociaux affichés sur le site public.
-      </p>
+      <h1 className="text-[24px] mb-6">Réglages du site</h1>
       <ReglagesForm reglages={reglages} notification={notification} />
     </div>
   );

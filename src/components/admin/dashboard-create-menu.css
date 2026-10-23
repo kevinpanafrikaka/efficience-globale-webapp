@@ -4,7 +4,7 @@
 .admin-space .dashboard-create-plus { font-size: 22px; font-weight: 400; line-height: 1; }
 .admin-space .dashboard-create-options { position: absolute; z-index: 30; top: calc(100% + 10px); right: 0; display: grid; width: 300px; max-width: calc(100vw - 40px); max-height: min(420px,var(--dashboard-menu-room,calc(100dvh - 200px))); overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; padding: 8px; border: 1px solid #d5dece; border-radius: 16px; background: white; box-shadow: 0 20px 50px -25px #16211a66; }
 .admin-space .dashboard-create-options[hidden] { display: none; }
-.admin-space .dashboard-create-options a { display: flex; gap: 14px; min-height: 68px; align-items: center; padding: 12px; border-radius: 10px; }
+.admin-space .dashboard-create-options a { display: flex; gap: 14px; min-height: 54px; align-items: center; padding: 12px; border-radius: 10px; }
 .admin-space .dashboard-create-icon { display: grid; place-items: center; width: 36px; height: 36px; flex-shrink: 0; border-radius: 10px; color: var(--dashboard-accent); background: #edf3e6; }
 .admin-space .dashboard-create-options strong { display: block; font-size: 14px; font-weight: 600; }
 .admin-space .dashboard-create-options small { display: block; margin-top: 4px; color: var(--ink-soft); font-size: 12px; line-height: 1.5; }

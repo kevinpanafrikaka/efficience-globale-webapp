@@ -15,9 +15,6 @@ export default function AdminApercuPage() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-[20px] mb-1">Aperçu du site</h1>
-          <p className="text-[13px] text-ink-soft">
-            Le site public en direct, navigable ci-dessous, sans quitter l&apos;espace admin.
-          </p>
         </div>
         <div className="flex items-center gap-3">
           <button

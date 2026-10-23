@@ -33,8 +33,7 @@ export default async function AdminMediasPage() {
       <h1 className="text-[24px] mb-2">Médias</h1>
       <p className="text-[14px] text-ink-soft mb-6">
         {objects.length} image{objects.length > 1 ? "s" : ""} envoyée{objects.length > 1 ? "s" : ""}
-        {inutilises > 0 && ` · ${inutilises} inutilisée${inutilises > 1 ? "s" : ""} (supprimables)`}. Les images du
-        dossier du projet (logos, héros) ne sont pas listées ici.
+        {inutilises > 0 && ` · ${inutilises} inutilisée${inutilises > 1 ? "s" : ""}`}
       </p>
 
       <MediaUpload />

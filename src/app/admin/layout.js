@@ -21,8 +21,7 @@ export default async function AdminLayout({ children }) {
     return (
       <div className="admin-space admin-login-page"><div className="admin-login-card">
         <Image src="/img/logo-eg.png" alt="Efficience Globale" width={200} height={65} className="admin-login-logo" />
-        <p className="admin-login-eyebrow">VOTRE ESPACE DE GESTION</p>
-        <h1>Bienvenue au cabinet.</h1><p className="admin-login-description">Connectez-vous pour gérer les contenus et les messages du site.</p>
+        <h1>Bienvenue au cabinet.</h1>
         <LoginForm /><a className="admin-login-back" href="/">← Retour au site public</a>
       </div></div>
     );

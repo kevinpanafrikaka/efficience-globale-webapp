@@ -55,7 +55,7 @@ test("Dashboard links lead directly to each task and publication, preserve all c
     assert.ok(topbar);
     assert.equal((full.match(/<h1\b/g) || []).length, 1);
     assert.match(topbar, /Tableau de bord/);
-    assert.match(topbar, /Vos contenus, vos échanges/);
+    assert.doesNotMatch(topbar, /Vos contenus, vos échanges/);
     assert.match(topbar, /Créer un contenu/);
     assert.doesNotMatch(html, /<h1|Créer un contenu/);
     assert.match(html, /À traiter/);
@@ -79,9 +79,9 @@ test("Dashboard empty and unavailable states do not invent activity or claim una
   try {
     const page = await runtime.module("src/app/admin/page.js");
     let html = renderToStaticMarkup(await page.default());
-    assert.match(html, /aucun message non lu ni brouillon à finaliser/);
-    assert.match(html, /La conversation commence ici/);
-    assert.match(html, /Votre prochaine publication commence ici/);
+    assert.match(html, /Aucun brouillon en attente/);
+    assert.match(html, /Aucun message reçu/);
+    assert.match(html, /Aucune publication en ligne/);
     runtime.sqlite.exec("DROP TABLE partenaires; DROP TABLE messages;");
     const db = await runtime.module("src/lib/db.js");
     const s = await db.getDashboardStats();

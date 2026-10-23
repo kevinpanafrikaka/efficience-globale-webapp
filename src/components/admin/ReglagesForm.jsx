@@ -7,13 +7,12 @@ const inputClass =
   "rounded-lg border border-line px-3.5 py-2.5 text-[15px] focus:outline-none focus:ring-2 focus:ring-lime w-full";
 const labelClass = "text-[13px] font-semibold text-dark";
 
-function Field({ label, hint, children }) {
+function Field({ label, children }) {
   const id = useId();
   return (
     <div className="flex flex-col gap-1.5">
       <label htmlFor={id} className={labelClass}>{label}</label>
       {cloneElement(children, { id })}
-      {hint && <p className="text-[12px] text-ink-faint">{hint}</p>}
     </div>
   );
 }
@@ -71,7 +70,7 @@ export default function ReglagesForm({ reglages, notification }) {
       <section className="flex flex-col gap-4">
         <div className="admin-note"><strong>Notifications du formulaire · {notification?.provider || "Non configurées"}</strong><p>Destinataire actif : {notification?.recipient || "À configurer"}</p>{notification?.sender && <p>Expéditeur : {notification.sender}</p>}<a href="/api/email/google" className="eg-button eg-button--secondary eg-button--compact mt-3">Gérer la connexion Gmail ↗</a></div>
         <h2 className="text-[16px]">Coordonnées</h2>
-        <Field label="Email de contact (affiché sur le site)">
+        <Field label="Email public">
           <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} required className={inputClass} />
         </Field>
         <div className="grid sm:grid-cols-2 gap-3">
@@ -86,7 +85,6 @@ export default function ReglagesForm({ reglages, notification }) {
 
       <section className="flex flex-col gap-4">
         <h2 className="text-[16px]">Réseaux sociaux</h2>
-        <p className="text-[12.5px] text-ink-faint -mt-2">Laissez vide pour masquer l&apos;icône dans le pied de page.</p>
         {[
           ["facebook", "Facebook"],
           ["x", "X (Twitter)"],

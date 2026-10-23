@@ -75,7 +75,7 @@ export default function PartenaireForm({ partenaire }) {
             onClick={() => update("logo_url", "")}
             className="eg-button eg-button--quiet eg-button--compact admin-upload-clear"
           >
-            Retirer le logo (le nom sera affiché à la place)
+            Retirer le logo
           </button>
         )}
       </div>
