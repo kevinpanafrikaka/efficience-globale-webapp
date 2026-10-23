@@ -1,3 +1,4 @@
+import { validateApplicationDocuments } from "./application-documents.mjs";
 import { ANNOUNCEMENT_TYPES, announcementActionUrl } from "./announcements.mjs";
 export class AdminInputError extends Error {}
 
@@ -55,6 +56,9 @@ export function validateAdminContent(kind, data) {
         if (!url) throw new AdminInputError("L’adresse de chaque photo est requise.");
         return { url, legende: text(photo, "legende", 300) };
       }).filter(photo => { if (seen.has(photo.url)) return false; seen.add(photo.url); return true; });
+    }
+    if(data.documents_candidature!==undefined){
+      try{result.documents_candidature=validateApplicationDocuments(data.documents_candidature);}catch(error){throw new AdminInputError(error.message);}
     }
     result.categorie = text(data, "categorie", 40) || "vie";
     if (!ANNOUNCEMENT_TYPES.some(type => type.value === result.categorie)) throw new AdminInputError("Type d’annonce invalide.");

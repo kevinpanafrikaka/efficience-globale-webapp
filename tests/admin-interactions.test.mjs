@@ -61,7 +61,7 @@ async function harness(path, props = {}, { fail = false, network = false, respon
   const cache = new Map();
   async function load(name) {
     if (imports[name]) return new vm.SyntheticModule(Object.keys(imports[name]), function () { for (const [k,v] of Object.entries(imports[name])) this.setExport(k,v); }, { context });
-    const file = name === "./AnnouncementGalleryUpload" ? "src/components/admin/AnnouncementGalleryUpload.jsx" : name === "./EditorDate" ? "src/components/admin/EditorDate.jsx" : name === "./AdminAnnouncementCard" ? "src/components/admin/AdminAnnouncementCard.jsx" : name === "./AnnouncementOptions" ? "src/components/admin/AnnouncementOptions.jsx" : name === "./AnnouncementCard" ? "src/components/AnnouncementCard.jsx" : name === "@/lib/announcements.mjs" ? "src/lib/announcements.mjs" : name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./MemberCard" ? "src/components/admin/MemberCard.jsx" : name === "./MemberOptions" ? "src/components/admin/MemberOptions.jsx" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name === "@/lib/member-expertises.mjs" ? "src/lib/member-expertises.mjs" : name;
+    const file = name === "@/lib/application-documents.mjs" ? "src/lib/application-documents.mjs" : name === "./AnnouncementGalleryUpload" ? "src/components/admin/AnnouncementGalleryUpload.jsx" : name === "./EditorDate" ? "src/components/admin/EditorDate.jsx" : name === "./AdminAnnouncementCard" ? "src/components/admin/AdminAnnouncementCard.jsx" : name === "./AnnouncementOptions" ? "src/components/admin/AnnouncementOptions.jsx" : name === "./AnnouncementCard" ? "src/components/AnnouncementCard.jsx" : name === "@/lib/announcements.mjs" ? "src/lib/announcements.mjs" : name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./MemberCard" ? "src/components/admin/MemberCard.jsx" : name === "./MemberOptions" ? "src/components/admin/MemberOptions.jsx" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name === "@/lib/member-expertises.mjs" ? "src/lib/member-expertises.mjs" : name;
     if (!cache.has(file)) {
       const source = await readFile(new URL("../" + file, import.meta.url), "utf8");
       const { code } = transformSync(source, { filename: file, jsc: { target: "es2022", parser: { syntax: "ecmascript", jsx: true }, transform: { react: { runtime: "automatic" } } }, module: { type: "es6" } });
@@ -521,4 +521,23 @@ test("Application form retains selected documents and the request identifier aft
  const file=new File(["%PDF-1.4\n%%EOF"],"cv.pdf",{type:"application/pdf"});find(h.render(),n=>n.type?.name==="DocumentField"&&n.props.kind==="cv").props.onChange(file);
  await h.render().props.onSubmit({preventDefault(){}});assert.ok(find(h.render(),n=>n.props?.role==="alert"));assert.equal(find(h.render(),n=>n.type?.name==="DocumentField"&&n.props.kind==="cv").props.file.name,"cv.pdf");
  await h.render().props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,2);assert.equal(h.requests[0].options.body.get("request_id"),h.requests[1].options.body.get("request_id"));
+});
+
+test("Offer editor adds, renames and removes requested documents and saves their required flags",async()=>{
+ const h=await harness("src/components/admin/AnnonceForm.jsx",{annonce:{id:"offer",titre:"Offre",texte:"Texte",date:"2026-10-23",categorie:"recrutement"}});
+ find(h.render(),n=>n.type?.name==="EditorSelect"&&n.props?.id==="announcement-document-required-cv").props.onChange("optional");
+ find(h.render(),n=>n.type==="button"&&n.props.children==="Ajouter un document").props.onClick();
+ const added=find(h.render(),n=>n.type==="input"&&n.props.id?.startsWith("announcement-document-piece_"));assert.ok(added);added.props.onChange({target:{value:"Diplôme"}});
+ const id=added.props.id.replace("announcement-document-","");find(h.render(),n=>n.type?.name==="EditorSelect"&&n.props?.id===`announcement-document-required-${id}`).props.onChange("required");
+ find(h.render(),n=>n.type==="button"&&n.props["aria-label"]==="Retirer Lettre de motivation").props.onClick();
+ await h.render().props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,1);
+ const payload=JSON.parse(h.requests[0].options.body);assert.equal(payload.documents_candidature.length,2);assert.equal(payload.documents_candidature[0].required,false);assert.equal(payload.documents_candidature[1].label,"Diplôme");assert.equal(payload.documents_candidature[1].required,true);
+});
+
+test("Application UI renders offer-specific fields and enforces a required diploma without requiring a CV",async()=>{
+ const documents=[{id:"portfolio",label:"Portfolio",required:false},{id:"diplome",label:"Diplôme",required:true}];
+ const h=await harness("src/components/ApplicationForm.jsx",{slug:"offre",documents});assert.equal(find(h.render(),n=>n.type?.name==="DocumentField"&&n.props.kind==="cv"),null);
+ await h.render().props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,0);assert.match(find(h.render(),n=>n.props?.role==="alert").props.children,/Diplôme/);
+ const pdf=new File(["%PDF-1.4\n%%EOF"],"diplome.pdf",{type:"application/pdf"});find(h.render(),n=>n.type?.name==="DocumentField"&&n.props.kind==="diplome").props.onChange(pdf);
+ await h.render().props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,1);assert.equal(h.requests[0].options.body.get("diplome").name,"diplome.pdf");assert.equal(h.requests[0].options.body.has("cv"),false);assert.equal(h.requests[0].options.body.has("portfolio"),false);
 });

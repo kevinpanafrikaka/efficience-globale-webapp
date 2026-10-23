@@ -128,3 +128,13 @@ CREATE TABLE IF NOT EXISTS candidatures (
 CREATE INDEX IF NOT EXISTS idx_candidatures_expiration ON candidatures(documents_supprimes,expire_le);
 
 CREATE TABLE IF NOT EXISTS candidature_limits (cle TEXT PRIMARY KEY, compteur INTEGER NOT NULL, heure INTEGER NOT NULL);
+-- Documents demandés par offre et pièces réellement reçues par candidature.
+-- Les offres et candidatures existantes gardent leurs réglages antérieurs.
+CREATE TABLE IF NOT EXISTS annonce_dossiers (
+ annonce_id TEXT PRIMARY KEY REFERENCES annonces(id) ON DELETE CASCADE,
+ documents_json TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS candidature_dossiers (
+ candidature_id TEXT PRIMARY KEY REFERENCES candidatures(id) ON DELETE CASCADE,
+ documents_json TEXT NOT NULL
+);

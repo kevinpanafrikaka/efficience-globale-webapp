@@ -7,6 +7,7 @@ import AnnouncementGalleryUpload from "./AnnouncementGalleryUpload";
 import EditorDate from "./EditorDate";
 import AdminAnnouncementCard from "./AdminAnnouncementCard";
 import { ANNOUNCEMENT_TYPES,announcementActionUrl } from "@/lib/announcements.mjs";
+import { applicationRequirements,validateApplicationDocuments,MAX_APPLICATION_DOCUMENTS } from "@/lib/application-documents.mjs";
 import "./project-editor.css";
 import "./admin-projects.css";
 import "./admin-announcements.css";
@@ -15,7 +16,7 @@ function Field({id,label,children}){return <div className="editor-field"><label 
 function validDate(value){return /^\d{4}-\d{2}-\d{2}$/.test(value)&&!Number.isNaN(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value;}
 export default function AnnonceForm({annonce}){
   const router=useRouter(),isEdit=!!annonce;
-  const [form,setForm]=useState({titre:annonce?.titre||"",texte:annonce?.texte||"",image_url:annonce?.image_url||"",date:annonce?.date?.slice(0,10)||new Date().toISOString().slice(0,10),statut:annonce?.statut||"brouillon",categorie:annonce?.categorie||"vie",resume:annonce?.resume||"",lieu:annonce?.lieu||"",echeance:annonce?.echeance||"",action_url:annonce?.action_url||"",action_label:annonce?.action_label||"",galerie:Array.isArray(annonce?.galerie)?annonce.galerie:[]});
+  const [form,setForm]=useState({titre:annonce?.titre||"",texte:annonce?.texte||"",image_url:annonce?.image_url||"",date:annonce?.date?.slice(0,10)||new Date().toISOString().slice(0,10),statut:annonce?.statut||"brouillon",categorie:annonce?.categorie||"vie",resume:annonce?.resume||"",lieu:annonce?.lieu||"",echeance:annonce?.echeance||"",action_url:annonce?.action_url||"",action_label:annonce?.action_label||"",documents_candidature:applicationRequirements(annonce?.documents_candidature),galerie:Array.isArray(annonce?.galerie)?annonce.galerie:[]});
   const [error,setError]=useState(""),[loading,setLoading]=useState(false),[coverUploading,setCoverUploading]=useState(false),[galleryUploading,setGalleryUploading]=useState(false);
   const uploading=coverUploading||galleryUploading;
   const saving=useRef(false),errorRef=useRef(null),textRef=useRef(null),caret=useRef(null);
@@ -27,8 +28,9 @@ export default function AnnonceForm({annonce}){
     if(!validDate(form.date)||(form.echeance&&!validDate(form.echeance))){setError("Renseignez une date complète et valide.");return;}
     if(Boolean(form.action_url.trim())!==Boolean(form.action_label.trim())){setError("Renseignez le libellé et le lien du bouton ensemble.");return;}
     if(form.action_url&&!announcementActionUrl(form.action_url)){setError("Le lien doit commencer par https://, http:// ou mailto:.");return;}
+    if(form.categorie==="recrutement"){try{validateApplicationDocuments(form.documents_candidature);}catch(error){setError(error.message);return;}}
     saving.current=true;setLoading(true);
-    try{const res=await fetch(isEdit?`/api/admin/annonces/${annonce.id}`:"/api/admin/annonces",{method:isEdit?"PUT":"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(form)});const data=await res.json();if(!res.ok){setError(data.error||"Une erreur est survenue.");setLoading(false);return;}router.push("/admin/annonces");router.refresh();}catch{setError("Impossible d’enregistrer. Vérifiez votre connexion.");setLoading(false);}finally{saving.current=false;}
+    try{const res=await fetch(isEdit?`/api/admin/annonces/${annonce.id}`:"/api/admin/annonces",{method:isEdit?"PUT":"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...form,...(form.categorie!=="recrutement"?{documents_candidature:undefined}:{})})});const data=await res.json();if(!res.ok){setError(data.error||"Une erreur est survenue.");setLoading(false);return;}router.push("/admin/annonces");router.refresh();}catch{setError("Impossible d’enregistrer. Vérifiez votre connexion.");setLoading(false);}finally{saving.current=false;}
   }
   const busy=loading||uploading,saveLabel=uploading?"Envoi des images…":loading?"Enregistrement…":isEdit?"Enregistrer les modifications":"Créer l’annonce";
   const practical=["recrutement","formation"].includes(form.categorie)||form.lieu||form.echeance||form.action_url||form.action_label;
@@ -65,6 +67,15 @@ export default function AnnonceForm({annonce}){
           <Field id="announcement-action-label" label="Texte du bouton"><input id="announcement-action-label" value={form.action_label} onChange={e=>update("action_label",e.target.value)} disabled={loading} maxLength={100} placeholder={form.categorie==="recrutement"?"Envoyer ma candidature":"M’inscrire"}/></Field>
           <Field id="announcement-action-url" label="Lien du bouton"><input id="announcement-action-url" value={form.action_url} onChange={e=>update("action_url",e.target.value)} disabled={loading} maxLength={2000} placeholder="https://… ou mailto:…"/></Field>
         </div>
+      </section>}
+      {form.categorie==="recrutement"&&<section className="editor-panel announcement-documents-panel" aria-labelledby="announcement-documents-title">
+        <div className="announcement-documents-heading"><h2 id="announcement-documents-title">Documents demandés</h2><span>PDF · 2 Mo par document</span></div>
+        <div className="announcement-document-list">{form.documents_candidature.map(doc=><div className="announcement-document-row" key={doc.id}>
+          <Field id={`announcement-document-${doc.id}`} label="Nom du document"><input id={`announcement-document-${doc.id}`} value={doc.label} onChange={e=>setForm(f=>({...f,documents_candidature:f.documents_candidature.map(d=>d.id===doc.id?{...d,label:e.target.value}:d)}))} maxLength={80} required disabled={loading} placeholder="CV, diplôme, portfolio…"/></Field>
+          <Field id={`announcement-document-required-${doc.id}`} label="Pièce"><EditorSelect id={`announcement-document-required-${doc.id}`} value={doc.required?"required":"optional"} options={[{value:"required",label:"Obligatoire"},{value:"optional",label:"Facultative"}]} onChange={v=>setForm(f=>({...f,documents_candidature:f.documents_candidature.map(d=>d.id===doc.id?{...d,required:v==="required"}:d)}))} disabled={loading}/></Field>
+          <button type="button" className="eg-button eg-button--quiet eg-button--compact" disabled={loading||form.documents_candidature.length===1} aria-label={`Retirer ${doc.label||"le document"}`} onClick={()=>setForm(f=>({...f,documents_candidature:f.documents_candidature.filter(d=>d.id!==doc.id)}))}>Retirer</button>
+        </div>)}</div>
+        <div className="announcement-document-add"><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={loading||form.documents_candidature.length>=MAX_APPLICATION_DOCUMENTS} onClick={()=>setForm(f=>({...f,documents_candidature:[...f.documents_candidature,{id:`piece_${crypto.randomUUID()}`,label:"",required:false}]}))}>Ajouter un document</button><span>{form.documents_candidature.length} / {MAX_APPLICATION_DOCUMENTS}</span></div>
       </section>}
       <section className="editor-panel announcement-gallery-panel" aria-labelledby="announcement-gallery-panel-title">
         <h2 id="announcement-gallery-panel-title">Galerie de photos</h2>

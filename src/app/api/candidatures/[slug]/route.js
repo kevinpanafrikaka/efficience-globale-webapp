@@ -1,3 +1,4 @@
+import { applicationRequirements } from "@/lib/application-documents.mjs";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getAnnonceBySlug } from "@/lib/db";
 import { announcementApplicationPath } from "@/lib/announcements.mjs";
@@ -20,14 +21,21 @@ export async function POST(request,{params}) {
   data.email=data.email.toLowerCase();
   if(!data.nom || !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(data.email))throw new ApplicationError("Renseignez votre nom et une adresse email valide.");
   if(!/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(data.request_id))throw new ApplicationError("Rechargez le formulaire puis réessayez.");
-  if(form.getAll("cv").length!==1 || form.getAll("lettre").length>1)throw new ApplicationError("Ajoutez un CV et une seule lettre de motivation.");
-  const cv=await applicationPdf(form.get("cv"),true),letter=await applicationPdf(form.get("lettre"));
   await ensureApplications(env);
   // Exact retries do not consume another slot or send another email.
   const prior=await env.DB.prepare("SELECT * FROM candidatures WHERE request_id=? AND email=? AND annonce_id=? AND upload_statut='ready'").bind(data.request_id,data.email,annonce.id).first();
   if(prior){if(prior.email_statut==="pending")await notifyApplication(env,prior);return Response.json({success:true});}
+  const requirements=applicationRequirements(annonce.documents_candidature),files=[];
+  const allowed=new Set(["nom","email","telephone","message","request_id","site_web",...requirements.map(doc=>doc.id)]);
+  for(const [key] of form)if(!allowed.has(key))throw new ApplicationError("Un document non demandé a été ajouté. Rechargez le formulaire.");
+  for(const doc of requirements){
+   if(form.getAll(doc.id).length>1)throw new ApplicationError(`Ajoutez un seul fichier pour « ${doc.label} ».`);
+   const file=form.get(doc.id);if(typeof file==="string")throw new ApplicationError(`Ajoutez un fichier PDF pour « ${doc.label} ».`);
+   const bytes=await applicationPdf(file,doc.required,doc.label);
+   if(bytes)files.push({...doc,bytes});
+  }
   await applicationRateLimit(env,request.headers.get("cf-connecting-ip")||"unknown");
-  const {row,created}=await storeApplication(env,annonce,data,cv,letter);
+  const {row,created}=await storeApplication(env,annonce,data,files);
   if(created)await notifyApplication(env,row);
   return Response.json({success:true});
  }catch(error){return Response.json({error:error instanceof ApplicationError?error.message:"Impossible d’enregistrer la candidature. Réessayez plus tard."},{status:error instanceof ApplicationError?error.status:503,headers:error.status===429?{"Retry-After":"3600"}:{}});}

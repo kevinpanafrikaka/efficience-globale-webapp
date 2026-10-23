@@ -21,6 +21,6 @@ export default async function ApplyPage({params}){
    <p>{annonce.titre}</p>
    {(annonce.lieu||annonce.echeance)&&<dl className="application-offer-facts" aria-label="L’offre en bref">{annonce.lieu&&<div><dt>Lieu</dt><dd>{annonce.lieu}</dd></div>}{annonce.echeance&&<div><dt>Date limite</dt><dd>{announcementDate(annonce.echeance)}</dd></div>}</dl>}
   </header>
-  {applicationOpen(annonce)?<ApplicationForm slug={slug}/>:<div className="application-result" role="status"><h2>Candidatures closes</h2><p>La date limite de cette offre est dépassée.</p><Link href="/annonces" className="eg-button eg-button--secondary">Toutes les annonces</Link></div>}
+  {applicationOpen(annonce)?<ApplicationForm slug={slug} documents={annonce.documents_candidature}/>:<div className="application-result" role="status"><h2>Candidatures closes</h2><p>La date limite de cette offre est dépassée.</p><Link href="/annonces" className="eg-button eg-button--secondary">Toutes les annonces</Link></div>}
  </section>;
 }
