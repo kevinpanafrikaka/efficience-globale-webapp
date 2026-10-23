@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { renderToStaticMarkup } from "react-dom/server";
 import { adminRuntime } from "./helpers/admin-runtime.mjs";
 import { validateAdminContent } from "../src/lib/admin-input.mjs";
-import { announcementArticleContent } from "../src/lib/announcements.mjs";
+import { announcementArticleContent,ANNOUNCEMENT_TYPES,announcementCategory,announcementType } from "../src/lib/announcements.mjs";
 const req=body=>new Request("https://example.org/admin/annonces",{method:"POST",headers:{origin:"https://example.org","Content-Type":"application/json"},body:JSON.stringify(body)});
 
 test("Existing announcements acquire editorial defaults without a manual database migration or content loss",async()=>{
@@ -11,7 +11,7 @@ test("Existing announcements acquire editorial defaults without a manual databas
  r.sqlite.exec("DROP TABLE annonce_details");
  r.sqlite.prepare("INSERT INTO annonces(id,slug,titre,texte,date,statut) VALUES(?,?,?,?,?,?)").run("old","ancienne","Texte existant","Parcours de l’annonce conservé","2026-10-21","publie");
  const db=await r.module("src/lib/db.js");const rows=await db.getAnnonces();
- assert.equal(rows.length,1);assert.equal(rows[0].categorie,"vie");assert.equal(rows[0].texte,"Parcours de l’annonce conservé");assert.equal(rows[0].resume,"");
+ assert.equal(rows.length,1);assert.equal(rows[0].categorie,"actualite");assert.equal(rows[0].texte,"Parcours de l’annonce conservé");assert.equal(rows[0].resume,"");
  assert.equal((await db.getAnnonceBySlug("ancienne")).id,"old");
  }finally{r.close();}
 });
@@ -31,7 +31,7 @@ test("Announcement editorial fields persist through draft, publication and edit,
 test("Announcement inputs reject unknown types, invalid deadlines, incomplete buttons and executable links",()=>{
  const base={titre:"Annonce",texte:"Contenu",date:"2026-10-21"};
  for(const extra of [{categorie:"fake"},{echeance:"2026-02-31"},{action_label:"Postuler"},{action_url:"javascript:alert(1)",action_label:"Ouvrir"},{action_url:"data:text/html,test",action_label:"Ouvrir"}])assert.throws(()=>validateAdminContent("annonces",{...base,...extra}));
- assert.equal(validateAdminContent("annonces",base).categorie,"vie");
+ assert.equal(validateAdminContent("annonces",base).categorie,"actualite");
 });
 
 test("Public announcement articles render safe headings and lists and close expired calls to action",async()=>{
@@ -102,7 +102,7 @@ test("Editorial grouping preserves author content and only avoids an exact repea
 test("Full-width article renders custom headings for every announcement type with one safe action",async()=>{
  const r=await adminRuntime();try{
  const db=await r.module("src/lib/db.js"),{default:Page}=await r.module("src/app/(public)/annonces/[slug]/page.js");
- for(const categorie of ["recrutement","formation","mission","publication","vie"]){
+ for(const categorie of ["recrutement","formation","evenement","actualite","publication"]){
   const id=await db.createAnnonce({titre:`Détail ${categorie}`,texte:"Résumé identique.\n\n## Découvrir\n\n- Premier élément\n- Deuxième élément\n\n## Approfondir\n\nTexte unique.\n\n## Participer\n\nDernier paragraphe.",resume:"Résumé identique.",date:"2026-10-23",statut:"publie",categorie,lieu:"Conakry",echeance:"2099-12-01",action_url:"mailto:contact@example.org",action_label:"Envoyer ma demande"});
   const html=renderToStaticMarkup(await Page({params:Promise.resolve({slug:id})}));
   const body=html.split('aria-label="Contenu de l’annonce"')[1].split('class="announcement-detail-return"')[0];
@@ -112,5 +112,23 @@ test("Full-width article renders custom headings for every announcement type wit
  }
  const id=await db.createAnnonce({titre:"Simple",texte:"Un texte sans sous-titres.",date:"2026-10-23",statut:"publie",categorie:"publication"});
  const simple=renderToStaticMarkup(await Page({params:Promise.resolve({slug:id})}));assert.match(simple,/Un texte sans sous-titres\./);assert.doesNotMatch(simple,/class="announcement-practical"/);
+ }finally{r.close();}
+});
+
+test("The agreed announcement taxonomy separates training, events, news and publications while retaining legacy records",async()=>{
+ assert.deepEqual(ANNOUNCEMENT_TYPES.map(type=>type.label),["Recrutement","Formations","Événements","Actualités","Publications"]);
+ for(const legacy of ["mission","vie",undefined])assert.equal(announcementCategory(legacy),"actualite");
+ assert.equal(announcementType("mission").label,"Actualités");assert.equal(announcementType("evenement").label,"Événements");
+ const r=await adminRuntime();try{
+ const db=await r.module("src/lib/db.js"),api=await r.module("src/app/api/admin/annonces/route.js");
+ for(const categorie of ["formation","evenement","actualite","publication"]){
+  const response=await api.POST(req({titre:`Annonce ${categorie}`,texte:"Texte conservé",date:"2026-10-23",statut:"publie",categorie}));assert.equal(response.status,200);const {id}=await response.json();assert.equal((await db.getAnnonceById(id)).categorie,categorie);assert.equal((await db.getAnnonceBySlug(id)).categorie,categorie);
+ }
+ for(const old of ["vie","mission"]){
+  const id=await db.createAnnonce({titre:`Ancienne ${old}`,texte:"Texte historique",date:"2026-10-23",statut:"publie"});
+  r.sqlite.prepare("UPDATE annonce_details SET categorie=? WHERE annonce_id=?").run(old,id);
+  assert.equal((await db.getAnnonceById(id)).categorie,"actualite");assert.equal((await db.getAnnonceBySlug(id)).texte,"Texte historique");assert.equal((await db.getAllAnnonces()).find(row=>row.id===id).categorie,"actualite");
+  const saved=validateAdminContent("annonces",{titre:"Ancien onglet",texte:"Contenu",date:"2026-10-23",categorie:old});assert.equal(saved.categorie,"actualite");
+ }
  }finally{r.close();}
 });

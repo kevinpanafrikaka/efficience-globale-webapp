@@ -6,7 +6,7 @@ import EditorSelect from "./EditorSelect";
 import AnnouncementGalleryUpload from "./AnnouncementGalleryUpload";
 import EditorDate from "./EditorDate";
 import AdminAnnouncementCard from "./AdminAnnouncementCard";
-import { ANNOUNCEMENT_TYPES,announcementActionUrl } from "@/lib/announcements.mjs";
+import { ANNOUNCEMENT_TYPES,announcementActionUrl,announcementCategory } from "@/lib/announcements.mjs";
 import { applicationRequirements,validateApplicationDocuments,MAX_APPLICATION_DOCUMENTS } from "@/lib/application-documents.mjs";
 import "./project-editor.css";
 import "./admin-projects.css";
@@ -16,7 +16,7 @@ function Field({id,label,children}){return <div className="editor-field"><label 
 function validDate(value){return /^\d{4}-\d{2}-\d{2}$/.test(value)&&!Number.isNaN(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value;}
 export default function AnnonceForm({annonce}){
   const router=useRouter(),isEdit=!!annonce;
-  const [form,setForm]=useState({titre:annonce?.titre||"",texte:annonce?.texte||"",image_url:annonce?.image_url||"",date:annonce?.date?.slice(0,10)||new Date().toISOString().slice(0,10),statut:annonce?.statut||"brouillon",categorie:annonce?.categorie||"vie",resume:annonce?.resume||"",lieu:annonce?.lieu||"",echeance:annonce?.echeance||"",action_url:annonce?.action_url||"",action_label:annonce?.action_label||"",documents_candidature:applicationRequirements(annonce?.documents_candidature),galerie:Array.isArray(annonce?.galerie)?annonce.galerie:[]});
+  const [form,setForm]=useState({titre:annonce?.titre||"",texte:annonce?.texte||"",image_url:annonce?.image_url||"",date:annonce?.date?.slice(0,10)||new Date().toISOString().slice(0,10),statut:annonce?.statut||"brouillon",categorie:announcementCategory(annonce?.categorie),resume:annonce?.resume||"",lieu:annonce?.lieu||"",echeance:annonce?.echeance||"",action_url:annonce?.action_url||"",action_label:annonce?.action_label||"",documents_candidature:applicationRequirements(annonce?.documents_candidature),galerie:Array.isArray(annonce?.galerie)?annonce.galerie:[]});
   const [error,setError]=useState(""),[loading,setLoading]=useState(false),[coverUploading,setCoverUploading]=useState(false),[galleryUploading,setGalleryUploading]=useState(false);
   const uploading=coverUploading||galleryUploading;
   const saving=useRef(false),errorRef=useRef(null),textRef=useRef(null),caret=useRef(null);
@@ -33,7 +33,7 @@ export default function AnnonceForm({annonce}){
     try{const res=await fetch(isEdit?`/api/admin/annonces/${annonce.id}`:"/api/admin/annonces",{method:isEdit?"PUT":"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({...form,...(form.categorie!=="recrutement"?{documents_candidature:undefined}:{})})});const data=await res.json();if(!res.ok){setError(data.error||"Une erreur est survenue.");setLoading(false);return;}router.push("/admin/annonces");router.refresh();}catch{setError("Impossible d’enregistrer. Vérifiez votre connexion.");setLoading(false);}finally{saving.current=false;}
   }
   const busy=loading||uploading,saveLabel=uploading?"Envoi des images…":loading?"Enregistrement…":isEdit?"Enregistrer les modifications":"Créer l’annonce";
-  const practical=["recrutement","formation"].includes(form.categorie)||form.lieu||form.echeance||form.action_url||form.action_label;
+  const practical=["recrutement","formation","evenement"].includes(form.categorie)||form.lieu||form.echeance||form.action_url||form.action_label;
   function Actions({mobile=false}){return <div className={mobile?"editor-mobile-actions":"editor-header-actions"}><a href="/admin/annonces" className="eg-button eg-button--secondary" aria-disabled={busy} onClick={e=>{if(busy)e.preventDefault();}}>Annuler</a><button type="submit" className="eg-button eg-button--primary" disabled={busy} aria-busy={busy}>{mobile&&isEdit&&!busy?"Enregistrer":saveLabel}</button></div>;}
   return <form onSubmit={handleSubmit} className="project-editor announcement-editor">
     <header className="editor-header"><h1>{isEdit?"Modifier l’annonce":"Nouvelle annonce"}</h1><Actions/></header>
@@ -64,7 +64,7 @@ export default function AnnonceForm({annonce}){
         <div className="editor-fields">
           <Field id="announcement-location" label="Lieu"><input id="announcement-location" value={form.lieu} onChange={e=>update("lieu",e.target.value)} disabled={loading} maxLength={300} placeholder="Conakry ou en ligne"/></Field>
           <EditorDate id="announcement-deadline" label="Date limite" value={form.echeance} onChange={v=>update("echeance",v)} optional disabled={loading}/>
-          <Field id="announcement-action-label" label="Texte du bouton"><input id="announcement-action-label" value={form.action_label} onChange={e=>update("action_label",e.target.value)} disabled={loading} maxLength={100} placeholder={form.categorie==="recrutement"?"Envoyer ma candidature":"M’inscrire"}/></Field>
+          <Field id="announcement-action-label" label="Texte du bouton"><input id="announcement-action-label" value={form.action_label} onChange={e=>update("action_label",e.target.value)} disabled={loading} maxLength={100} placeholder={form.categorie==="recrutement"?"Envoyer ma candidature":form.categorie==="formation"?"M’inscrire":"En savoir plus"}/></Field>
           <Field id="announcement-action-url" label="Lien du bouton"><input id="announcement-action-url" value={form.action_url} onChange={e=>update("action_url",e.target.value)} disabled={loading} maxLength={2000} placeholder="https://… ou mailto:…"/></Field>
         </div>
       </section>}

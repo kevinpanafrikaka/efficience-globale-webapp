@@ -2,7 +2,7 @@
 import { useEffect,useRef,useState } from "react";
 import AdminAnnouncementCard from "./AdminAnnouncementCard";
 import EditorSelect from "./EditorSelect";
-import { ANNOUNCEMENT_TYPES,announcementType } from "@/lib/announcements.mjs";
+import { ANNOUNCEMENT_TYPES,announcementType,announcementCategory } from "@/lib/announcements.mjs";
 import "./project-editor.css";
 import "./admin-projects.css";
 import "./admin-announcements.css";
@@ -12,7 +12,7 @@ export default function AdminAnnoncesGrid({ annonces }) {
   const input=useRef(null),searchButton=useRef(null),restore=useRef(false);
   useEffect(()=>{if(searchOpen)input.current?.focus();else if(restore.current){searchButton.current?.focus();restore.current=false;}},[searchOpen]);
   function close(){restore.current=true;setQuery("");setSearchOpen(false);}
-  const filtered=annonces.filter(a=>(status==="all"||a.statut===status)&&(type==="all"||(a.categorie||"vie")===type)&&normalize(`${a.titre} ${a.resume||""} ${a.texte} ${announcementType(a.categorie).label}`).includes(normalize(query).trim()));
+  const filtered=annonces.filter(a=>(status==="all"||a.statut===status)&&(type==="all"||announcementCategory(a.categorie)===type)&&normalize(`${a.titre} ${a.resume||""} ${a.texte} ${announcementType(a.categorie).label}`).includes(normalize(query).trim()));
   return <div className="admin-projects admin-announcements project-editor"><div className="projects-toolbar"><div className="projects-browse" hidden={searchOpen}>
     <div className="projects-filter-window"><div className="projects-filters" role="group" aria-label="Filtrer les annonces par statut">{[["all","Toutes"],["publie","Publiées"],["brouillon","Brouillons"]].map(([key,label])=><button key={key} type="button" className="eg-button eg-button--filter eg-button--compact" aria-pressed={status===key} onClick={e=>{setStatus(key);e.currentTarget.scrollIntoView?.({block:"nearest",inline:"nearest"});}}>{label}</button>)}</div></div>
     <div className="announcement-type-filter"><label htmlFor="announcement-type-filter" className="sr-only">Filtrer par type d’annonce</label><EditorSelect id="announcement-type-filter" value={type} options={[{value:"all",label:"Tous les types"},...ANNOUNCEMENT_TYPES]} onChange={setType} /></div>

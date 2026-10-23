@@ -439,7 +439,7 @@ test("Announcement filters combine publication, category and accent-insensitive 
  find(h.render(),n=>n.type==="button"&&n.props.children==="Publiées").props.onClick({currentTarget:{}});
  assert.ok(card("a"));assert.equal(card("b"),null);
  find(h.render(),n=>n.props?.id==="announcement-type-filter").props.onChange("recrutement");assert.equal(card("a"),null);
- find(h.render(),n=>n.props?.id==="announcement-type-filter").props.onChange("mission");
+ find(h.render(),n=>n.props?.id==="announcement-type-filter").props.onChange("actualite");
  find(h.render(),n=>n.props?.["aria-controls"]==="announcements-search").props.onClick();
  assert.equal(find(h.render(),n=>n.props?.className==="projects-browse").props.hidden,true);
  const field=()=>find(h.render(),n=>n.props?.id==="announcements-query");field().props.onChange({target:{value:"evaluation"}});assert.ok(card("a"));
@@ -540,4 +540,23 @@ test("Application UI renders offer-specific fields and enforces a required diplo
  await h.render().props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,0);assert.match(find(h.render(),n=>n.props?.role==="alert").props.children,/Diplôme/);
  const pdf=new File(["%PDF-1.4\n%%EOF"],"diplome.pdf",{type:"application/pdf"});find(h.render(),n=>n.type?.name==="DocumentField"&&n.props.kind==="diplome").props.onChange(pdf);
  await h.render().props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,1);assert.equal(h.requests[0].options.body.get("diplome").name,"diplome.pdf");assert.equal(h.requests[0].options.body.has("cv"),false);assert.equal(h.requests[0].options.body.has("portfolio"),false);
+});
+
+test("All six public filters separate future training and event reports and retain legacy news",async()=>{
+ const annonces=[{id:"stage",categorie:"recrutement"},{id:"training",categorie:"formation"},{id:"report",categorie:"evenement"},{id:"news",categorie:"actualite"},{id:"legacy",categorie:"mission"},{id:"old",categorie:"vie"},{id:"guide",categorie:"publication"}];
+ const h=await harness("src/components/AnnouncementsGrid.jsx",{annonces});
+ const cases=[["Recrutement",["stage"]],["Formations",["training"]],["Événements",["report"]],["Actualités",["news","legacy","old"]],["Publications",["guide"]],["Toutes",annonces.map(a=>a.id)]];
+ for(const [label,expected] of cases){
+  const button=find(h.render(),n=>n.type==="button"&&n.props.children===label);assert.ok(button,label);button.props.onClick({currentTarget:{}});
+  assert.equal(find(h.render(),n=>n.type==="button"&&n.props.children===label).props["aria-pressed"],true);
+  for(const a of annonces)assert.equal(!!find(h.render(),n=>n.type?.name==="AnnouncementCard"&&n.props.annonce.id===a.id),expected.includes(a.id),`${label}: ${a.id}`);
+ }
+});
+
+test("The announcement editor offers the five new categories and opens older news with the matching current choice",async()=>{
+ const h=await harness("src/components/admin/AnnonceForm.jsx",{annonce:{id:"legacy",titre:"Nouvelle",texte:"Contenu",date:"2026-10-23",categorie:"mission"}});
+ const select=()=>find(h.render(),n=>n.type?.name==="EditorSelect"&&n.props.id==="announcement-category");
+ assert.equal(select().props.value,"actualite");assert.deepEqual(Array.from(select().props.options,o=>o.label),["Recrutement","Formations","Événements","Actualités","Publications"]);
+ select().props.onChange("evenement");assert.ok(find(h.render(),n=>n.props?.id==="announcement-location"));
+ await h.render().props.onSubmit({preventDefault(){}});assert.equal(JSON.parse(h.requests[0].options.body).categorie,"evenement");
 });

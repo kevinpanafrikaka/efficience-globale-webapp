@@ -1,5 +1,5 @@
 import { validateApplicationDocuments } from "./application-documents.mjs";
-import { ANNOUNCEMENT_TYPES, announcementActionUrl } from "./announcements.mjs";
+import { ANNOUNCEMENT_TYPES, announcementActionUrl, announcementCategory } from "./announcements.mjs";
 export class AdminInputError extends Error {}
 
 function text(data, key, max = 500, required = false) {
@@ -60,8 +60,9 @@ export function validateAdminContent(kind, data) {
     if(data.documents_candidature!==undefined){
       try{result.documents_candidature=validateApplicationDocuments(data.documents_candidature);}catch(error){throw new AdminInputError(error.message);}
     }
-    result.categorie = text(data, "categorie", 40) || "vie";
-    if (!ANNOUNCEMENT_TYPES.some(type => type.value === result.categorie)) throw new AdminInputError("Type d’annonce invalide.");
+    result.categorie = text(data, "categorie", 40) || "actualite";
+    if (!["vie","mission"].includes(result.categorie) && !ANNOUNCEMENT_TYPES.some(type => type.value === result.categorie)) throw new AdminInputError("Type d’annonce invalide.");
+    result.categorie = announcementCategory(result.categorie);
     result.resume = text(data, "resume", 500);
     result.lieu = text(data, "lieu", 300);
     result.echeance = text(data, "echeance", 10);

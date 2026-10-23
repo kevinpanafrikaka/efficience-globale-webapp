@@ -1,3 +1,4 @@
+import { announcementCategory } from "./announcements.mjs";
 import { applicationRequirements } from "./application-documents.mjs";
 import { sortProjectsByEnd } from "@/lib/project-period.mjs";
 import { expertiseTags } from "@/lib/member-expertises.mjs";
@@ -228,7 +229,7 @@ function galleryStatements(db, id, photos) {
 async function withAnnouncementGallery(db, row) {
   if (!row) return null;
   const { results } = await db.prepare("SELECT url,legende FROM annonce_photos WHERE annonce_id = ? ORDER BY position ASC").bind(row.id).all();
-  return { ...row, documents_candidature: applicationRequirements(row.documents_candidature), galerie: results };
+  return { ...row, categorie:announcementCategory(row.categorie), documents_candidature: applicationRequirements(row.documents_candidature), galerie: results };
 }
 
 // Idempotent bootstrap keeps existing D1 databases compatible with this deployment.
@@ -236,7 +237,7 @@ async function announcementDB() {
   const db = await getDB();
   await db.prepare(`CREATE TABLE IF NOT EXISTS annonce_details (
     annonce_id TEXT PRIMARY KEY REFERENCES annonces(id) ON DELETE CASCADE,
-    categorie TEXT NOT NULL DEFAULT 'vie', resume TEXT NOT NULL DEFAULT '',
+    categorie TEXT NOT NULL DEFAULT 'actualite', resume TEXT NOT NULL DEFAULT '',
     lieu TEXT NOT NULL DEFAULT '', echeance TEXT NOT NULL DEFAULT '',
     action_url TEXT NOT NULL DEFAULT '', action_label TEXT NOT NULL DEFAULT ''
   )`).run();
@@ -244,7 +245,7 @@ async function announcementDB() {
   await ensureAnnouncementPhotos(db);
   return db;
 }
-const ANNOUNCEMENT_SELECT = `SELECT a.*, COALESCE(d.categorie, 'vie') AS categorie,
+const ANNOUNCEMENT_SELECT = `SELECT a.*, COALESCE(d.categorie, 'actualite') AS categorie,
   COALESCE(d.resume, '') AS resume, COALESCE(d.lieu, '') AS lieu,
   COALESCE(d.echeance, '') AS echeance, COALESCE(d.action_url, '') AS action_url,
   COALESCE(d.action_label, '') AS action_label, ad.documents_json AS documents_candidature
@@ -258,12 +259,12 @@ function announcementDetailsStatement(db, id, data) {
     VALUES (?,?,?,?,?,?,?) ON CONFLICT(annonce_id) DO UPDATE SET categorie=excluded.categorie,
     resume=excluded.resume,lieu=excluded.lieu,echeance=excluded.echeance,
     action_url=excluded.action_url,action_label=excluded.action_label`)
-    .bind(id,data.categorie || "vie",data.resume || "",data.lieu || "",data.echeance || "",data.action_url || "",data.action_label || "");
+    .bind(id,announcementCategory(data.categorie),data.resume || "",data.lieu || "",data.echeance || "",data.action_url || "",data.action_label || "");
 }
 export async function getAnnonces() {
   const db = await announcementDB();
   const { results } = await db.prepare(`${ANNOUNCEMENT_SELECT} WHERE a.statut = 'publie' ORDER BY a.date DESC, a.cree_le DESC, a.id ASC`).all();
-  return results.map(row=>({...row,documents_candidature:applicationRequirements(row.documents_candidature)}));
+  return results.map(row=>({...row,categorie:announcementCategory(row.categorie),documents_candidature:applicationRequirements(row.documents_candidature)}));
 }
 export async function getAnnonceBySlug(slug) {
   const db = await announcementDB();
@@ -272,7 +273,7 @@ export async function getAnnonceBySlug(slug) {
 export async function getAllAnnonces() {
   const db = await announcementDB();
   const { results } = await db.prepare(`${ANNOUNCEMENT_SELECT} ORDER BY a.date DESC, a.cree_le DESC, a.id ASC`).all();
-  return results.map(row=>({...row,documents_candidature:applicationRequirements(row.documents_candidature)}));
+  return results.map(row=>({...row,categorie:announcementCategory(row.categorie),documents_candidature:applicationRequirements(row.documents_candidature)}));
 }
 export async function getAnnonceById(id) {
   const db = await announcementDB();

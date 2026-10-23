@@ -1,11 +1,16 @@
 export const ANNOUNCEMENT_TYPES = [
   { value: "recrutement", label: "Recrutement" },
-  { value: "formation", label: "Formations et événements" },
-  { value: "mission", label: "Missions et partenariats" },
+  { value: "formation", label: "Formations" },
+  { value: "evenement", label: "Événements" },
+  { value: "actualite", label: "Actualités" },
   { value: "publication", label: "Publications" },
-  { value: "vie", label: "Vie du cabinet" },
 ];
-export function announcementType(value) { return ANNOUNCEMENT_TYPES.find(type => type.value === value) || ANNOUNCEMENT_TYPES.at(-1); }
+// Old categories remain readable in saved records and already-open editor tabs.
+export function announcementCategory(value) {
+  if(value === "mission" || value === "vie") return "actualite";
+  return ANNOUNCEMENT_TYPES.some(type => type.value === value) ? value : "actualite";
+}
+export function announcementType(value) { return ANNOUNCEMENT_TYPES.find(type => type.value === announcementCategory(value)); }
 export function announcementBlocks(value) {
   return String(value || "").split(/\n\s*\n/).filter(block => block.trim()).map(block => {
     const text = block.trim();

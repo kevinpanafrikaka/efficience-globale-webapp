@@ -96,7 +96,7 @@ CREATE INDEX IF NOT EXISTS idx_tentatives_ip ON tentatives_login(ip, cree_le);
 -- Informations éditoriales des annonces.
 CREATE TABLE IF NOT EXISTS annonce_details (
   annonce_id TEXT PRIMARY KEY REFERENCES annonces(id) ON DELETE CASCADE,
-  categorie TEXT NOT NULL DEFAULT 'vie',
+  categorie TEXT NOT NULL DEFAULT 'actualite',
   resume TEXT NOT NULL DEFAULT '',
   lieu TEXT NOT NULL DEFAULT '',
   echeance TEXT NOT NULL DEFAULT '',
