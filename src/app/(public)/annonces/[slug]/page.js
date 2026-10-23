@@ -39,7 +39,7 @@ export default async function AnnonceDetailPage({ params }) {
     </section>
     <section className="eg-container eg-section announcement-detail-body" aria-label="Contenu de l’annonce">
       <AnnouncementArticle annonce={displayAnnonce} action={action} expired={expired}/>
-      {annonce.galerie?.length > 0 && <AnnouncementGallery photos={annonce.galerie} title={annonce.titre} />}
+      {!["recrutement","formation"].includes(annonce.categorie) && annonce.galerie?.length > 0 && <AnnouncementGallery photos={annonce.galerie} title={annonce.titre} />}
       <div className="announcement-detail-return"><Link href="/annonces" className="eg-button eg-button--secondary">Revenir aux annonces</Link></div>
     </section>
     {related.length > 0 && <section className="announcement-related" aria-labelledby="announcement-related-title"><div className="eg-container"><h2 id="announcement-related-title">À lire également</h2><div className="eg-news-grid">{related.map(a => <AnnouncementCard key={a.id} annonce={a} />)}</div></div></section>}

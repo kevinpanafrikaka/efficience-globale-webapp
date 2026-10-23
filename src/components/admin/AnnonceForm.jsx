@@ -117,10 +117,10 @@ export default function AnnonceForm({annonce}){
         </div>)}</div>
         <div className="announcement-document-add"><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={loading||form.documents_candidature.length>=MAX_APPLICATION_DOCUMENTS} onClick={()=>setForm(f=>({...f,documents_candidature:[...f.documents_candidature,{id:`piece_${crypto.randomUUID()}`,label:"",required:false}]}))}>Ajouter un document</button><span>{form.documents_candidature.length} / {MAX_APPLICATION_DOCUMENTS}</span></div>
       </section>}
-      <section className="editor-panel announcement-gallery-panel" aria-labelledby="announcement-gallery-panel-title">
+      {!["recrutement","formation"].includes(type)&&<section className="editor-panel announcement-gallery-panel" aria-labelledby="announcement-gallery-panel-title">
         <h2 id="announcement-gallery-panel-title">{type==="evenement"?"Photos de l’activité":"Galerie de photos"}</h2>
         <AnnouncementGalleryUpload photos={form.galerie} onChange={photos=>update("galerie",photos)} onAdd={photos=>setForm(f=>({...f,galerie:[...f.galerie,...photos].slice(0,50)}))} onUploadingChange={setGalleryUploading} disabled={loading||coverUploading||pdfUploading}/>
-      </section>
+      </section>}
     </div>
     <Actions mobile/>
   </form>;
