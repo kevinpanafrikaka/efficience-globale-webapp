@@ -1,10 +1,14 @@
 .public-site .eg-section.application-page { max-width: 1100px; padding-block: 40px 64px; }
-.public-site .application-heading { margin-bottom: 28px; }
-.public-site .application-heading-top { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-.public-site .application-heading h1 { font-size: clamp(34px,4.5vw,52px); line-height: 1.12; margin: 0; letter-spacing: -.025em; }
-.public-site .application-heading-top .eg-button { flex-shrink: 0; }
-.public-site .application-heading > p { max-width: 780px; margin: 18px 0 0; font-size: clamp(18px,2vw,22px); line-height: 1.5; color: #4f6349; overflow-wrap: anywhere; }
-.public-site .application-offer-facts { display: flex; flex-wrap: wrap; gap: 16px 32px; margin: 24px 0 0; padding: 18px 22px; border-left: 3px solid #80af46; border-radius: 0 12px 12px 0; background: #f5f7f1; }
+.public-site .application-hero { position: relative; display: flex; align-items: center; min-height: 320px; overflow: hidden; background: #16211a; }
+.public-site .application-hero-image { object-fit: cover; object-position: center 40%; }
+.public-site .application-hero-pattern { position: absolute; inset: 0; background: radial-gradient(ellipse at 90% 10%,#537449 0%,#243b2d 45%,#16211a 85%); }
+.public-site .application-hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg,#0d130ef2 0%,#0d130ec4 48%,#0d130e59 100%),linear-gradient(0deg,#0a0f0b66,transparent); }
+.public-site .application-hero-content { position: relative; max-width: 1100px; padding-block: 48px; }
+.public-site .application-hero h1 { margin: 0; max-width: 800px; color: white; font-size: clamp(34px,4.5vw,52px); line-height: 1.12; letter-spacing: -.025em; text-wrap: balance; }
+.public-site .application-hero-content > p { max-width: 740px; margin: 16px 0 24px; color: #e2e9dc; font-size: clamp(18px,2vw,22px); line-height: 1.5; overflow-wrap: anywhere; }
+.public-site .application-hero .eg-button { min-height: 44px; border-color: #ffffff80; background: #16211a40; color: white; }
+.public-site .application-hero .eg-button:hover { border-color: white; background: #ffffff1a; }
+.public-site .application-offer-facts { display: flex; flex-wrap: wrap; gap: 16px 32px; margin: 0 0 28px; padding: 18px 22px; border-left: 3px solid #80af46; border-radius: 0 12px 12px 0; background: #f5f7f1; }
 .public-site .application-offer-facts > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px 12px; min-width: 0; }
 .public-site .application-offer-facts dt { font-size: 13px; color: #5c6b55; }
 .public-site .application-offer-facts dd { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.6; overflow-wrap: anywhere; }
@@ -48,8 +52,9 @@
 }
 @media(max-width:479px) {
  .public-site .eg-section.application-page { padding-inline: 20px; padding-top: 28px; }
- .public-site .application-heading-top { flex-direction: column-reverse; align-items: flex-start; gap: 22px; }
- .public-site .application-heading-top .eg-button { min-height: 44px; }
+ .public-site .application-hero { min-height: 280px; }
+ .public-site .application-hero-content { padding: 36px 20px; }
+ .public-site .application-hero-shade { background: linear-gradient(90deg,#0d130ee6,#0d130ea6); }
  .public-site .application-offer-facts { flex-direction: column; gap: 10px; padding: 16px 18px; }
  .public-site .application-form, .public-site .application-result { padding: 22px 18px; border-radius: 16px; }
  .public-site .application-document { padding: 16px; gap: 12px; }
