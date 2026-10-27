@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import AdminNavLink from "./AdminNavLink";
 import LogoutButton from "./LogoutButton";
 import DashboardCreateMenu from "./DashboardCreateMenu";
-import AnnouncementAdminTabs from "./AnnouncementAdminTabs";
 
 const NAV = [
   ["/admin", "Tableau de bord", "◫"], ["/admin/projets", "Projets", "▤"],
@@ -46,7 +45,7 @@ export default function AdminShell({ children, unread }) {
         {dashboard || projects || team || announcements ? <div className="admin-topbar-title"><h1>{announcements ? "Annonces" : team ? "Équipe" : projects ? "Projets" : "Tableau de bord"}</h1></div> : <span>Administration <span aria-hidden="true">/</span> <strong>{current}</strong></span>}
         <div className="admin-topbar-actions"><a href="/admin/messages" aria-label={`${unread} message${unread > 1 ? "s" : ""} non lu${unread > 1 ? "s" : ""}`}>Messages <span className="admin-unread-count">{unread}</span></a>{dashboard && <DashboardCreateMenu />}{projects && <a href="/admin/projets/nouveau" className="eg-button eg-button--primary">+ Nouveau projet</a>}{team && <a href="/admin/membres/nouveau" className="eg-button eg-button--primary">+ Nouveau membre</a>}{announcements && <a href="/admin/annonces/nouveau" className="eg-button eg-button--primary">+ Nouvelle annonce</a>}</div>
       </header>}
-      <main id="admin-main" className="admin-main" tabIndex={-1}>{announcements && <AnnouncementAdminTabs applications={applications} />}{children}</main>
+      <main id="admin-main" className="admin-main" tabIndex={-1}>{children}</main>
       <footer className="admin-footer">Efficience Globale</footer>
     </div>
   </div>;

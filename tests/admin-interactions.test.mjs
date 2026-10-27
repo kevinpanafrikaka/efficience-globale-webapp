@@ -447,12 +447,20 @@ test("Announcement filters combine publication, category and accent-insensitive 
  assert.ok(card("a"));assert.ok(card("b"));
  find(h.render(),n=>n.type==="button"&&n.props.children==="Publiées").props.onClick({currentTarget:{}});
  assert.ok(card("a"));assert.equal(card("b"),null);
- find(h.render(),n=>n.props?.id==="announcement-type-filter").props.onChange("recrutement");assert.equal(card("a"),null);
- find(h.render(),n=>n.props?.id==="announcement-type-filter").props.onChange("actualite");
+ find(h.render(),n=>n.type==="button"&&n.props.children==="Recrutement").props.onClick({currentTarget:{}});assert.equal(card("a"),null);
+ find(h.render(),n=>n.type==="button"&&n.props.children==="Actualités").props.onClick({currentTarget:{}});
  find(h.render(),n=>n.props?.["aria-controls"]==="announcements-search").props.onClick();
  assert.equal(find(h.render(),n=>n.props?.className==="projects-browse").props.hidden,true);
  const field=()=>find(h.render(),n=>n.props?.id==="announcements-query");field().props.onChange({target:{value:"evaluation"}});assert.ok(card("a"));
  field().props.onKeyDown({key:"Escape"});assert.equal(field().props.value,"");assert.ok(card("a"));assert.equal(card("b"),null);
+});
+
+test("Returning from the offer inbox selects recruitment immediately in the announcement list",async()=>{
+ const annonces=[{id:"stage",titre:"Stage",categorie:"recrutement",statut:"publie"},{id:"news",titre:"Actualité",categorie:"actualite",statut:"publie"}];
+ const h=await harness("src/components/admin/AdminAnnoncesGrid.jsx",{annonces,initialType:"recrutement"});
+ assert.ok(find(h.render(),n=>n.type?.name==="AdminAnnouncementCard"&&n.props.annonce.id==="stage"));
+ assert.equal(find(h.render(),n=>n.type?.name==="AdminAnnouncementCard"&&n.props.annonce.id==="news"),null);
+ assert.equal(find(h.render(),n=>n.type==="button"&&n.props.children==="Recrutement").props["aria-pressed"],true);
 });
 
 test("Public category filters keep real links' records together and reset an empty selection",async()=>{

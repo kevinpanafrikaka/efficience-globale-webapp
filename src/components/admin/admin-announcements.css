@@ -5,6 +5,10 @@
 .admin-announcements .project-card-actions { flex-wrap: wrap; }
 .admin-announcements .project-card-actions > .eg-button { min-width: 0; max-width: 100%; white-space: normal; overflow-wrap: anywhere; text-align: center; }
 .admin-announcements .project-card-actions > .announcement-options { margin-left: auto; }
+.admin-announcements .projects-filter-window { flex: 1; }
+.admin-announcements .announcements-type-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 12px; margin-bottom: 20px; scrollbar-width: thin; overscroll-behavior-inline: contain; }
+.admin-announcements .announcements-type-tabs > button { flex-shrink: 0; white-space: nowrap; min-height: 44px; border-radius: 10px; }
+.admin-announcements .announcements-type-tabs [aria-pressed="true"] { background: #354d40; border-color: #354d40; color: white; }
 .admin-announcements .announcement-card-summary { font-size: 13px; line-height: 1.65; color: #657260; margin: 0 0 20px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
 .announcement-options { position: relative; flex-shrink: 0; }
 .announcement-options:has(.announcement-options-panel) { z-index: 10; }
