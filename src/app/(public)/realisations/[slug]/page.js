@@ -123,7 +123,7 @@ export default async function ProjetDetailPage({ params }) {
 
       {similaires.length > 0 && (
         <section className="bg-cream py-16 md:py-20">
-          <div className="max-w-6xl mx-auto px-5 md:px-8">
+          <div className="eg-container">
             <h2 className="text-[22px] md:text-[26px] tracking-[-0.01em] mb-8">Projets similaires</h2>
             <div className="grid md:grid-cols-3 gap-5">
               {similaires.map((p) => (

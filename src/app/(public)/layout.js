@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import "./public-site.css";
 import "./editorial.css";
+import "./fluid-layout.css";
 
 // Le Footer lit les réglages (coordonnées, réseaux) en base : pas de rendu statique.
 export const dynamic = "force-dynamic";

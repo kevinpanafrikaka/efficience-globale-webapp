@@ -47,7 +47,7 @@ export default async function Footer() {
 
   return (
     <footer className="bg-darker text-[#8fa189] safe-bottom">
-      <div className="max-w-6xl mx-auto px-5 md:px-8 py-10">
+      <div className="public-shell py-10">
         <div className="public-footer-grid grid md:grid-cols-[1.2fr_1fr_1fr] gap-8 pb-8 border-b border-white/10">
           {/* Marque */}
           <div>

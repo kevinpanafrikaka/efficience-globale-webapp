@@ -54,7 +54,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-line safe-top">
-      <div className="max-w-7xl mx-auto px-5 md:px-8 h-[72px] flex items-center gap-5 justify-between">
+      <div className="public-shell h-[72px] flex items-center gap-5 justify-between">
         <Link href="/" className="flex items-center shrink-0" aria-label="Efficience Globale — Accueil">
           <Image src="/img/logo-eg.png" alt="Efficience Globale" width={160} height={52} className="h-9 w-auto" priority />
         </Link>
