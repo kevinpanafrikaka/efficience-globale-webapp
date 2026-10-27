@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function AdminNavLink({ href, children, badge = 0 }) {
+export default function AdminNavLink({ href, children, badge = 0, relatedPaths = [] }) {
   const pathname = usePathname();
-  const active = pathname === href || (href !== "/admin" && pathname.startsWith(href));
+  const active = [href, ...relatedPaths].some(path => pathname === path || (path !== "/admin" && pathname.startsWith(`${path}/`)));
 
   return (
     <Link

@@ -11,7 +11,7 @@ const require = createRequire(import.meta.url);
 const { transformSync } = require("next/dist/build/swc");
 const root = resolve(dirname(new URL(import.meta.url).pathname), "../..");
 
-export async function adminRuntime({ authenticated = true, fetcher = async () => { throw new Error("Unexpected network in test"); } } = {}) {
+export async function adminRuntime({ authenticated = true, pathname = "/admin", fetcher = async () => { throw new Error("Unexpected network in test"); } } = {}) {
   const sqlite = new DatabaseSync(":memory:");
   sqlite.exec(await readFile(resolve(root, "schema.sql"), "utf8"));
   const files = new Map();
@@ -43,7 +43,7 @@ export async function adminRuntime({ authenticated = true, fetcher = async () =>
     "react": react, "react/jsx-runtime": jsx,
     "next/link": { default: ({ href, children, ...props }) => react.createElement("a", { href, ...props }, children) },
     "next/image": { default: ({ fill, priority, ...props }) => react.createElement("img", props) },
-    "next/navigation": { notFound() { throw new Error("NOT_FOUND"); }, useRouter: () => router, usePathname: () => "/admin" },
+    "next/navigation": { notFound() { throw new Error("NOT_FOUND"); }, useRouter: () => router, usePathname: () => pathname },
   };
   const context = vm.createContext({ Response, Request, Headers, FormData, File, URL, URLSearchParams, AbortSignal, TextEncoder, TextDecoder, Buffer, Date, Intl, crypto: webcrypto, fetch: fetcher, console });
   const cache = new Map();

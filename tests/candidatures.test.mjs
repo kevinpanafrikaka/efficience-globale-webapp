@@ -12,6 +12,42 @@ function request(slug,extra={}){const f=new FormData();for(const [k,v] of Object
 async function setup(options={}){const mails=[];const r=await adminRuntime({fetcher:async(url,opts)=>{mails.push({url,body:JSON.parse(opts.body)});return Response.json(options.mailFails?{}:{messageId:"accepted"},{status:options.mailFails?503:201});},...options});Object.assign(r.env,{BREVO_API_KEY:"test",BREVO_SENDER_EMAIL:"site@example.org"});const db=await r.module("src/lib/db.js");const id=await db.createAnnonce({titre:"Chargé de projets",texte:"Offre",date:"2026-10-23",categorie:"recrutement",statut:"publie"});const api=await r.module("src/app/api/candidatures/[slug]/route.js"),core=await r.module("src/lib/candidatures.mjs");return {r,id,api,core,mails};}
 const params=id=>({params:Promise.resolve({id})});
 
+test("Announcements and applications share one sidebar entry and keep the correct view active through dossier navigation",async()=>{
+ for(const pathname of ["/admin/annonces","/admin/candidatures","/admin/candidatures/dossier"]){
+  const r=await adminRuntime({pathname});try{
+   const Shell=(await r.module("src/components/admin/AdminShell.jsx")).default;
+   const html=renderToStaticMarkup((await import("react")).createElement(Shell,{unread:0}));
+   const sidebar=html.match(/<nav aria-label="Administration"[^>]*>([\s\S]*?)<\/nav>/)[1];
+   assert.match(sidebar,/href="\/admin\/annonces" aria-current="page"/);
+   assert.doesNotMatch(sidebar,/href="\/admin\/candidatures"/);
+   const tabs=html.match(/<nav class="announcement-admin-tabs"[^>]*>([\s\S]*?)<\/nav>/)[1];
+   assert.match(tabs,/Les annonces/);assert.match(tabs,/Les candidatures/);
+   const active=pathname==="/admin/annonces"?"/admin/annonces":"/admin/candidatures";
+   assert.ok(tabs.includes(`href="${active}" class="eg-button eg-button--filter" aria-current="page"`));
+   assert.equal((html.match(/<h1/g)||[]).length,1);
+  }finally{r.close();}
+ }
+});
+
+test("Application offer and status filters combine without mixing dossiers or dropping saved offers",async()=>{
+ const r=await adminRuntime();try{
+  const db=await r.module("src/lib/db.js"),core=await r.module("src/lib/candidatures.mjs");await core.ensureApplications(r.env);
+  const offer1=await db.createAnnonce({titre:"Offre A",texte:"Texte",date:"2026-10-27",categorie:"recrutement",statut:"publie"});
+  const offer2=await db.createAnnonce({titre:"Offre B",texte:"Texte",date:"2026-10-27",categorie:"recrutement",statut:"publie"});
+  const add=r.sqlite.prepare("INSERT INTO candidatures(id,request_id,annonce_id,offre_titre,nom,email,cv_key,document_secret,octets,cree_le,expire_le,upload_statut,statut) VALUES(?,?,?,?,?,?,'','',0,'2026-10-27','2026-11-27','ready',?)");
+  add.run("a1","r1",offer1,"Offre A","Candidate retenue","a@example.org","retenue");
+  add.run("a2","r2",offer1,"Offre A","Candidate nouvelle","b@example.org","nouvelle");
+  add.run("b1","r3",offer2,"Offre B","Autre dossier","c@example.org","retenue");
+  const page=(await r.module("src/app/admin/candidatures/page.js")).default;
+  const html=renderToStaticMarkup(await page({searchParams:Promise.resolve({annonce:offer1,statut:"retenue"})}));
+  assert.match(html,/Candidate retenue/);assert.doesNotMatch(html,/Candidate nouvelle|Autre dossier/);
+  assert.match(html,/Offre de recrutement/);assert.match(html,/Offre A/);assert.match(html,/Toutes les offres/);
+  assert.ok(html.includes(`annonce=${offer1}`));assert.ok(html.includes('statut=nouvelle'));
+  const filter=(await r.module("src/components/admin/ApplicationOfferFilter.jsx")).default;
+  assert.match(renderToStaticMarkup((await import("react")).createElement(filter,{offers:[{value:offer1,label:"Offre A"}],offer:offer2})),/Offre sélectionnée/);
+ }finally{r.close();}
+});
+
 test("A candidature stores encrypted PDFs, sends both attachments to Oumar, and exact retries do not resend",async()=>{
  const {r,id,api,core,mails}=await setup();try{
  const key=randomUUID(),extra={request_id:key,lettre:new File([pdf],"motivation.pdf",{type:"application/pdf"})};

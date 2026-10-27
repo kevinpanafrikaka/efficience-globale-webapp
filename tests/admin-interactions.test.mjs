@@ -14,7 +14,7 @@ async function harness(path, props = {}, { fail = false, network = false, respon
   let pendingEffects = [];
   let cursor = 0;
   const context = vm.createContext({
-    URL, FormData, File, crypto: webcrypto,
+    URL, URLSearchParams, FormData, File, crypto: webcrypto,
     fetch: async (url, options) => { requests.push({ url, options }); if (respond) return respond(url, options); if (network) throw Error("offline"); return Response.json(fail ? { error: "Échec de test" } : { success: true }, { status: fail ? 401 : 200 }); },
     window: {
       confirm: () => true, innerHeight: 700,
@@ -91,6 +91,14 @@ function find(root, predicate) {
   for (const child of [root.props?.children].flat(Infinity)) { const found = find(child, predicate); if (found) return found; }
   return null;
 }
+
+test("The shared application view switches offers while preserving status and resetting pagination",async()=>{
+ const h=await harness("src/components/admin/ApplicationOfferFilter.jsx",{offers:[{value:"offre-a",label:"Offre A"}],offer:"",status:"retenue"});
+ const select=find(h.render(),n=>n.type?.name==="EditorSelect");
+ select.props.onChange("offre-a");assert.equal(h.navigations[0],"/admin/candidatures?annonce=offre-a&statut=retenue");
+ select.props.onChange("");assert.equal(h.navigations[1],"/admin/candidatures?statut=retenue");
+ assert.equal(h.requests.length,0);
+});
 
 test("Every image form waits for upload completion and saves the new image exactly once", async () => {
   for (const [name, key, imageKey, fields] of [

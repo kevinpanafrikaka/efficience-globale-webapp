@@ -1,6 +1,8 @@
 .admin-applications { min-width: 0; }
 .applications-admin-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 16px; margin: 24px 0; }
-.applications-admin-heading h1 { font-size: clamp(26px,3vw,34px); line-height: 1.25; overflow-wrap: anywhere; }
+.applications-admin-heading :is(h1,h2) { font-size: clamp(26px,3vw,34px); line-height: 1.25; overflow-wrap: anywhere; }
+.application-offer-filter { width: 100%; max-width: 480px; margin-bottom: 20px; min-width: 0; }
+.application-offer-filter > label { display: block; margin-bottom: 8px; font-size: 13px; font-weight: 600; }
 .applications-admin-heading > span, .application-storage { font-size: 12px; line-height: 1.7; color: #657260; }
 .applications-admin-heading p { margin-top: 12px; line-height: 1.6; color: #4f6349; }
 .application-admin-filters { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 14px; }
