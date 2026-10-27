@@ -554,6 +554,20 @@ test("All six public filters separate future training and event reports and reta
  }
 });
 
+test("Changing announcement type hides unsupported galleries without discarding saved photos or the cover",async()=>{
+ const photo={url:"/uploads/activity.jpg",legende:"Atelier"};
+ const h=await harness("src/components/admin/AnnonceForm.jsx",{annonce:{id:"gallery",titre:"Annonce",texte:"Contenu",date:"2026-10-23",categorie:"actualite",image_url:"/uploads/cover.jpg",galerie:[photo]}});
+ for(const type of ["formation","recrutement","evenement","publication","actualite"]){
+  find(h.render(),n=>n.type?.name==="EditorSelect"&&n.props.id==="announcement-category").props.onChange(type);
+  const gallery=find(h.render(),n=>n.type?.name==="AnnouncementGalleryUpload");
+  assert.equal(Boolean(gallery),!["formation","recrutement"].includes(type),type);
+  if(gallery)assert.equal(gallery.props.photos[0].url,photo.url);
+ }
+ await h.render().props.onSubmit({preventDefault(){}});
+ const payload=JSON.parse(h.requests[0].options.body);
+ assert.equal(payload.galerie[0].url,photo.url);assert.equal(payload.image_url,"/uploads/cover.jpg");
+});
+
 test("The announcement editor offers the five new categories and opens older news with the matching current choice",async()=>{
  const h=await harness("src/components/admin/AnnonceForm.jsx",{annonce:{id:"legacy",titre:"Nouvelle",texte:"Contenu",date:"2026-10-23",categorie:"mission"}});
  const select=()=>find(h.render(),n=>n.type?.name==="EditorSelect"&&n.props.id==="announcement-category");

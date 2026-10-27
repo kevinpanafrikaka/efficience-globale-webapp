@@ -2,6 +2,9 @@
 .admin-announcements .announcement-type-filter { flex: 0 1 270px; min-width: 180px; }
 .admin-announcements .project-metadata > time { border-left: 1px solid #dce4d7; padding-left: 10px; }
 .admin-announcements .project-card h2 { margin-bottom: 14px; }
+.admin-announcements .project-card-actions { flex-wrap: wrap; }
+.admin-announcements .project-card-actions > .eg-button { min-width: 0; max-width: 100%; white-space: normal; overflow-wrap: anywhere; text-align: center; }
+.admin-announcements .project-card-actions > .announcement-options { margin-left: auto; }
 .admin-announcements .announcement-card-summary { font-size: 13px; line-height: 1.65; color: #657260; margin: 0 0 20px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
 .announcement-options { position: relative; flex-shrink: 0; }
 .announcement-options:has(.announcement-options-panel) { z-index: 10; }

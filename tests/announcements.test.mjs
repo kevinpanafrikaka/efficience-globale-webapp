@@ -3,8 +3,19 @@ import assert from "node:assert/strict";
 import { renderToStaticMarkup } from "react-dom/server";
 import { adminRuntime } from "./helpers/admin-runtime.mjs";
 import { validateAdminContent } from "../src/lib/admin-input.mjs";
-import { announcementArticleContent,ANNOUNCEMENT_TYPES,announcementCategory,announcementType } from "../src/lib/announcements.mjs";
+import { announcementBlocks,announcementArticleContent,ANNOUNCEMENT_TYPES,announcementCategory,announcementType } from "../src/lib/announcements.mjs";
 const req=body=>new Request("https://example.org/admin/annonces",{method:"POST",headers:{origin:"https://example.org","Content-Type":"application/json"},body:JSON.stringify(body)});
+
+test("Pasted headings, lists and paragraphs remain distinct without blank lines, including Windows line breaks",()=>{
+ const input="## Programme\r\nUne introduction\r\nsur deux lignes.\r\n- Premier point\r\n• Deuxième point\r\n## Modalités\r\nContenu";
+ assert.deepEqual(announcementBlocks(input),[
+  {type:"heading",text:"Programme"},{type:"paragraph",text:"Une introduction\nsur deux lignes."},
+  {type:"list",items:["Premier point","Deuxième point"]},{type:"heading",text:"Modalités"},{type:"paragraph",text:"Contenu"}
+ ]);
+ const article=announcementArticleContent(input);
+ assert.deepEqual(article.sections.map(s=>s.title),["Programme","Modalités"]);
+ assert.equal(article.sections[0].blocks[1].items.length,2);
+});
 
 test("Existing announcements acquire editorial defaults without a manual database migration or content loss",async()=>{
  const r=await adminRuntime();try{
@@ -88,6 +99,18 @@ test("Gallery validation rejects unsafe or oversized data and deduplicates photo
  const base={titre:"Annonce",texte:"Contenu",date:"2026-10-23"};
  for(const galerie of [null,{},[null],[{url:"javascript:alert(1)"}],[{url:""}],[{url:"/a.jpg",legende:"a".repeat(301)}],Array.from({length:51},()=>({url:"/a.jpg"}))])assert.throws(()=>validateAdminContent("annonces",{...base,galerie}));
  const result=validateAdminContent("annonces",{...base,galerie:[{url:"/a.jpg",legende:"Première"},{url:"/b.jpg"},{url:"/a.jpg"}]});assert.equal(result.galerie.length,2);assert.equal(result.galerie[0].legende,"Première");
+});
+
+test("Public galleries stay hidden on recruitment and training while retaining stored photos",async()=>{
+ const r=await adminRuntime();try{
+  const db=await r.module("src/lib/db.js"),{default:Page}=await r.module("src/app/(public)/annonces/[slug]/page.js");
+  for(const categorie of ANNOUNCEMENT_TYPES.map(t=>t.value)){
+   const id=await db.createAnnonce({titre:categorie,texte:"Contenu",date:"2026-10-27",statut:"publie",categorie,image_url:"/uploads/cover.jpg",galerie:[{url:"/uploads/gallery.jpg",legende:"Atelier"}]});
+   const html=renderToStaticMarkup(await Page({params:Promise.resolve({slug:id})}));
+   assert.equal(html.includes('class="announcement-gallery"'),!["recrutement","formation"].includes(categorie),categorie);
+   assert.ok(html.includes('/uploads/cover.jpg'));assert.equal((await db.getAnnonceById(id)).galerie.length,1);
+  }
+ }finally{r.close();}
 });
 
 test("Editorial grouping preserves author content and only avoids an exact repeated introduction",()=>{

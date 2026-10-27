@@ -12,13 +12,25 @@ export function announcementCategory(value) {
 }
 export function announcementType(value) { return ANNOUNCEMENT_TYPES.find(type => type.value === announcementCategory(value)); }
 export function announcementBlocks(value) {
-  return String(value || "").split(/\n\s*\n/).filter(block => block.trim()).map(block => {
-    const text = block.trim();
-    if (/^## /u.test(text)) return { type: "heading", text: text.slice(3) };
-    const lines = text.split("\n");
-    if (lines.every(line => /^[-•] /u.test(line))) return { type: "list", items: lines.map(line => line.slice(2)) };
-    return { type: "paragraph", text };
-  });
+  const blocks = [];
+  let pending = null;
+  function flush() { if (pending) blocks.push(pending); pending = null; }
+  for (const raw of String(value || "").replace(/\r\n?/g, "\n").split("\n")) {
+    const line = raw.trim();
+    if (!line) { flush(); continue; }
+    const heading = /^##[\t ]+(.+)$/u.exec(line);
+    if (heading) { flush(); blocks.push({ type: "heading", text: heading[1].trim() }); continue; }
+    const item = /^[-•][\t ]+(.+)$/u.exec(line);
+    if (item) {
+      if (pending?.type !== "list") { flush(); pending = { type: "list", items: [] }; }
+      pending.items.push(item[1].trim());
+    } else {
+      if (pending?.type !== "paragraph") { flush(); pending = { type: "paragraph", text: "" }; }
+      pending.text += `${pending.text ? "\n" : ""}${line}`;
+    }
+  }
+  flush();
+  return blocks;
 }
 export function announcementSummary(annonce) { return annonce.resume?.trim() || announcementExcerpt(annonce.texte); }
 export function announcementActionUrl(value) {
