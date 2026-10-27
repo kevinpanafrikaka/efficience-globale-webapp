@@ -1,14 +1,21 @@
-.admin-announcements .projects-search-toggle { flex: 0 0 46px; width: 46px; padding: 0; }
-.admin-announcements .announcement-type-filter { flex: 0 1 270px; min-width: 180px; }
+.admin-projects.admin-announcements .projects-search-toggle { flex: 0 0 46px; width: 46px; padding: 0; }
 .admin-announcements .project-metadata > time { border-left: 1px solid #dce4d7; padding-left: 10px; }
 .admin-announcements .project-card h2 { margin-bottom: 14px; }
 .admin-announcements .project-card-actions { flex-wrap: wrap; }
 .admin-announcements .project-card-actions > .eg-button { min-width: 0; max-width: 100%; white-space: normal; overflow-wrap: anywhere; text-align: center; }
 .admin-announcements .project-card-actions > .announcement-options { margin-left: auto; }
-.admin-announcements .projects-filter-window { flex: 1; }
-.admin-announcements .announcements-type-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 12px; margin-bottom: 20px; scrollbar-width: thin; overscroll-behavior-inline: contain; }
+.admin-projects.admin-announcements .projects-toolbar { margin-bottom: 12px; }
+.admin-projects.admin-announcements .projects-browse { align-items: center; flex-wrap: nowrap; }
+.admin-projects.admin-announcements .projects-filter-window { flex: 1; min-width: 0; max-width: none; }
+.admin-announcements .announcements-type-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 6px; margin: 0; scrollbar-width: thin; overscroll-behavior-inline: contain; }
 .admin-announcements .announcements-type-tabs > button { flex-shrink: 0; white-space: nowrap; min-height: 44px; border-radius: 10px; }
 .admin-announcements .announcements-type-tabs [aria-pressed="true"] { background: #354d40; border-color: #354d40; color: white; }
+.admin-announcements .announcements-status-row { min-width: 0; margin-bottom: 22px; padding-bottom: 16px; border-bottom: 1px solid #dce4d7; }
+.admin-announcements .announcements-status-filters { display: flex; gap: 4px; overflow-x: auto; padding: 2px; scrollbar-width: thin; overscroll-behavior-inline: contain; }
+.admin-announcements .announcement-status-button { flex-shrink: 0; min-height: 40px; padding: 8px 12px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #657260; font: inherit; font-size: 13px; font-weight: 500; line-height: 1.3; white-space: nowrap; cursor: pointer; }
+.admin-announcements .announcement-status-button:hover { background: #edf2e8; color: #354d40; }
+.admin-announcements .announcement-status-button[aria-pressed="true"] { background: #e5eddf; color: #354d40; font-weight: 600; }
+.admin-announcements .announcement-status-button:focus-visible { outline: 2px solid #354d40; outline-offset: 2px; }
 .admin-announcements .announcement-card-summary { font-size: 13px; line-height: 1.65; color: #657260; margin: 0 0 20px; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
 .announcement-options { position: relative; flex-shrink: 0; }
 .announcement-options:has(.announcement-options-panel) { z-index: 10; }
@@ -17,8 +24,8 @@
 .announcement-options-panel[data-below="true"] { top: calc(100% + 8px); bottom: auto; }
 .announcement-options-panel .eg-button { width: 100%; }
 @media(max-width:719px){
- .admin-announcements .projects-browse { flex-wrap: wrap; }
- .admin-announcements .projects-filter-window { flex: 1; min-width: 0; max-width: calc(100% - 54px); }
- .admin-announcements .projects-filters { flex-wrap: nowrap; overflow-x: auto; }
- .admin-announcements .announcement-type-filter { order: 2; flex-basis: 100%; }
+ .admin-announcements .announcements-type-tabs { padding-right: 16px; }
+ .admin-announcements .announcements-type-tabs > button { padding-inline: 13px; font-size: 12px; }
+ .admin-announcements .announcement-status-button { padding-inline: 10px; font-size: 12px; }
+ .admin-announcements .announcements-status-row { margin-bottom: 18px; padding-bottom: 12px; }
 }

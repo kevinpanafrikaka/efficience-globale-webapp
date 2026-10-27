@@ -451,6 +451,10 @@ test("Announcement filters combine publication, category and accent-insensitive 
  find(h.render(),n=>n.type==="button"&&n.props.children==="Actualités").props.onClick({currentTarget:{}});
  find(h.render(),n=>n.props?.["aria-controls"]==="announcements-search").props.onClick();
  assert.equal(find(h.render(),n=>n.props?.className==="projects-browse").props.hidden,true);
+ const browse=find(h.render(),n=>n.props?.className==="projects-browse");
+ assert.ok(find(browse,n=>n.props?.["aria-label"]==="Filtrer les annonces par type"));
+ assert.equal(find(browse,n=>n.props?.["aria-label"]==="Filtrer les annonces par statut"),null);
+ assert.ok(find(h.render(),n=>n.type==="button"&&n.props.children==="Tous les statuts"));
  const field=()=>find(h.render(),n=>n.props?.id==="announcements-query");field().props.onChange({target:{value:"evaluation"}});assert.ok(card("a"));
  field().props.onKeyDown({key:"Escape"});assert.equal(field().props.value,"");assert.ok(card("a"));assert.equal(card("b"),null);
 });
