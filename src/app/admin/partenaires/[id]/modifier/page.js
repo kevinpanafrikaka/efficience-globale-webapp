@@ -9,10 +9,5 @@ export default async function AdminModifierPartenairePage({ params }) {
   const partenaire = await getPartenaireById(id);
   if (!partenaire) notFound();
 
-  return (
-    <div>
-      <h1 className="text-[24px] mb-6">Modifier : {partenaire.nom}</h1>
-      <PartenaireForm partenaire={partenaire} />
-    </div>
-  );
+  return <PartenaireForm partenaire={partenaire} />;
 }

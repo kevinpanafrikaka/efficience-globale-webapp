@@ -1,83 +1,13 @@
-import AdminImage from "@/components/admin/AdminImage";
 import { adminPageAllowed } from "@/lib/admin-page";
-import Link from "next/link";
-import { getAllPartenaires } from "@/lib/db";
-import DeleteButton from "@/components/admin/DeleteButton";
-import ReorderButtons from "@/components/admin/ReorderButtons";
+import { getAllPartenaires, getProjets } from "@/lib/db";
+import { projectsForPartner } from "@/lib/partner-projects.mjs";
+import AdminPartenairesGrid from "@/components/admin/AdminPartenairesGrid";
 
 export default async function AdminPartenairesPage() {
   if (!(await adminPageAllowed())) return null;
-  let partenaires = [];
-  let migrationManquante = false;
-  try {
-    partenaires = await getAllPartenaires();
-  } catch {
-    migrationManquante = true;
-  }
-
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-[24px]">Partenaires</h1>
-        <Link
-          href="/admin/partenaires/nouveau"
-          className="eg-button eg-button--primary"
-        >
-          + Nouveau partenaire
-        </Link>
-      </div>
-
-      {migrationManquante ? (
-        <p className="text-[14.5px] text-red-600">
-          La table « partenaires » n&apos;existe pas encore. Appliquez la migration
-          <code className="mx-1">migrations/001_admin_completion.sql</code> sur la base D1.
-        </p>
-      ) : partenaires.length === 0 ? (
-        <p className="text-[14.5px] text-ink-soft">Aucun partenaire pour le moment.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {partenaires.map((p, i) => (
-            <div key={p.id} className="border border-line rounded-lg overflow-hidden flex flex-col bg-white">
-              <div className="relative h-32 bg-cream flex items-center justify-center px-6">
-                {p.logo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <AdminImage src={p.logo_url} alt={p.nom} className="max-h-20 max-w-full object-contain" />
-                ) : (
-                  <span className="text-[14px] font-bold text-dark-2 text-center">{p.nom}</span>
-                )}
-                <span
-                  className={`absolute top-2 left-2 text-[10.5px] font-bold tracking-wide px-1.5 py-0.5 rounded ${
-                    p.statut === "publie" ? "bg-lime text-ink" : "bg-white text-ink-faint"
-                  }`}
-                >
-                  {p.statut === "publie" ? "PUBLIÉ" : "BROUILLON"}
-                </span>
-              </div>
-              <div className="p-4 flex flex-col gap-1.5 flex-1">
-                <h3 className="text-[15px] font-semibold text-dark leading-snug">{p.nom}</h3>
-                <div className="text-[12.5px] text-ink-faint truncate">{p.site_web || "—"}</div>
-                <div className="mt-auto flex items-center justify-between pt-3 border-t border-line">
-                  <ReorderButtons
-                    table="partenaires"
-                    id={p.id}
-                    prevId={partenaires[i - 1]?.id}
-                    nextId={partenaires[i + 1]?.id}
-                  />
-                  <div className="flex items-center gap-4">
-                    <Link
-                      href={`/admin/partenaires/${p.id}/modifier`}
-                      className="eg-button eg-button--secondary eg-button--compact"
-                    >
-                      Modifier
-                    </Link>
-                    <DeleteButton endpoint={`/api/admin/partenaires/${p.id}`} confirmMessage={`Supprimer "${p.nom}" ?`} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  let partenaires;
+  try { partenaires = await getAllPartenaires(); }
+  catch { return <p role="alert">Les partenaires n’ont pas pu être chargés. Réessayez dans quelques instants.</p>; }
+  const projets = await getProjets();
+  return <AdminPartenairesGrid partenaires={partenaires.map(p => ({ ...p, projectCount: projectsForPartner(p, projets).length }))} />;
 }

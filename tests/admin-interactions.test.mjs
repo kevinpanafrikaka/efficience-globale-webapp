@@ -44,6 +44,7 @@ async function harness(path, props = {}, { fail = false, network = false, respon
     "./dashboard-create-menu.css": {},
     "./admin-projects.css": {},
     "./admin-team.css": {},
+    "./admin-partners.css": {},
     "./project-editor.css": {},
     "./member-editor.css": {},
     "./admin-announcements.css": {},
@@ -61,7 +62,7 @@ async function harness(path, props = {}, { fail = false, network = false, respon
   const cache = new Map(),linking=new Map();
   async function load(name) {
     if (imports[name]) return new vm.SyntheticModule(Object.keys(imports[name]), function () { for (const [k,v] of Object.entries(imports[name])) this.setExport(k,v); }, { context });
-    const file = name === "@/lib/announcement-fields.mjs" ? "src/lib/announcement-fields.mjs" : name === "./announcement-fields.mjs" ? "src/lib/announcement-fields.mjs" : name === "./announcements.mjs" ? "src/lib/announcements.mjs" : name === "./EditorTime" ? "src/components/admin/EditorTime.jsx" : name === "./PublicationPdfUpload" ? "src/components/admin/PublicationPdfUpload.jsx" : name === "@/lib/application-documents.mjs" ? "src/lib/application-documents.mjs" : name === "./AnnouncementGalleryUpload" ? "src/components/admin/AnnouncementGalleryUpload.jsx" : name === "./EditorDate" ? "src/components/admin/EditorDate.jsx" : name === "./AdminAnnouncementCard" ? "src/components/admin/AdminAnnouncementCard.jsx" : name === "./AnnouncementOptions" ? "src/components/admin/AnnouncementOptions.jsx" : name === "./AnnouncementCard" ? "src/components/AnnouncementCard.jsx" : name === "@/lib/announcements.mjs" ? "src/lib/announcements.mjs" : name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./MemberCard" ? "src/components/admin/MemberCard.jsx" : name === "./MemberOptions" ? "src/components/admin/MemberOptions.jsx" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name === "@/lib/member-expertises.mjs" ? "src/lib/member-expertises.mjs" : name;
+    const file = name === "./PartnerOptions" ? "src/components/admin/PartnerOptions.jsx" : name === "@/lib/partner-projects.mjs" ? "src/lib/partner-projects.mjs" : name === "@/lib/announcement-fields.mjs" ? "src/lib/announcement-fields.mjs" : name === "./announcement-fields.mjs" ? "src/lib/announcement-fields.mjs" : name === "./announcements.mjs" ? "src/lib/announcements.mjs" : name === "./EditorTime" ? "src/components/admin/EditorTime.jsx" : name === "./PublicationPdfUpload" ? "src/components/admin/PublicationPdfUpload.jsx" : name === "@/lib/application-documents.mjs" ? "src/lib/application-documents.mjs" : name === "./AnnouncementGalleryUpload" ? "src/components/admin/AnnouncementGalleryUpload.jsx" : name === "./EditorDate" ? "src/components/admin/EditorDate.jsx" : name === "./AdminAnnouncementCard" ? "src/components/admin/AdminAnnouncementCard.jsx" : name === "./AnnouncementOptions" ? "src/components/admin/AnnouncementOptions.jsx" : name === "./AnnouncementCard" ? "src/components/AnnouncementCard.jsx" : name === "@/lib/announcements.mjs" ? "src/lib/announcements.mjs" : name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./MemberCard" ? "src/components/admin/MemberCard.jsx" : name === "./MemberOptions" ? "src/components/admin/MemberOptions.jsx" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name === "@/lib/member-expertises.mjs" ? "src/lib/member-expertises.mjs" : name;
     if (!cache.has(file)) {
       const source = await readFile(new URL("../" + file, import.meta.url), "utf8");
       const { code } = transformSync(source, { filename: file, jsc: { target: "es2022", parser: { syntax: "ecmascript", jsx: true }, transform: { react: { runtime: "automatic" } } }, module: { type: "es6" } });
@@ -636,4 +637,47 @@ test("PDF upload errors keep the previously selected document and duplicate sele
  const event=()=>({target:{files:[new File(["%PDF-1.4\n%%EOF"],"Nouveau.pdf",{type:"application/pdf"})],value:"selected"}});
  const first=input().props.onChange(event());await input().props.onChange(event());assert.equal(h.requests.length,1);
  done(Response.json({error:"Échec du stockage"},{status:503}));await first;assert.equal(changes.length,0);assert.equal(uploads.at(-1),false);assert.ok(find(h.render(),n=>n.props?.role==="alert"));assert.ok(find(h.render(),n=>n.type==="a"&&n.props.children==="Ancien.pdf"));
+});
+
+
+test("Partner filters combine status, accent-insensitive name and website search, preserving true reorder neighbours", async () => {
+ const partenaires=[{id:"a",nom:"École",statut:"publie",site_web:"https://ecole.example.org",projectCount:2},{id:"b",nom:"Brouillon",statut:"brouillon",projectCount:1},{id:"c",nom:"Institut",statut:"publie"}];
+ const h=await harness("src/components/admin/AdminPartenairesGrid.jsx",{partenaires});
+ assert.equal(find(h.render(),n=>n.props?.href==="/realisations?partenaire=b#projets"),null);
+ find(h.render(),n=>n.type==="button"&&n.props.children==="Publiés").props.onClick();
+ assert.equal(find(h.render(),n=>n.type==="h2"&&n.props.children==="Brouillon"),null);
+ const option=find(h.render(),n=>n.type?.name==="PartnerOptions"&&n.props.partenaire.id==="c");assert.equal(option.props.prevId,"b");
+ find(h.render(),n=>n.props?.["aria-controls"]==="partner-search").props.onClick();
+ assert.equal(find(h.render(),n=>n.props?.className==="projects-browse").props.hidden,true);
+ const field=()=>find(h.render(),n=>n.props?.id==="partner-query");
+ field().props.onChange({target:{value:"ecole"}});assert.ok(find(h.render(),n=>n.type==="h2"&&n.props.children==="École"));assert.equal(find(h.render(),n=>n.type==="h2"&&n.props.children==="Institut"),null);
+ field().props.onChange({target:{value:"example.org"}});assert.ok(find(h.render(),n=>n.props?.href==="https://ecole.example.org/"));
+ assert.ok(find(h.render(),n=>n.props?.href==="/realisations?partenaire=a#projets"));
+ field().props.onKeyDown({key:"Escape"});assert.equal(field().props.value,"");assert.ok(find(h.render(),n=>n.type==="h2"&&n.props.children==="Institut"));
+});
+
+test("Partner options reorder exactly once and publication preserves the partner's contents", async () => {
+ const partenaire={id:"gavi",nom:"Gavi",statut:"publie",site_web:"https://gavi.org",logo_url:"/img/logo.png",ordre_affichage:7};
+ const h=await harness("src/components/admin/PartnerOptions.jsx",{partenaire,prevId:"before",nextId:"after"});
+ find(h.render(),n=>n.type==="button"&&n.props["aria-expanded"]!==undefined).props.onClick();h.render();
+ const move=find(h.render(),n=>n.type==="button"&&n.props.children==="Déplacer après");
+ await Promise.all([move.props.onClick(),move.props.onClick()]);assert.equal(h.requests.length,1);
+ assert.deepEqual(JSON.parse(h.requests[0].options.body),{table:"partenaires",id:"gavi",targetId:"after"});
+ find(h.render(),n=>n.type==="button"&&n.props["aria-expanded"]!==undefined).props.onClick();h.render();
+ await find(h.render(),n=>n.type==="button"&&n.props.children==="Passer en brouillon").props.onClick();
+ assert.equal(h.requests[1].url,"/api/admin/partenaires/gavi");assert.deepEqual(JSON.parse(h.requests[1].options.body),{nom:"Gavi",logo_url:"/img/logo.png",site_web:"https://gavi.org",ordre_affichage:7,statut:"brouillon"});
+ const failed=await harness("src/components/admin/PartnerOptions.jsx",{partenaire,nextId:"after"},{network:true});
+ find(failed.render(),n=>n.type==="button"&&n.props["aria-expanded"]!==undefined).props.onClick();failed.render();
+ await find(failed.render(),n=>n.type==="button"&&n.props.children==="Déplacer après").props.onClick();assert.ok(find(failed.render(),n=>n.props?.role==="alert"));
+ failed.dispatch("keydown",{key:"Escape"});assert.equal(find(failed.render(),n=>n.type==="button"&&n.props["aria-expanded"]!==undefined).props["aria-expanded"],false);
+});
+
+test("Partner editor keeps manual position hidden, supports a custom status and retains failed edits", async () => {
+ const h=await harness("src/components/admin/PartenaireForm.jsx",{partenaire:{id:"a",nom:"Institution",ordre_affichage:12,logo_url:"/img/a.png"}},{fail:true});
+ assert.equal(find(h.render(),n=>n.type==="input"&&n.props.type==="number"),null);
+ find(h.render(),n=>n.type?.name==="EditorSelect").props.onChange("publie");
+ find(h.render(),n=>n.props?.id==="partenaireform-1").props.onChange({target:{value:"Institution modifiée"}});
+ await h.render().props.onSubmit({preventDefault(){}});
+ const payload=JSON.parse(h.requests[0].options.body);assert.equal(payload.ordre_affichage,12);assert.equal(payload.statut,"publie");assert.equal(payload.nom,"Institution modifiée");assert.ok(find(h.render(),n=>n.props?.role==="alert"));assert.equal(h.navigations.length,0);
+ const fresh=await harness("src/components/admin/PartenaireForm.jsx",{initialOrder:13});await fresh.render().props.onSubmit({preventDefault(){}});assert.equal(JSON.parse(fresh.requests[0].options.body).ordre_affichage,13);
 });

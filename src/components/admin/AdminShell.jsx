@@ -18,6 +18,8 @@ export default function AdminShell({ children, unread }) {
   const pathname = usePathname();
   const dashboard = pathname === "/admin";
   const projects = pathname === "/admin/projets";
+  const partners = pathname === "/admin/partenaires";
+  const partnerEditor = pathname === "/admin/partenaires/nouveau" || /^\/admin\/partenaires\/[^/]+\/modifier$/.test(pathname);
   const team = pathname === "/admin/membres";
   const applications = pathname === "/admin/candidatures" || pathname.startsWith("/admin/candidatures/");
   const announcements = pathname === "/admin/annonces" || applications;
@@ -41,9 +43,9 @@ export default function AdminShell({ children, unread }) {
       </div>
     </aside>
     <div className="admin-workspace">
-      {!projectEditor && !memberEditor && !announcementEditor && <header className={`admin-topbar ${dashboard || projects || team || announcements ? "is-dashboard" : ""}${projects ? " is-projects" : team ? " is-team" : announcements ? " is-announcements" : ""}`}>
-        {dashboard || projects || team || announcements ? <div className="admin-topbar-title"><h1>{announcements ? "Annonces" : team ? "Équipe" : projects ? "Projets" : "Tableau de bord"}</h1></div> : <span>Administration <span aria-hidden="true">/</span> <strong>{current}</strong></span>}
-        <div className="admin-topbar-actions"><a href="/admin/messages" aria-label={`${unread} message${unread > 1 ? "s" : ""} non lu${unread > 1 ? "s" : ""}`}>Messages <span className="admin-unread-count">{unread}</span></a>{dashboard && <DashboardCreateMenu />}{projects && <a href="/admin/projets/nouveau" className="eg-button eg-button--primary">+ Nouveau projet</a>}{team && <a href="/admin/membres/nouveau" className="eg-button eg-button--primary">+ Nouveau membre</a>}{announcements && <a href="/admin/annonces/nouveau" className="eg-button eg-button--primary">+ Nouvelle annonce</a>}</div>
+      {!projectEditor && !memberEditor && !announcementEditor && !partnerEditor && <header className={`admin-topbar ${dashboard || projects || team || announcements || partners ? "is-dashboard" : ""}${projects ? " is-projects" : team ? " is-team" : announcements ? " is-announcements" : partners ? " is-partners" : ""}`}>
+        {dashboard || projects || team || announcements || partners ? <div className="admin-topbar-title"><h1>{partners ? "Partenaires" : announcements ? "Annonces" : team ? "Équipe" : projects ? "Projets" : "Tableau de bord"}</h1></div> : <span>Administration <span aria-hidden="true">/</span> <strong>{current}</strong></span>}
+        <div className="admin-topbar-actions"><a href="/admin/messages" aria-label={`${unread} message${unread > 1 ? "s" : ""} non lu${unread > 1 ? "s" : ""}`}>Messages <span className="admin-unread-count">{unread}</span></a>{dashboard && <DashboardCreateMenu />}{projects && <a href="/admin/projets/nouveau" className="eg-button eg-button--primary">+ Nouveau projet</a>}{team && <a href="/admin/membres/nouveau" className="eg-button eg-button--primary">+ Nouveau membre</a>}{partners && <a href="/admin/partenaires/nouveau" className="eg-button eg-button--primary">+ Nouveau partenaire</a>}{announcements && <a href="/admin/annonces/nouveau" className="eg-button eg-button--primary">+ Nouvelle annonce</a>}</div>
       </header>}
       <main id="admin-main" className="admin-main" tabIndex={-1}>{children}</main>
       <footer className="admin-footer">Efficience Globale</footer>

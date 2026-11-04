@@ -1,0 +1,46 @@
+.admin-projects.admin-partners .projects-search-toggle { flex: 0 0 46px; width: 46px; padding: 0; }
+.admin-projects.admin-partners .projects-filter-window { flex: 1; max-width: none; }
+.admin-projects.admin-partners .projects-filters { flex-wrap: nowrap; }
+.admin-partners .partner-grid { display: grid; grid-template-columns: minmax(0,1fr); gap: 22px; align-items: stretch; }
+.admin-partners .partner-card { display: flex; flex-direction: column; min-width: 0; padding: 7px; background: white; border: 1px solid #dce4d7; border-radius: 16px; box-shadow: 0 8px 28px -25px #26362a66; }
+.admin-space .partner-logo { display: grid; place-items: center; height: 166px; min-width: 0; padding: 22px; background: white; border-radius: 10px; }
+.admin-space .partner-logo-image { display: block; width: 100%; height: 100%; max-height: 122px; min-height: 0; object-fit: contain; }
+.admin-space .partner-logo-empty { max-width: 100%; color: #657260; font-size: 17px; line-height: 1.4; text-align: center; overflow-wrap: anywhere; }
+.admin-partners .partner-card-body { display: flex; flex: 1; flex-direction: column; min-width: 0; padding: 10px 14px 14px; }
+.admin-partners .partner-card h2 { margin: 0 0 12px; font-size: clamp(20px,1.65vw,24px); line-height: 1.3; letter-spacing: -.015em; }
+.admin-partners .partner-metadata { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; font-size: 12px; line-height: 1.6; color: #657260; margin-bottom: 10px; }
+.admin-partners .partner-metadata > :is(a,.partner-project-count) { border-left: 1px solid #dce4d7; padding-left: 10px; color: #4b7728; }
+.admin-partners .partner-website { display: block; width: fit-content; max-width: 100%; font-size: 12px; line-height: 1.6; color: #657260; overflow-wrap: anywhere; margin-bottom: 12px; }
+.admin-partners :is(.partner-metadata a,.partner-website):hover { text-decoration: underline; text-underline-offset: 3px; }
+.admin-partners .partner-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 14px; border-top: 1px solid #e5eadf; }
+.admin-partners .partner-actions .eg-button { border-radius: 10px; }
+.admin-partners .partner-options { position: relative; flex-shrink: 0; }
+.admin-partners .partner-options > button { font-size: 22px; letter-spacing: 1px; }
+.admin-partners .partner-options:has(.partner-options-panel) { z-index: 10; }
+.admin-partners .partner-options-panel { position: absolute; right: 0; bottom: calc(100% + 8px); width: min(250px,calc(100vw - 70px)); display: grid; gap: 4px; padding: 10px; border: 1px solid #dce4d7; border-radius: 12px; background: white; box-shadow: 0 12px 40px #16211a26; overflow-y: auto; overscroll-behavior: contain; }
+.admin-partners .partner-options-panel[data-below="true"] { top: calc(100% + 8px); bottom: auto; }
+.admin-partners .partner-options-panel > button { padding: 8px 10px; border-radius: 8px; text-align: left; font-size: 13px; }
+.admin-partners .partner-options-panel > button:hover:not(:disabled) { background: #edf3e6; }
+.admin-partners .partner-options-panel > span { font-size: 12px; }
+.admin-partners .partner-options-panel .eg-button--danger { width: 100%; }
+.admin-partners .partner-options-panel > .inline-flex { border-top: 1px solid #e5eadf; padding-top: 8px; }
+.admin-partners .admin-empty .eg-button { margin-top: 20px; }
+.admin-space .admin-topbar.is-partners .admin-topbar-actions > .eg-button { min-height: 46px; border-radius: 10px; }
+.partner-editor .partner-editor-layout { display: grid; grid-template-columns: minmax(0,1fr); gap: 22px; align-items: start; }
+.partner-editor .partner-logo-preview { height: 210px; padding: 28px; margin-bottom: 18px; border: 1px solid #e5eadf; }
+.partner-editor .partner-logo-preview .partner-logo-image { max-height: 152px; }
+.partner-editor .partner-logo-panel > .flex > .eg-button { width: 100%; }
+.partner-editor .editor-error { position: static; }
+@media (min-width: 720px) { .admin-partners .partner-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (min-width: 1000px) { .partner-editor .partner-editor-layout { grid-template-columns: minmax(0,1fr) minmax(0,1.35fr); } }
+@media (min-width: 1280px) { .admin-partners .partner-grid { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+@media (max-width: 639px) {
+ .admin-space .admin-topbar.is-dashboard.is-partners .admin-topbar-actions { display: block; }
+ .admin-space .admin-topbar.is-partners .admin-topbar-actions > a:first-child { display: none; }
+ .admin-space .admin-topbar.is-partners .admin-topbar-actions > .eg-button { display: flex; width: 100%; justify-content: center; }
+ .admin-projects.admin-partners .projects-filter-window::after { display: none; }
+ .admin-projects.admin-partners .projects-filters { padding: 0; gap: 6px; }
+ .admin-projects.admin-partners .projects-filters .eg-button { padding-inline: 10px; font-size: 12px; }
+ .admin-partners .partner-card-body { padding-inline: 12px; }
+ .admin-partners .partner-logo { height: 152px; }
+}

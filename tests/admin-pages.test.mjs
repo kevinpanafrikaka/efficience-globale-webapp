@@ -79,3 +79,22 @@ test("Real session signatures reject forged, expired, malformed and non-finite c
     assert.equal(await auth.isAdminRequest(request(`${payload}.${signature}`), env), false);
   }
 });
+
+
+test("Partner administration counts published projects only, preserves records and appends new partners", async () => {
+ const runtime=await adminRuntime({pathname:"/admin/partenaires"});
+ try {
+  const db=await runtime.module("src/lib/db.js");
+  await db.createPartenaire({nom:"Gavi",statut:"publie",ordre_affichage:8});
+  await db.createPartenaire({nom:"Android",statut:"brouillon",ordre_affichage:9});
+  await db.createProjet({titre:"Mission visible",secteur:"sante",client:"Gavi",statut:"publie"});
+  await db.createProjet({titre:"Mission privée",secteur:"sante",client:"Gavi",statut:"brouillon"});
+  const page=await runtime.module("src/app/admin/partenaires/page.js");
+  const result=await page.default();assert.equal(result.props.partenaires.length,2);assert.equal(result.props.partenaires[0].projectCount,1);
+  const html=renderToStaticMarkup(result);assert.match(html,/Gavi/);assert.match(html,/Android/);assert.doesNotMatch(html,/PUBLIÉ|Ordre d.affichage/);assert.match(html,/partenaire=gavi#projets/);
+  const fresh=await runtime.module("src/app/admin/partenaires/nouveau/page.js");assert.equal((await fresh.default()).props.initialOrder,10);
+  const shell=await runtime.module("src/components/admin/AdminShell.jsx");
+  const React=await import("react");const frame=renderToStaticMarkup(React.createElement(shell.default,{unread:0},result));
+  assert.match(frame,/<h1>Partenaires<\/h1>/);assert.equal((frame.match(/Nouveau partenaire/g)||[]).length,1);
+ } finally {runtime.close();}
+});
