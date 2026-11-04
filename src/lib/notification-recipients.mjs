@@ -16,8 +16,6 @@ export function notificationRecipients(reglages) {
 }
 
 export async function readNotificationRecipients(env) {
-  let row;
-  try { row = await env.DB.prepare("SELECT valeur FROM reglages WHERE cle = ?").bind("email_notifications").first(); }
-  catch { return [...DEFAULT_NOTIFICATION_RECIPIENTS]; }
+  const row = await env.DB.prepare("SELECT valeur FROM reglages WHERE cle = ?").bind("email_notifications").first();
   return notificationRecipients({ email_notifications: row?.valeur });
 }

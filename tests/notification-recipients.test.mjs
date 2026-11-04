@@ -45,3 +45,8 @@ test("The Gmail send request uses the saved recipients and the visitor reply add
   assert.equal(await gmail.sendGmail(r.env,{nom:"Visiteur",email:"visitor@example.org",message:"Bonjour"}),"test-only-message");assert.equal(sent,1);
  }finally{r.close();}
 });
+
+
+test("A settings read failure never reroutes notifications to a fallback recipient",async()=>{
+ await assert.rejects(readNotificationRecipients({DB:{prepare(){throw new Error("Database unavailable");}}}),/Database unavailable/);
+});
