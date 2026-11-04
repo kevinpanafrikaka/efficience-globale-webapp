@@ -100,14 +100,18 @@ export function buildMime({ nom, email, sujet, message, attachments = [], recipi
 }
 
 export async function sendGmail(env, message) {
+  const recipients = await readNotificationRecipients(env);
+  return sendRawGmail(env, buildMime({ ...message, recipients }));
+}
+
+async function sendRawGmail(env, mime) {
   const row = await connection(env);
   if (!row) throw new Error("Gmail is not connected");
   const { refreshToken } = await unseal(row.token, env);
   const token = await googleToken({ client_id: env.GOOGLE_CLIENT_ID, client_secret: env.GOOGLE_CLIENT_SECRET, grant_type: "refresh_token", refresh_token: refreshToken });
-  const recipients = await readNotificationRecipients(env);
   const response = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
     method: "POST", headers: { Authorization: `Bearer ${token.access_token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ raw: base64url(encoder.encode(buildMime({ ...message, recipients }))) }), signal: AbortSignal.timeout(15000),
+    body: JSON.stringify({ raw: base64url(encoder.encode(mime)) }), signal: AbortSignal.timeout(15000),
   });
   if (!response.ok) throw new Error("Gmail delivery failed");
   const result = await response.json();
@@ -115,3 +119,27 @@ export async function sendGmail(env, message) {
   return result.id;
 }
 
+
+// Replies go only to the original visitor. Future replies return to the cabinet.
+export function buildReplyMime({ recipient, subject, text, replyTo }) {
+  const to = validateNotificationRecipients([recipient])[0];
+  const returnAddresses = validateNotificationRecipients(replyTo);
+  if (typeof subject !== "string" || !subject.trim() || subject.length > 200 || /[\r\n]/.test(subject)) throw new Error("Invalid subject");
+  if (typeof text !== "string" || !text.trim() || text.length > 20000) throw new Error("Invalid reply");
+  const parts = [""];
+  for (const char of subject) {
+    if (Buffer.byteLength(parts.at(-1) + char, "utf8") > 30) parts.push("");
+    parts[parts.length - 1] += char;
+  }
+  return [
+    `From: Efficience Globale <${GMAIL_OWNER}>`, `To: ${to}`,
+    `Reply-To: ${returnAddresses.join(", ")}`,
+    `Subject: ${parts.map(part => `=?UTF-8?B?${Buffer.from(part).toString("base64")}?=`).join("\r\n ")}`,
+    "MIME-Version: 1.0", "Content-Type: text/plain; charset=UTF-8", "Content-Transfer-Encoding: base64", "",
+    Buffer.from(text, "utf8").toString("base64").match(/.{1,76}/g).join("\r\n"),
+  ].join("\r\n");
+}
+
+export async function sendGmailReply(env, message) {
+  return sendRawGmail(env, buildReplyMime(message));
+}

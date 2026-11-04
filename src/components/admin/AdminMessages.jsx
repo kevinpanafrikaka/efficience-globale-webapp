@@ -1,0 +1,152 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { formatDate } from "@/lib/format";
+import "./admin-messages.css";
+
+const normalize = value => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+function replyRequestId() {
+  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 15) | 64;
+  bytes[8] = (bytes[8] & 63) | 128;
+  const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+const endpoint = id => `/api/admin/messages/${encodeURIComponent(id)}`;
+
+export default function AdminMessages({ messages: initialMessages, initialSelectedId = null }) {
+  const router = useRouter();
+  const [messages, setMessages] = useState(initialMessages);
+  const [selectedId, setSelectedId] = useState(initialSelectedId);
+  const [filter, setFilter] = useState("all"), [query, setQuery] = useState(""), [searchOpen, setSearchOpen] = useState(false);
+  const [detail, setDetail] = useState(null), [detailError, setDetailError] = useState(""), [actionError, setActionError] = useState("");
+  const [loading, setLoading] = useState(false), [busy, setBusy] = useState(false), [deleting, setDeleting] = useState(false);
+  const [drafts, setDrafts] = useState({}), [reload, setReload] = useState(0);
+  const searchRef = useRef(null), searchToggle = useRef(null), titleRef = useRef(null), selectedButton = useRef(null);
+  const busyRef = useRef(false);
+  useEffect(() => setMessages(initialMessages), [initialMessages]);
+  useEffect(() => {
+    const initial = initialMessages.find(m => m.id === initialSelectedId);
+    if (initial && !initial.lu) markRead(initial.id, true);
+  }, [initialSelectedId]);
+  useEffect(() => { if (searchOpen) searchRef.current?.focus(); }, [searchOpen]);
+  const selected = messages.find(m => m.id === selectedId);
+  const unread = messages.filter(m => !m.lu).length;
+  const filtered = messages.filter(m => (filter === "all" || (filter === "unread" ? !m.lu : !!m.lu)) && normalize(`${m.nom} ${m.email} ${m.sujet} ${m.message}`).includes(normalize(query).trim()));
+
+  useEffect(() => {
+    if (!selectedId) return;
+    let cancelled = false;
+    const controller = new AbortController();
+    setDetail(null); setDetailError(""); setActionError(""); setDeleting(false); setLoading(true);
+    titleRef.current?.focus();
+    async function load() {
+      try {
+        const response = await fetch(endpoint(selectedId), { cache: "no-store", signal: controller.signal });
+        const data = await response.json();
+        if (!response.ok) throw new Error(response.status === 401 ? "Session expirée. Reconnectez-vous à l’administration." : data.error || "Chargement impossible.");
+        if (!cancelled) setDetail(data);
+      } catch (error) { if (!cancelled) setDetailError(error.message || "Chargement impossible."); }
+      finally { if (!cancelled) setLoading(false); }
+    }
+    load();
+    return () => { cancelled = true; controller.abort(); };
+  }, [selectedId, reload]);
+
+  async function markRead(id, lu) {
+    try {
+      const response = await fetch(endpoint(id), { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ lu }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Le statut n’a pas pu être modifié.");
+      setMessages(items => items.map(m => m.id === id ? { ...m, lu: lu ? 1 : 0 } : m));
+      router.refresh();
+    } catch (error) { setActionError(error.message || "Connexion interrompue."); }
+  }
+  function openMessage(message, button) {
+    if (busyRef.current) return;
+    selectedButton.current = button;
+    setSelectedId(message.id);
+    if (!message.lu) markRead(message.id, true);
+  }
+  function closeMessage() { if (busyRef.current) return; setSelectedId(null); setDetail(null); selectedButton.current?.focus(); }
+  async function remove() {
+    if (busyRef.current) return;
+    busyRef.current = true; setBusy(true); setActionError("");
+    try {
+      const response = await fetch(endpoint(selectedId), { method: "DELETE" });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Suppression impossible.");
+      setMessages(items => items.filter(m => m.id !== selectedId)); setSelectedId(null); setDeleting(false); router.refresh();
+    } catch (error) { setActionError(error.message || "Connexion interrompue."); }
+    finally { busyRef.current = false; setBusy(false); }
+  }
+  function setSending(value) { busyRef.current = value; setBusy(value); }
+  function closeSearch() { setSearchOpen(false); setQuery(""); requestAnimationFrame(() => searchToggle.current?.focus()); }
+
+  return <div className="message-center" data-reading={!!selected}>
+    <div className="messages-toolbar">
+      {searchOpen ? <div className="messages-search"><label className="sr-only" htmlFor="messages-query">Rechercher dans les messages</label><input ref={searchRef} id="messages-query" type="search" placeholder="Nom, email, objet…" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === "Escape") closeSearch(); }} /><button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={closeSearch}>Fermer</button></div> : <>
+        <div className="messages-filters" role="group" aria-label="Filtrer les messages">
+          {[["all", "Tous", messages.length], ["unread", "Non lus", unread], ["read", "Lus", messages.length - unread]].map(([value, label, count]) => <button type="button" key={value} className="eg-button eg-button--filter eg-button--compact" aria-pressed={filter === value} onClick={() => setFilter(value)}>{label}<span className="message-filter-count">{count}</span></button>)}
+        </div><button ref={searchToggle} type="button" className="eg-button eg-button--secondary eg-button--icon" aria-label="Rechercher un message" aria-expanded={false} onClick={() => setSearchOpen(true)}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button>
+      </>}
+    </div>
+    <div className="messages-layout">
+      <section className="messages-inbox" aria-label="Messages reçus">
+        <div className="messages-inbox-heading"><h2>Boîte de réception</h2><span>{filtered.length}</span></div>
+        {filtered.length ? <ul className="messages-list">{filtered.map(m => <li key={m.id}><button type="button" className="message-row" data-active={m.id === selectedId} data-unread={!m.lu} aria-pressed={m.id === selectedId} disabled={busy} onClick={e => openMessage(m, e.currentTarget)}>
+          <div className="message-row-top"><span className="message-row-sender">{!m.lu && <span className="message-unread-dot" aria-label="Non lu" />}{m.nom}</span><span className="message-row-date">{formatDate(m.cree_le).split(",")[0]}</span></div>
+          <span className="message-row-subject">{m.sujet || "Sans objet"}</span><span className="message-row-excerpt">{m.message}</span>
+        </button></li>)}</ul> : <div className="messages-empty-list"><h3>{messages.length ? "Aucun résultat" : "Aucun message"}</h3>{messages.length > 0 && <button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={() => { setFilter("all"); setQuery(""); }}>Réinitialiser</button>}</div>}
+      </section>
+      <section className="messages-reader" aria-label="Lecture du message">
+        {!selected ? <div className="messages-placeholder"><div className="messages-placeholder-mark" aria-hidden="true">EG</div><h2>Chaque échange commence ici.</h2><p>Sélectionnez un message pour le consulter.</p></div> : <>
+          <div className="message-reader-tools"><button type="button" onClick={closeMessage} disabled={busy} className="eg-button eg-button--secondary eg-button--compact message-back">Tous les messages</button><div className="message-reader-actions"><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={busy} onClick={() => markRead(selected.id, !selected.lu)}>{selected.lu ? "Marquer non lu" : "Marquer lu"}</button><button type="button" className="eg-button eg-button--danger eg-button--compact" disabled={busy} onClick={() => setDeleting(true)}>Supprimer</button></div></div>
+          {deleting && <div className="message-delete-confirm" role="group" aria-label="Confirmer la suppression"><p>Supprimer ce message et son historique de réponses ?</p><div><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={busy} onClick={() => setDeleting(false)}>Annuler</button><button type="button" className="eg-button eg-button--danger eg-button--compact" disabled={busy} onClick={remove}>{busy ? "Suppression…" : "Confirmer la suppression"}</button></div></div>}
+          {actionError && <p role="alert" className="message-alert">{actionError}</p>}
+          <header className="message-heading"><h2 ref={titleRef} tabIndex={-1}>{selected.sujet || "Sans objet"}</h2><div className="message-contact"><strong>{selected.nom}</strong><a href={`mailto:${selected.email}`}>{selected.email}</a><time>{formatDate(selected.cree_le)}</time></div>{!selected.envoye && <span className="message-delivery-note">Notification email non envoyée</span>}</header>
+          <div className="message-original">{selected.message}</div>
+          {loading && <p className="message-load-status" role="status">Chargement des réponses…</p>}
+          {detailError && <div className="message-alert" role="alert"><p>{detailError}</p><button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={() => setReload(value => value + 1)}>Réessayer</button></div>}
+          {detail && <>
+            {detail.replies.length > 0 && <section className="message-history" aria-label="Historique des réponses"><h3>Réponses du cabinet</h3>{detail.replies.map(reply => <article key={reply.id} className="message-reply-record"><div><strong>{reply.status === "sent" ? "Réponse envoyée" : "Envoi à vérifier dans Gmail"}</strong><time>{formatDate(reply.cree_le)}</time></div><p className="message-reply-destination">À : {reply.recipient}</p><h4>{reply.subject}</h4><p className="message-reply-body">{reply.body}</p></article>)}</section>}
+            {detail.connected ? <ReplyComposer key={selected.id} message={selected} detail={detail} draft={drafts[selected.id]} onDraft={draft => setDrafts(prev => ({ ...prev, [selected.id]: draft }))} onBusy={setSending} onSent={() => { setReload(value => value + 1); router.refresh(); }} /> : <div className="message-connect"><p>Connectez Gmail pour répondre depuis cet espace.</p><Link href="/admin/reglages" className="eg-button eg-button--secondary eg-button--compact">Ouvrir les réglages</Link></div>}
+          </>}
+        </>}
+      </section>
+    </div>
+  </div>;
+}
+
+function ReplyComposer({ message, detail, draft, onDraft, onBusy, onSent }) {
+  const initialSubject = `Re: ${message.sujet || "Votre message"}`.replace(/[\r\n]/g, " ").slice(0, 200);
+  const [confirming, setConfirming] = useState(false), [sending, setSending] = useState(false), [error, setError] = useState(""), [sent, setSent] = useState(false), [uncertain, setUncertain] = useState(false);
+  const claim = useRef(null), locked = useRef(false);
+  const subject = draft?.subject ?? initialSubject, text = draft?.text ?? "";
+  const update = changes => { onDraft({ subject, text, ...changes }); setSent(false); claim.current = null; };
+  async function send() {
+    if (locked.current || uncertain) return;
+    locked.current = true; setSending(true); onBusy(true); setError("");
+    let receivedResponse = false;
+    try {
+      claim.current ||= replyRequestId();
+      const response = await fetch(`${endpoint(message.id)}/reponse`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ subject, text, requestId: claim.current }) });
+      const data = await response.json();
+      receivedResponse = true;
+      if (!response.ok) { if (data.uncertain) setUncertain(true); throw new Error(data.error || "Envoi impossible."); }
+      onDraft({ subject: initialSubject, text: "" }); setSent(true); setConfirming(false); claim.current = null; onSent();
+    } catch (error) { if (!receivedResponse) setUncertain(true); setError(receivedResponse ? error.message : "Envoi non confirmé. Vérifiez les messages envoyés dans Gmail avant de renvoyer."); }
+    finally { locked.current = false; setSending(false); onBusy(false); }
+  }
+  return <form className="message-composer" onSubmit={e => { e.preventDefault(); setConfirming(true); setError(""); }}>
+    <div className="message-composer-title"><h3>Répondre</h3><span>Via Gmail</span></div>
+    <dl className="message-envelope"><div><dt>À</dt><dd>{message.email}</dd></div><div><dt>De</dt><dd>Efficience Globale · {detail.sender}</dd></div><div><dt>Réponses vers</dt><dd>{detail.replyTo.join(", ")}</dd></div></dl>
+    <label htmlFor="reply-subject">Objet</label><input id="reply-subject" value={subject} onChange={e => update({ subject: e.target.value })} maxLength={200} required disabled={sending || confirming || uncertain} />
+    <label htmlFor="reply-body">Votre réponse</label><textarea id="reply-body" rows={7} placeholder="Bonjour…" value={text} onChange={e => update({ text: e.target.value })} maxLength={20000} required disabled={sending || confirming || uncertain} />
+    {error && <p role="alert">{error}</p>}{sent && <p role="status" className="message-success">Réponse envoyée.</p>}
+    {confirming ? <div className="message-send-confirm"><p>Envoyer cette réponse à <strong>{message.email}</strong> ?</p><div><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={sending || uncertain} onClick={() => setConfirming(false)}>Modifier</button><button type="button" className="eg-button eg-button--primary eg-button--compact" disabled={sending || uncertain} onClick={send}>{sending ? "Envoi…" : "Confirmer l’envoi"}</button></div></div> : <div className="message-composer-footer"><button type="submit" className="eg-button eg-button--primary" disabled={!text.trim() || !subject.trim() || uncertain}>Envoyer la réponse</button></div>}
+  </form>;
+}
