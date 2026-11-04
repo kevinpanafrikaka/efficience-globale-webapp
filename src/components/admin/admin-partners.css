@@ -26,13 +26,29 @@
 .admin-partners .partner-options-panel > .inline-flex { border-top: 1px solid #e5eadf; padding-top: 8px; }
 .admin-partners .admin-empty .eg-button { margin-top: 20px; }
 .admin-space .admin-topbar.is-partners .admin-topbar-actions > .eg-button { min-height: 46px; border-radius: 10px; }
-.partner-editor .partner-editor-layout { display: grid; grid-template-columns: minmax(0,1fr); gap: 22px; align-items: start; }
-.partner-editor .partner-logo-preview { height: 210px; padding: 28px; margin-bottom: 18px; border: 1px solid #e5eadf; }
-.partner-editor .partner-logo-preview .partner-logo-image { max-height: 152px; }
-.partner-editor .partner-logo-panel > .flex > .eg-button { width: 100%; }
+.partner-editor .partner-editor-layout { display: grid; grid-template-columns: minmax(0,1fr); gap: 26px; align-items: start; }
+.admin-space .partner-editor :is(.partner-logo-panel,.partner-details-panel) { min-width: 0; margin: 0; padding: 0; border: 0; }
+.partner-editor .partner-editor-layout h2 { margin-bottom: 18px; font-size: 22px; }
+.partner-editor .partner-detail-fields { display: grid; grid-template-columns: minmax(0,1fr); gap: 18px; }
+.partner-editor .partner-detail-fields > .editor-field { margin: 0; }
+.admin-space .partner-editor .partner-logo-panel { border-top: 1px solid #e5eadf; padding-top: 24px; }
+.partner-editor .partner-logo-preview { height: 160px; padding: 22px; margin-bottom: 12px; border: 1px solid #e5eadf; }
+.partner-editor .partner-logo-preview[data-empty="true"] { border-style: dashed; background: #f8faf5; }
+.partner-editor .partner-logo-preview .partner-logo-image { max-height: 114px; }
+.partner-editor .partner-logo-preview .partner-logo-empty { display: grid; justify-items: center; gap: 10px; font-size: 13px; }
+.partner-editor .partner-logo-panel > .flex > .eg-button { width: 100%; min-height: 44px; padding-inline: 10px; font-size: 12px; }
+.partner-editor .partner-logo-panel > .admin-upload-clear { min-height: 36px; margin-top: 4px; padding: 6px 0; font-size: 12px; }
 .partner-editor .editor-error { position: static; }
 @media (min-width: 720px) { .admin-partners .partner-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
-@media (min-width: 1000px) { .partner-editor .partner-editor-layout { grid-template-columns: minmax(0,1fr) minmax(0,1.35fr); } }
+@media (min-width: 1000px) {
+ .partner-editor .partner-editor-layout { grid-template-columns: clamp(200px,24%,280px) minmax(0,1fr); gap: 30px; }
+ .partner-editor .partner-details-panel { grid-column: 2; grid-row: 1; }
+ .admin-space .partner-editor .partner-logo-panel { grid-column: 1; grid-row: 1; border-top: 0; border-right: 1px solid #e5eadf; padding: 0 30px 0 0; }
+}
+@media (min-width: 1280px) {
+ .partner-editor .partner-detail-fields { grid-template-columns: minmax(0,1.7fr) minmax(160px,1fr); }
+ .partner-editor .partner-name-field { grid-column: 1/-1; }
+}
 @media (min-width: 1280px) { .admin-partners .partner-grid { grid-template-columns: repeat(3,minmax(0,1fr)); } }
 @media (max-width: 639px) {
  .admin-space .admin-topbar.is-dashboard.is-partners .admin-topbar-actions { display: block; }

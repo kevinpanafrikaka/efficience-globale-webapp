@@ -35,16 +35,18 @@ export default function PartenaireForm({ partenaire, initialOrder = 0 }) {
   return <form className="project-editor partner-editor" onSubmit={handleSubmit}>
     <header className="editor-header"><h1>{isEdit ? "Modifier le partenaire" : "Nouveau partenaire"}</h1><Actions /></header>
     {error && <div role="alert" className="editor-error" ref={errorRef} tabIndex={-1}>{error}</div>}
-    <div className="partner-editor-layout">
-      <section className="editor-panel partner-logo-panel" aria-labelledby="partner-logo-title"><h2 id="partner-logo-title">Logo</h2>
-        <div className="partner-logo partner-logo-preview">{form.logo_url ? <AdminImage src={form.logo_url} alt={`Logo de ${form.nom || "votre partenaire"}`} className="partner-logo-image" /> : <span className="partner-logo-empty">{form.nom.trim() || "Logo du partenaire"}</span>}</div>
+    <div className="editor-panel partner-editor-layout">
+      <section className="partner-details-panel" aria-labelledby="partner-details-title"><h2 id="partner-details-title">Informations du partenaire</h2>
+        <div className="partner-detail-fields">
+          <div className="editor-field partner-name-field"><label htmlFor="partenaireform-1">Nom du partenaire</label><input id="partenaireform-1" value={form.nom} onChange={e => update("nom", e.target.value)} maxLength={200} required disabled={loading} autoComplete="organization" placeholder="Ex. Gavi" /></div>
+          <div className="editor-field"><label htmlFor="partenaireform-2">Site web (optionnel)</label><input id="partenaireform-2" type="url" value={form.site_web} onChange={e => update("site_web", e.target.value)} maxLength={2000} disabled={loading} placeholder="https://…" autoComplete="url" /></div>
+          <div className="editor-field"><label htmlFor="partenaireform-3">Statut</label><EditorSelect id="partenaireform-3" value={form.statut} options={[{ value: "brouillon", label: "Brouillon" }, { value: "publie", label: "Publié" }]} onChange={value => update("statut", value)} disabled={loading} /></div>
+        </div>
+      </section>
+      <section className="partner-logo-panel" aria-labelledby="partner-logo-title"><h2 id="partner-logo-title">Logo</h2>
+        <div className="partner-logo partner-logo-preview" data-empty={!form.logo_url}>{form.logo_url ? <AdminImage src={form.logo_url} alt={`Logo de ${form.nom || "votre partenaire"}`} className="partner-logo-image" /> : <span className="partner-logo-empty"><svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.5"/><path d="m4 17 5-5 4 4 3-3 5 5"/></svg><span>Ajouter un logo</span></span>}</div>
         <ImageUpload value={form.logo_url} onChange={url => update("logo_url", url)} onUploadingChange={setUploading} disabled={busy} showPreview={false} />
         {form.logo_url && <button type="button" disabled={busy} className="eg-button eg-button--quiet eg-button--compact admin-upload-clear" onClick={() => update("logo_url", "")}>Retirer le logo</button>}
-      </section>
-      <section className="editor-panel partner-details-panel" aria-labelledby="partner-details-title"><h2 id="partner-details-title">Informations du partenaire</h2>
-        <div className="editor-field"><label htmlFor="partenaireform-1">Nom du partenaire</label><input id="partenaireform-1" value={form.nom} onChange={e => update("nom", e.target.value)} maxLength={200} required disabled={loading} autoComplete="organization" placeholder="Ex. Gavi" /></div>
-        <div className="editor-field"><label htmlFor="partenaireform-2">Site web (optionnel)</label><input id="partenaireform-2" type="url" value={form.site_web} onChange={e => update("site_web", e.target.value)} maxLength={2000} disabled={loading} placeholder="https://…" autoComplete="url" /></div>
-        <div className="editor-field"><label htmlFor="partenaireform-3">Statut</label><EditorSelect id="partenaireform-3" value={form.statut} options={[{ value: "brouillon", label: "Brouillon" }, { value: "publie", label: "Publié" }]} onChange={value => update("statut", value)} disabled={loading} /></div>
       </section>
     </div>
     <Actions mobile />
