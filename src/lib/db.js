@@ -437,6 +437,7 @@ export async function countMessagesNonLus() {
 
 export const REGLAGES_PAR_DEFAUT = {
   email: "oumar.camara@efficienceglobale.com",
+  email_notifications: JSON.stringify(["oumar.camara@efficienceglobale.com"]),
   telephone: "+224 626 852 951",
   adresse: "Camayenne, Conakry, Guinée",
   // Resend sans domaine vérifié n'envoie qu'à l'adresse du compte Resend.

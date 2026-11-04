@@ -2,6 +2,7 @@
 
 import { cloneElement, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { notificationRecipients } from "@/lib/notification-recipients.mjs";
 
 const inputClass =
   "rounded-lg border border-line px-3.5 py-2.5 text-[15px] focus:outline-none focus:ring-2 focus:ring-lime w-full";
@@ -22,6 +23,7 @@ export default function ReglagesForm({ reglages, notification }) {
   const saving = useRef(false);
   const [form, setForm] = useState({
     email: reglages.email,
+    email_notifications: notificationRecipients(reglages).join("\n"),
     telephone: reglages.telephone,
     adresse: reglages.adresse,
     facebook: reglages.facebook,
@@ -68,7 +70,13 @@ export default function ReglagesForm({ reglages, notification }) {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-8 max-w-2xl">
       <section className="flex flex-col gap-4">
-        <div className="admin-note"><strong>Notifications du formulaire · {notification?.provider || "Non configurées"}</strong><p>Destinataire actif : {notification?.recipient || "À configurer"}</p>{notification?.sender && <p>Expéditeur : {notification.sender}</p>}<a href="/api/email/google" className="eg-button eg-button--secondary eg-button--compact mt-3">Gérer la connexion Gmail ↗</a></div>
+        <div className="admin-note"><strong>Notifications du formulaire · {notification?.provider || "Non configurées"}</strong>{notification?.sender && <p>Expéditeur : {notification.sender}</p>}<a href="/api/email/google" className="eg-button eg-button--secondary eg-button--compact mt-3">Gérer la connexion Gmail</a></div>
+        <Field label="Destinataires des notifications Gmail">
+          <textarea value={form.email_notifications} onChange={e => update("email_notifications", e.target.value)} rows={3} maxLength={3000} disabled={loading} required className={inputClass} placeholder="Une adresse email par ligne" aria-describedby="notification-recipients-help" />
+        </Field>
+        <p id="notification-recipients-help" className="text-[12px] text-ink-soft">Une adresse par ligne · Messages et candidatures · 10 maximum.</p>
+      </section>
+      <section className="flex flex-col gap-4">
         <h2 className="text-[16px]">Coordonnées</h2>
         <Field label="Email public">
           <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} required className={inputClass} />

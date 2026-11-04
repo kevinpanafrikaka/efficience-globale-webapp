@@ -1,3 +1,4 @@
+import { DEFAULT_NOTIFICATION_RECIPIENTS, readNotificationRecipients, validateNotificationRecipients } from "./notification-recipients.mjs";
 import { emailAttachments } from "./email-attachments.mjs";
 // Server-side only: never import this module from a client component.
 export const GMAIL_OWNER = "kevinkandet05@gmail.com";
@@ -71,7 +72,7 @@ export async function isGmailConnected(env) {
   return configured(env) && Boolean(await connection(env));
 }
 
-export function buildMime({ nom, email, sujet, message, attachments = [] }) {
+export function buildMime({ nom, email, sujet, message, attachments = [], recipients = DEFAULT_NOTIFICATION_RECIPIENTS }) {
   // All user content in headers is encoded or strictly validated against CR/LF.
   if (!/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email)) throw new Error("Invalid reply address");
   const subject = sujet ? `Nouveau message : ${sujet}` : "Nouveau message depuis le site";
@@ -85,7 +86,7 @@ export function buildMime({ nom, email, sujet, message, attachments = [] }) {
   const files = emailAttachments(attachments);
   const headers = [
     `From: Site Efficience Globale <${GMAIL_OWNER}>`,
-    `To: ${GMAIL_RECIPIENT}`, `Reply-To: ${email}`,
+    `To: ${validateNotificationRecipients(recipients).join(", ")}`, `Reply-To: ${email}`,
     `Subject: ${encodedSubject}`, "MIME-Version: 1.0",
   ];
   if (!files.length) return [...headers, "Content-Type: text/plain; charset=UTF-8", "Content-Transfer-Encoding: base64", "", body].join("\r\n");
@@ -103,9 +104,10 @@ export async function sendGmail(env, message) {
   if (!row) throw new Error("Gmail is not connected");
   const { refreshToken } = await unseal(row.token, env);
   const token = await googleToken({ client_id: env.GOOGLE_CLIENT_ID, client_secret: env.GOOGLE_CLIENT_SECRET, grant_type: "refresh_token", refresh_token: refreshToken });
+  const recipients = await readNotificationRecipients(env);
   const response = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
     method: "POST", headers: { Authorization: `Bearer ${token.access_token}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ raw: base64url(encoder.encode(buildMime(message))) }), signal: AbortSignal.timeout(15000),
+    body: JSON.stringify({ raw: base64url(encoder.encode(buildMime({ ...message, recipients }))) }), signal: AbortSignal.timeout(15000),
   });
   if (!response.ok) throw new Error("Gmail delivery failed");
   const result = await response.json();
