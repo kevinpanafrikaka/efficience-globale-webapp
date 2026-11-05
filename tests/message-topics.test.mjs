@@ -57,10 +57,33 @@ test("Inbox category tabs expose separate unread counts while keeping body text 
   const {default:Messages}=await r.module("src/components/admin/AdminMessages.jsx");
   const messages=[{id:"one",nom:"A",email:"a@example.org",sujet:"Objet A",message:"Private body A",type_demande:"projet",lu:0},{id:"two",nom:"B",email:"b@example.org",sujet:"Objet B",message:"Private body B",type_demande:"formation",lu:1},{id:"three",nom:"C",email:"c@example.org",sujet:"Objet C",message:"Private body C",type_demande:"partenariat",lu:0}];
   const html=renderToStaticMarkup(React.createElement(Messages,{messages}));
-  assert.equal((html.match(/role="tab"/g)||[]).length,4);
-  for(const label of ["Projets","Formations","Partenariats"])assert.ok(html.includes(label));
+  assert.equal((html.match(/role="tab"/g)||[]).length,5);
+  for(const label of ["Projets","Formations","Partenariats","Candidatures"])assert.ok(html.includes(label));
   assert.ok(html.includes('aria-label="2 messages non lus"'));
-  assert.ok(html.includes('aria-label="Filtrer par état de lecture"')||html.includes('Filtrer par état de lecture'));
+  assert.doesNotMatch(html,/Filtrer par état de lecture|Réinitialiser/);
   assert.doesNotMatch(html,/Private body/);
+ }finally{r.close();}
+});
+
+
+test("Application category isolates dossiers and empty inboxes use contextual text without reset controls",async()=>{
+ const r=await adminRuntime();try{
+  const {default:Messages,matchesMessageCategory,messageEmptyText}=await r.module("src/components/admin/AdminMessages.jsx");
+  const application={id:"notification",candidature_id:"dossier",type_demande:"projet"};
+  assert.equal(matchesMessageCategory(application,"candidatures"),true);
+  assert.equal(matchesMessageCategory(application,"projet"),false);
+  assert.equal(matchesMessageCategory({type_demande:"projet"},"candidatures"),false);
+  assert.equal(matchesMessageCategory(application,"all"),true);
+  for(const type of ["all","projet","formation","partenariat","candidatures"])assert.ok(messageEmptyText(type).length>20);
+  assert.match(messageEmptyText("formation","aucun"),/recherche/);
+  const html=renderToStaticMarkup(React.createElement(Messages,{messages:[]}));
+  assert.match(html,/Vous n’avez pas encore reçu de message/);
+  assert.doesNotMatch(html,/Réinitialiser|Tous les statuts/);
+  // Header placement is rendered on the Messages route.
+  const other=await adminRuntime({pathname:"/admin/messages"});try{
+   const S=(await other.module("src/components/admin/AdminShell.jsx")).default;
+   const markup=renderToStaticMarkup(React.createElement(S,{unread:0}));
+   assert.match(markup,/<header[^>]*>[\s\S]*aria-label="Rechercher un message"[\s\S]*<\/header>/);
+  }finally{other.close();}
  }finally{r.close();}
 });

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import AdminNavLink from "./AdminNavLink";
 import LogoutButton from "./LogoutButton";
+import AdminMessageSearch, { MessageSearchContext } from "./AdminMessageSearch";
 import DashboardCreateMenu from "./DashboardCreateMenu";
 
 const NAV = [
@@ -14,6 +15,7 @@ const NAV = [
 ];
 
 export default function AdminShell({ children, unread }) {
+  const [messageQuery,setMessageQuery]=useState(""), [messageSearchOpen,setMessageSearchOpen]=useState(false);
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const dashboard = pathname === "/admin";
@@ -27,9 +29,9 @@ export default function AdminShell({ children, unread }) {
   const announcementEditor = pathname === "/admin/annonces/nouveau" || /^\/admin\/annonces\/[^/]+\/modifier$/.test(pathname);
   const projectEditor = pathname === "/admin/projets/nouveau" || /^\/admin\/projets\/[^/]+\/modifier$/.test(pathname);
   const memberEditor = pathname === "/admin/membres/nouveau" || /^\/admin\/membres\/[^/]+\/modifier$/.test(pathname);
-  useEffect(() => { setOpen(false); }, [pathname]);
+  useEffect(() => { setOpen(false); setMessageQuery(""); setMessageSearchOpen(false); }, [pathname]);
   const current = [...NAV].reverse().find(([href]) => pathname === href || (href !== "/admin" && pathname.startsWith(`${href}/`)))?.[1] || "Administration";
-  return <div className="admin-space admin-shell">
+  return <MessageSearchContext.Provider value={{query:messageQuery,setQuery:setMessageQuery,searchOpen:messageSearchOpen,setSearchOpen:setMessageSearchOpen}}><div className="admin-space admin-shell">
     <a href="#admin-main" className="admin-skip-link">Aller au contenu</a>
     <aside className="admin-sidebar">
       <div className="admin-brand-row">
@@ -44,12 +46,12 @@ export default function AdminShell({ children, unread }) {
       </div>
     </aside>
     <div className="admin-workspace">
-      {!projectEditor && !memberEditor && !announcementEditor && !partnerEditor && <header className={`admin-topbar ${dashboard || projects || team || announcements || partners || messages ? "is-dashboard" : ""}${projects ? " is-projects" : team ? " is-team" : announcements ? " is-announcements" : partners ? " is-partners" : messages ? " is-messages" : ""}`}>
+      {!projectEditor && !memberEditor && !announcementEditor && !partnerEditor && <header data-message-search={messages ? messageSearchOpen : undefined} className={`admin-topbar ${dashboard || projects || team || announcements || partners || messages ? "is-dashboard" : ""}${projects ? " is-projects" : team ? " is-team" : announcements ? " is-announcements" : partners ? " is-partners" : messages ? " is-messages" : ""}`}>
         {dashboard || projects || team || announcements || partners || messages ? <div className="admin-topbar-title"><h1>{messages ? "Messages" : partners ? "Partenaires" : announcements ? "Annonces" : team ? "Équipe" : projects ? "Projets" : "Tableau de bord"}</h1></div> : <span>Administration <span aria-hidden="true">/</span> <strong>{current}</strong></span>}
-        <div className="admin-topbar-actions">{messages ? <span className="message-header-count">{unread} non lu{unread > 1 ? "s" : ""}</span> : <a href="/admin/messages" aria-label={`${unread} message${unread > 1 ? "s" : ""} non lu${unread > 1 ? "s" : ""}`}>Messages <span className="admin-unread-count">{unread}</span></a>}{dashboard && <DashboardCreateMenu />}{projects && <a href="/admin/projets/nouveau" className="eg-button eg-button--primary">+ Nouveau projet</a>}{team && <a href="/admin/membres/nouveau" className="eg-button eg-button--primary">+ Nouveau membre</a>}{partners && <a href="/admin/partenaires/nouveau" className="eg-button eg-button--primary">+ Nouveau partenaire</a>}{announcements && <a href="/admin/annonces/nouveau" className="eg-button eg-button--primary">+ Nouvelle annonce</a>}</div>
+        <div className="admin-topbar-actions">{messages ? <><span className="message-header-count">{unread} non lu{unread > 1 ? "s" : ""}</span><AdminMessageSearch /></> : <a href="/admin/messages" aria-label={`${unread} message${unread > 1 ? "s" : ""} non lu${unread > 1 ? "s" : ""}`}>Messages <span className="admin-unread-count">{unread}</span></a>}{dashboard && <DashboardCreateMenu />}{projects && <a href="/admin/projets/nouveau" className="eg-button eg-button--primary">+ Nouveau projet</a>}{team && <a href="/admin/membres/nouveau" className="eg-button eg-button--primary">+ Nouveau membre</a>}{partners && <a href="/admin/partenaires/nouveau" className="eg-button eg-button--primary">+ Nouveau partenaire</a>}{announcements && <a href="/admin/annonces/nouveau" className="eg-button eg-button--primary">+ Nouvelle annonce</a>}</div>
       </header>}
       <main id="admin-main" className="admin-main" tabIndex={-1}>{children}</main>
       <footer className="admin-footer">Efficience Globale</footer>
     </div>
-  </div>;
+  </div></MessageSearchContext.Provider>;
 }

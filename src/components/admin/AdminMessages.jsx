@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import EditorSelect from "./EditorSelect";
+import { MessageSearchContext } from "./AdminMessageSearch";
 import { MESSAGE_TOPICS } from "@/lib/message-topics.mjs";
 import { formatDate } from "@/lib/format";
 import "./admin-messages.css";
@@ -23,7 +23,7 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
   const router = useRouter();
   const [messages, setMessages] = useState(initialMessages);
   const [selectedId, setSelectedId] = useState(initialSelectedId);
-  const [filter, setFilter] = useState("all"), [query, setQuery] = useState(""), [searchOpen, setSearchOpen] = useState(false);
+  const {query} = useContext(MessageSearchContext);
   const [detail, setDetail] = useState(null), [detailError, setDetailError] = useState(""), [actionError, setActionError] = useState("");
   const [loading, setLoading] = useState(false), [busy, setBusy] = useState(false), [deleting, setDeleting] = useState(false);
   const [drafts, setDrafts] = useState({}), [reload, setReload] = useState(0);
@@ -31,14 +31,14 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
   const [replyOpen, setReplyOpen] = useState(false), [optionsOpen, setOptionsOpen] = useState(false);
   const optionsRef = useRef(null), replyRef = useRef(null);
   const centerRef = useRef(null), inboxHeadingRef = useRef(null), listScroll = useRef(null);
-  const searchRef = useRef(null), searchToggle = useRef(null), titleRef = useRef(null), selectedButton = useRef(null);
+  const titleRef = useRef(null), selectedButton = useRef(null);
   const busyRef = useRef(false);
   useEffect(() => setMessages(initialMessages), [initialMessages]);
   useEffect(() => {
     const initial = initialMessages.find(m => m.id === initialSelectedId);
     if (initial && !initial.lu) markRead(initial.id, true);
   }, [initialSelectedId]);
-  useEffect(() => { if (searchOpen) searchRef.current?.focus(); }, [searchOpen]);
+  useEffect(() => { if (query) setSelectedId(null); }, [query]);
   useEffect(() => {
     if (!optionsOpen) return;
     const close = event => { if (!optionsRef.current?.contains(event.target)) setOptionsOpen(false); };
@@ -49,7 +49,7 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
     if (replyOpen) replyRef.current?.querySelector("textarea")?.focus();
   }, [replyOpen, detail]);
   const selected = messages.find(m => m.id === selectedId);
-  useEffect(() => { setPage(0); }, [filter, query, category]);
+  useEffect(() => { setPage(0); }, [query, category]);
   useEffect(() => {
     if (selectedId) centerRef.current?.scrollIntoView({ block: "start" });
     else if (listScroll.current !== null) {
@@ -58,9 +58,8 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
       target?.focus({ preventScroll: true });
     }
   }, [selectedId]);
-  const unread = messages.filter(m => !m.lu).length;
-  const filtered = messages.filter(m => (category === "all" || m.type_demande === category) && (filter === "all" || (filter === "unread" ? !m.lu : !!m.lu)) && normalize(`${m.nom} ${m.email} ${m.sujet} ${m.message}`).includes(normalize(query).trim()));
-  const categories = [{ id: "all", label: "Tous" }, ...MESSAGE_TOPICS];
+  const filtered = messages.filter(m => matchesMessageCategory(m, category) && normalize(`${m.nom} ${m.email} ${m.sujet} ${m.message}`).includes(normalize(query).trim()));
+  const categories = [{ id: "all", label: "Tous" }, ...MESSAGE_TOPICS, { id: "candidatures", label: "Candidatures" }];
   function categoryKey(event, index) {
     if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
     event.preventDefault();
@@ -124,20 +123,13 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
     finally { busyRef.current = false; setBusy(false); }
   }
   function setSending(value) { busyRef.current = value; setBusy(value); }
-  function closeSearch() { setSearchOpen(false); setQuery(""); requestAnimationFrame(() => searchToggle.current?.focus()); }
 
   return <div ref={centerRef} className="message-center" data-reading={!!selected}>
-    <div className="messages-toolbar">
-      {searchOpen ? <div className="messages-search"><label className="sr-only" htmlFor="messages-query">Rechercher dans les messages</label><input ref={searchRef} id="messages-query" type="search" placeholder="Nom, email, objet…" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === "Escape") closeSearch(); }} /><button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={closeSearch}>Fermer</button></div> : <>
-        <div className="messages-status-filter"><label className="sr-only" htmlFor="messages-read-filter">Filtrer par état de lecture</label><EditorSelect id="messages-read-filter" value={filter} options={[{ value: "all", label: "Tous les statuts" }, { value: "unread", label: "Non lus" }, { value: "read", label: "Lus" }]} onChange={setFilter}/>
-        </div><button ref={searchToggle} type="button" className="eg-button eg-button--secondary eg-button--icon" aria-label="Rechercher un message" aria-expanded={false} onClick={() => setSearchOpen(true)}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></button>
-      </>}
-    </div>
     <div className="messages-layout">
       <section className="messages-inbox" aria-label="Messages reçus" hidden={!!selected}>
         <div className="messages-inbox-heading"><h2 ref={inboxHeadingRef} tabIndex={-1}>Boîte de réception</h2><div className="messages-inbox-controls"><button type="button" className="eg-button eg-button--secondary eg-button--icon" aria-label="Actualiser les messages" onClick={() => router.refresh()}><svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 6.1A8 8 0 0 1 20 12M4 12a8 8 0 0 0 13.9 5.9"/></svg></button><span className="messages-range">{filtered.length ? `${currentPage * pageSize + 1}–${Math.min((currentPage + 1) * pageSize, filtered.length)} sur ${filtered.length}` : "0 message"}</span>{lastPage > 0 && <><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>Précédent</button><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={currentPage === lastPage} onClick={() => setPage(currentPage + 1)}>Suivant</button></>}</div></div>
         <div className="message-category-tabs" role="tablist" aria-label="Catégories des messages">{categories.map((item, index) => {
-          const count = messages.filter(m => !m.lu && (item.id === "all" || m.type_demande === item.id)).length;
+          const count = messages.filter(m => !m.lu && matchesMessageCategory(m, item.id)).length;
           return <button type="button" role="tab" key={item.id} id={`message-tab-${item.id}`} aria-selected={category === item.id} aria-controls="message-category-panel" tabIndex={category === item.id ? 0 : -1} onKeyDown={event => categoryKey(event, index)} onClick={() => setCategory(item.id)}><CategoryIcon category={item.id}/><span className="message-tab-label">{item.label}</span>{count > 0 && <span className="message-tab-count" aria-label={`${count} message${count > 1 ? "s" : ""} non lu${count > 1 ? "s" : ""}`}>{count}<span className="message-tab-count-label"> non lu{count > 1 ? "s" : ""}</span></span>}</button>;
         })}</div>
         <div id="message-category-panel" role="tabpanel" aria-labelledby={`message-tab-${category}`} tabIndex={0}>
@@ -145,7 +137,7 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
           <span className="message-row-sender" title={m.email}><span className="message-row-name">{m.nom}</span></span>
           <span className="message-row-summary"><span className="message-row-subject">{m.sujet || "Sans objet"}</span></span>
           <time className="message-row-date">{formatDate(m.cree_le).split(",")[0]}</time>
-        </button></li>)}</ul> : <div className="messages-empty-list"><h3>{messages.length ? "Aucun résultat" : "Aucun message"}</h3>{messages.length > 0 && <button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={() => { setFilter("all"); setCategory("all"); setQuery(""); }}>Réinitialiser</button>}</div>}
+        </button></li>)}</ul> : <div className="messages-empty-list" role="status"><span className="messages-empty-symbol" aria-hidden="true"><CategoryIcon category={category}/></span><p>{messageEmptyText(category,query)}</p></div>}
         </div>
       </section>
       <section id="message-reader" className="messages-reader" aria-label="Lecture du message" hidden={!selected}>
@@ -209,6 +201,13 @@ function ReplyComposer({ message, detail, draft, onDraft, onBusy, onSent, onClos
 }
 
 
+export function matchesMessageCategory(message, category) {
+ return category === "all" || (category === "candidatures" ? !!message.candidature_id : !message.candidature_id && message.type_demande === category);
+}
+export function messageEmptyText(category,query="") {
+ if(query.trim()) return "Aucun message ne correspond à votre recherche dans cet onglet.";
+ return {all:"Vous n’avez pas encore reçu de message.",projet:"Aucune demande d’accompagnement de projet pour le moment.",formation:"Aucune demande de formation pour le moment.",partenariat:"Aucune proposition de partenariat pour le moment.",candidatures:"Les nouvelles candidatures apparaîtront ici dès qu’un candidat aura postulé."}[category];
+}
 function CategoryIcon({ category }) {
-  return <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{category === "projet" ? <><rect x="4" y="7" width="16" height="13" rx="2"/><path d="M9 7V4h6v3M4 12h16M10 12v3h4v-3"/></> : category === "formation" ? <><path d="M12 5C9 3 5 3 3 4v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-2-1-6-1-9 1ZM12 5v15"/></> : category === "partenariat" ? <><path d="m3 12 6-6 6 6-6 6-6-6Zm6 0 6-6 6 6-6 6-6-6Z"/></> : <><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></>}</svg>;
+  return <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{category === "candidatures" ? <><rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="9" r="2"/><path d="M8 16c0-4 8-4 8 0M9 19h6"/></> : category === "projet" ? <><rect x="4" y="7" width="16" height="13" rx="2"/><path d="M9 7V4h6v3M4 12h16M10 12v3h4v-3"/></> : category === "formation" ? <><path d="M12 5C9 3 5 3 3 4v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-2-1-6-1-9 1ZM12 5v15"/></> : category === "partenariat" ? <><path d="m3 12 6-6 6 6-6 6-6-6Zm6 0 6-6 6 6-6 6-6-6Z"/></> : <><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></>}</svg>;
 }
