@@ -114,14 +114,13 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
         {filtered.length ? <ul className="messages-list">{filtered.map(m => <li key={m.id}><button type="button" className="message-row" data-active={m.id === selectedId} data-unread={!m.lu} aria-pressed={m.id === selectedId} disabled={busy} onClick={e => openMessage(m, e.currentTarget)}>
           <div className="message-row-top"><span className="message-row-sender">{!m.lu && <span className="message-unread-dot" aria-label="Non lu" />}{m.nom}</span><span className="message-row-date">{formatDate(m.cree_le).split(",")[0]}</span></div>
           <span className="message-row-subject">{m.sujet || "Sans objet"}</span><span className="message-row-excerpt">{m.message}</span>
-          <span className="message-row-bottom"><span>{m.email}</span><span className="message-row-state">{m.id === selectedId ? "Ouvert" : m.lu ? "Lu" : "Non lu"}</span></span>
         </button></li>)}</ul> : <div className="messages-empty-list"><h3>{messages.length ? "Aucun résultat" : "Aucun message"}</h3>{messages.length > 0 && <button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={() => { setFilter("all"); setQuery(""); }}>Réinitialiser</button>}</div>}
       </section>
       <section className="messages-reader" aria-label="Lecture du message">
         {!selected ? <div className="messages-placeholder"><div className="messages-placeholder-mark" aria-hidden="true"><MailMark /></div><h2>Vos échanges, au même endroit.</h2><p>Sélectionnez un message pour le consulter.</p></div> : <>
           <div className="message-reader-tools">
-            <button type="button" onClick={closeMessage} disabled={busy} className="eg-button eg-button--secondary eg-button--compact message-back">Tous les messages</button>
-            <span className="message-read-state"><span aria-hidden="true"/>{selected.lu ? "Lu" : "Non lu"}</span>
+            <button type="button" onClick={closeMessage} disabled={busy} className="eg-button eg-button--secondary eg-button--compact message-back" aria-label="Tous les messages">Messages</button>
+            <h2 ref={titleRef} tabIndex={-1} className="message-reader-subject">{selected.sujet || "Sans objet"}</h2>
             <div className="message-reader-actions">
               <button type="button" className="eg-button eg-button--primary eg-button--compact" aria-expanded={replyOpen} aria-controls="message-reply" disabled={busy || !detail?.connected} onClick={() => setReplyOpen(true)}>{drafts[selected.id]?.text?.trim() ? "Reprendre la réponse" : "Répondre"}</button>
               <div className="message-options" ref={optionsRef} onKeyDown={e => { if (e.key === "Escape") { setOptionsOpen(false); optionsRef.current?.querySelector("button")?.focus(); } }}>
@@ -132,7 +131,7 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
           </div>
           {deleting && <div className="message-delete-confirm" role="group" aria-label="Confirmer la suppression"><p>Supprimer ce message et son historique de réponses ?</p><div><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={busy} onClick={() => setDeleting(false)}>Annuler</button><button type="button" className="eg-button eg-button--danger eg-button--compact" disabled={busy} onClick={remove}>{busy ? "Suppression…" : "Confirmer la suppression"}</button></div></div>}
           {actionError && <p role="alert" className="message-alert">{actionError}</p>}
-          <header className="message-heading"><h2 ref={titleRef} tabIndex={-1}>{selected.sujet || "Sans objet"}</h2><div className="message-contact"><span className="message-sender-mark" aria-hidden="true"><MailMark /></span><div><strong>{selected.nom}</strong><a href={`mailto:${selected.email}`}>{selected.email}</a></div><time>{formatDate(selected.cree_le)}</time></div>{!selected.envoye && <span className="message-delivery-note">Notification email non envoyée</span>}</header>
+          <header className="message-heading"><div className="message-contact"><div><strong>{selected.nom}</strong><a href={`mailto:${selected.email}`}>{selected.email}</a></div><time>{formatDate(selected.cree_le)}</time></div>{!selected.envoye && <span className="message-delivery-note">Notification email non envoyée</span>}</header>
           <div className="message-original">{selected.message}</div>
           {loading && <div className="message-loading" role="status"><span aria-hidden="true"/><span>Chargement des réponses…</span></div>}
           {detailError && <div className="message-alert" role="alert"><p>{detailError}</p><button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={() => setReload(value => value + 1)}>Réessayer</button></div>}
