@@ -1,3 +1,4 @@
+import { validateMessageTopic } from "../src/lib/message-topics.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
@@ -67,6 +68,7 @@ async function routeFor(runtimeEnv, events, { saveFails = false } = {}) {
       sendGmail: async () => { throw new Error("Unexpected Gmail send"); },
     },
     "@/lib/brevo.mjs": { isBrevoConfigured, sendBrevo },
+    "@/lib/message-topics.mjs": { validateMessageTopic },
   };
   // fetch in the route uses the same mocked fetch as the actual Brevo module.
   context.fetch = (...args) => globalThis.fetch(...args);

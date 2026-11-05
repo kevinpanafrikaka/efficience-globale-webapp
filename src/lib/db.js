@@ -1,3 +1,4 @@
+import { validateMessageTopic } from "./message-topics.mjs";
 import { announcementCategory } from "./announcements.mjs";
 import { applicationRequirements } from "./application-documents.mjs";
 import { sortProjectsByEnd } from "@/lib/project-period.mjs";
@@ -387,13 +388,22 @@ export async function deletePartenaire(id) {
 
 // ===== Messages de contact =====
 
-export async function createMessage({ nom, email, sujet, message }) {
+async function ensureMessageTopics(db) {
+  await db.prepare(`CREATE TABLE IF NOT EXISTS message_topics (
+    message_id TEXT PRIMARY KEY REFERENCES messages(id) ON DELETE CASCADE,
+    type_demande TEXT NOT NULL CHECK (type_demande IN ('projet', 'formation', 'partenariat'))
+  )`).run();
+}
+
+export async function createMessage({ nom, email, sujet, message, type_demande }) {
+  const topic = validateMessageTopic(type_demande);
   const db = await getDB();
   const id = crypto.randomUUID();
-  await db
-    .prepare("INSERT INTO messages (id, nom, email, sujet, message) VALUES (?, ?, ?, ?, ?)")
-    .bind(id, nom, email, sujet || null, message)
-    .run();
+  const insert = db.prepare("INSERT INTO messages (id, nom, email, sujet, message) VALUES (?, ?, ?, ?, ?)").bind(id, nom, email, sujet || null, message);
+  if (topic) {
+    await ensureMessageTopics(db);
+    await db.batch([insert, db.prepare("INSERT INTO message_topics (message_id, type_demande) VALUES (?, ?)").bind(id, topic)]);
+  } else await insert.run();
   return id;
 }
 
@@ -404,13 +414,15 @@ export async function markMessageSent(id) {
 
 export async function getAllMessages() {
   const db = await getDB();
-  const { results } = await db.prepare("SELECT * FROM messages ORDER BY cree_le DESC").all();
+  await ensureMessageTopics(db);
+  const { results } = await db.prepare("SELECT messages.*, message_topics.type_demande FROM messages LEFT JOIN message_topics ON message_topics.message_id = messages.id ORDER BY messages.cree_le DESC").all();
   return results;
 }
 
 export async function getMessageById(id) {
   const db = await getDB();
-  return db.prepare("SELECT * FROM messages WHERE id = ?").bind(id).first();
+  await ensureMessageTopics(db);
+  return db.prepare("SELECT messages.*, message_topics.type_demande FROM messages LEFT JOIN message_topics ON message_topics.message_id = messages.id WHERE messages.id = ?").bind(id).first();
 }
 
 export async function setMessageLu(id, lu) {
@@ -420,7 +432,8 @@ export async function setMessageLu(id, lu) {
 
 export async function deleteMessage(id) {
   const db = await getDB();
-  await db.prepare("DELETE FROM messages WHERE id = ?").bind(id).run();
+  await ensureMessageTopics(db);
+  await db.batch([db.prepare("DELETE FROM message_topics WHERE message_id = ?").bind(id), db.prepare("DELETE FROM messages WHERE id = ?").bind(id)]);
 }
 
 export async function countMessagesNonLus() {

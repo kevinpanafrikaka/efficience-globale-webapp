@@ -1,3 +1,4 @@
+import { validateMessageTopic } from "@/lib/message-topics.mjs";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createMessage, markMessageSent, getReglages } from "@/lib/db";
 
@@ -37,10 +38,14 @@ export async function POST(request) {
     return Response.json({ error: "Un des champs est trop long." }, { status: 400 });
   }
 
+  let type_demande;
+  try { type_demande = validateMessageTopic(data.get("type_demande")?.toString().trim()); }
+  catch { return Response.json({ error: "Type de demande invalide." }, { status: 400 }); }
+
   // 1. On enregistre d'abord : le message n'est jamais perdu, même si l'email échoue.
   let id;
   try {
-    id = await createMessage({ nom, email, sujet, message });
+    id = await createMessage({ nom, email, sujet, message, type_demande });
   } catch {
     return Response.json({ error: "Impossible d'enregistrer votre message. Réessayez plus tard." }, { status: 500 });
   }
