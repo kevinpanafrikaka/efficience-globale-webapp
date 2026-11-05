@@ -19,6 +19,6 @@ export async function DELETE(request,{params}){
  const {env,response}=await applicationAdmin(request,true);if(response)return response;
  const row=await getApplication(env,(await params).id);if(!row)return Response.json({error:"Candidature introuvable."},{status:404});
  if(row.email_statut==="sending"&&row.email_lock_le>new Date().toISOString())return Response.json({error:"Un envoi est en cours. Réessayez dans quelques instants."},{status:409});
- try{const keys=await applicationDocumentKeys(env,row);if(keys.length)await env.UPLOADS.delete(keys);await env.DB.batch([env.DB.prepare("DELETE FROM candidature_dossiers WHERE candidature_id=?").bind(row.id),env.DB.prepare("DELETE FROM candidatures WHERE id=?").bind(row.id)]);return Response.json({success:true});}
+ try{const keys=await applicationDocumentKeys(env,row);if(keys.length)await env.UPLOADS.delete(keys);await env.DB.batch([env.DB.prepare("DELETE FROM candidature_dossiers WHERE candidature_id=?").bind(row.id),env.DB.prepare("DELETE FROM message_applications WHERE candidature_id=?").bind(row.id),env.DB.prepare("DELETE FROM candidatures WHERE id=?").bind(row.id)]);return Response.json({success:true});}
  catch{return Response.json({error:"La suppression n’a pas pu être confirmée. Réessayez."},{status:503});}
 }

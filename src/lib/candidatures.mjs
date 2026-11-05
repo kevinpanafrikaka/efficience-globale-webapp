@@ -1,3 +1,4 @@
+import { APPLICATION_MESSAGE_SCHEMA, applicationMessageId } from "./application-messages.mjs";
 import { MAX_APPLICATION_DOCUMENTS,MAX_DOCUMENT_BYTES,applicationDocumentFilename } from "./application-documents.mjs";
 import { isGmailConnected, sendGmail } from "./gmail.mjs";
 import { isBrevoConfigured, sendBrevo } from "./brevo.mjs";
@@ -24,7 +25,7 @@ export class ApplicationError extends Error {
  constructor(message,status=400){ super(message);this.status=status; }
 }
 export async function ensureApplications(env) {
- await env.DB.batch(APPLICATION_SCHEMA.map(sql=>env.DB.prepare(sql)));
+ await env.DB.batch([...APPLICATION_SCHEMA,APPLICATION_MESSAGE_SCHEMA].map(sql=>env.DB.prepare(sql)));
 }
 export function applicationOpen(annonce,now=new Date()) {
  return annonce?.statut==="publie" && annonce.categorie==="recrutement" && (!annonce.echeance || annonce.echeance>=now.toISOString().slice(0,10));
@@ -110,9 +111,13 @@ export async function storeApplication(env,annonce,data,files) {
  try {
   await env.DB.prepare("INSERT INTO candidature_dossiers(candidature_id,documents_json) VALUES(?,?)").bind(id,JSON.stringify(documents)).run();
   for(let i=0;i<files.length;i++){const key=documents[i].key;await env.UPLOADS.put(key,await encryptFile(secret,key,files[i].bytes),{httpMetadata:{contentType:"application/octet-stream"}});}
-  await env.DB.prepare("UPDATE candidatures SET upload_statut='ready' WHERE id=?").bind(id).run();
+  await env.DB.batch([
+   env.DB.prepare("UPDATE candidatures SET upload_statut='ready' WHERE id=?").bind(id),
+   env.DB.prepare("INSERT INTO messages (id,nom,email,sujet,message,cree_le) VALUES (?,?,?,?,?,?)").bind(applicationMessageId(id),data.nom,data.email,`Candidature — ${annonce.titre}`,`${data.nom} a déposé une candidature pour « ${annonce.titre} ».`,now.toISOString()),
+   env.DB.prepare("INSERT INTO message_applications (message_id,candidature_id) VALUES (?,?)").bind(applicationMessageId(id),id),
+  ]);
  }catch{
-  try{if(documents.length)await env.UPLOADS.delete(documents.map(doc=>doc.key));await env.DB.batch([env.DB.prepare("DELETE FROM candidature_dossiers WHERE candidature_id=?").bind(id),env.DB.prepare("DELETE FROM candidatures WHERE id=?").bind(id)]);}
+  try{if(documents.length)await env.UPLOADS.delete(documents.map(doc=>doc.key));await env.DB.batch([env.DB.prepare("DELETE FROM candidature_dossiers WHERE candidature_id=?").bind(id),env.DB.prepare("DELETE FROM message_applications WHERE candidature_id=?").bind(id),env.DB.prepare("DELETE FROM messages WHERE id=?").bind(applicationMessageId(id)),env.DB.prepare("DELETE FROM candidatures WHERE id=?").bind(id)]);}
   catch{await env.DB.prepare("UPDATE candidatures SET upload_statut='failed',expire_le=? WHERE id=?").bind(new Date().toISOString(),id).run();}
   throw new ApplicationError("Les documents n’ont pas pu être enregistrés. Réessayez.",503);
  }
@@ -131,7 +136,10 @@ export async function notifyApplication(env,row) {
   if(isBrevoConfigured(env))await sendBrevo(env,message);
   else if(await isGmailConnected(env))await sendGmail(env,message);
   else throw new Error("No application email provider configured");
-  await env.DB.prepare("UPDATE candidatures SET email_statut='sent',email_envoye_le=?,email_lock_le=NULL WHERE id=?").bind(new Date().toISOString(),row.id).run();
+  await env.DB.batch([
+   env.DB.prepare("UPDATE candidatures SET email_statut='sent',email_envoye_le=?,email_lock_le=NULL WHERE id=?").bind(new Date().toISOString(),row.id),
+   env.DB.prepare("UPDATE messages SET envoye=1 WHERE id=?").bind(applicationMessageId(row.id)),
+  ]);
   return true;
  }catch{
   await env.DB.prepare("UPDATE candidatures SET email_statut='failed',email_lock_le=NULL WHERE id=?").bind(row.id).run();

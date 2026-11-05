@@ -50,12 +50,17 @@ test("A candidature stores encrypted PDFs, sends both attachments to Oumar, and 
  const {r,id,api,core,mails}=await setup();try{
  const key=randomUUID(),extra={request_id:key,lettre:new File([pdf],"motivation.pdf",{type:"application/pdf"})};
  assert.equal((await api.POST(request(id,extra),{params:Promise.resolve({slug:id})})).status,200);
- const row=r.sqlite.prepare("SELECT * FROM candidatures").get();assert.equal(row.email_statut,"sent");assert.equal(row.upload_statut,"ready");assert.equal(r.files.size,2);
+ const row=r.sqlite.prepare("SELECT * FROM candidatures").get();
+ const db=await r.module("src/lib/db.js"),notification=(await db.getAllMessages())[0];
+ assert.equal(notification.candidature_id,row.id);assert.equal(notification.lu,0);assert.equal(notification.envoye,1);assert.equal(notification.sujet,"Candidature — Chargé de projets");
+ assert.equal((await db.getMessageById(notification.id)).candidature_id,row.id);
+ assert.equal(row.email_statut,"sent");assert.equal(row.upload_statut,"ready");assert.equal(r.files.size,2);
  for(const bytes of r.files.values())assert.notEqual(Buffer.from(bytes).subarray(0,5).toString(),"%PDF-");
  assert.deepEqual(Buffer.from(await core.applicationDocument(r.env,row,"cv")),pdf);
  assert.equal(mails.length,1);assert.equal(mails[0].body.to[0].email,"oumar.camara@efficienceglobale.com");assert.equal(mails[0].body.replyTo.email,"candidate@example.net");
  assert.deepEqual(mails[0].body.attachment.map(x=>x.name),["CV.pdf","Lettre-motivation.pdf"]);for(const a of mails[0].body.attachment)assert.deepEqual(Buffer.from(a.content,"base64"),pdf);
  assert.equal((await api.POST(request(id,extra),{params:Promise.resolve({slug:id})})).status,200);assert.equal(mails.length,1);assert.equal(r.sqlite.prepare("SELECT count(*) n FROM candidatures").get().n,1);
+ assert.equal(r.sqlite.prepare("SELECT count(*) n FROM messages").get().n,1);
  const duplicate=await api.POST(request(id),{params:Promise.resolve({slug:id})});assert.equal(duplicate.status,409);
  }finally{r.close();}
 });
@@ -99,7 +104,8 @@ test("Cleanup removes only expired application copies, keeps records and site ph
 test("Provider failures keep the dossier, allow a deliberate retry, and do not fall back to another service",async()=>{
  let fail=true,sends=0;const {r,id,api,core}=await setup({fetcher:async()=>{sends++;return Response.json(fail?{}:{messageId:"ok"},{status:fail?503:201});}});try{
  assert.equal((await api.POST(request(id),{params:Promise.resolve({slug:id})})).status,200);const row=r.sqlite.prepare("SELECT * FROM candidatures").get();assert.equal(row.email_statut,"failed");assert.equal(r.files.size,1);assert.equal(sends,1);
- fail=false;assert.equal(await core.notifyApplication(r.env,row),true);assert.equal(sends,2);assert.equal(await core.notifyApplication(r.env,row),false);assert.equal(sends,2);
+ const db=await r.module("src/lib/db.js");const notification=(await db.getAllMessages())[0];assert.equal(notification.candidature_id,row.id);assert.equal(notification.envoye,0);
+ fail=false;assert.equal(await core.notifyApplication(r.env,row),true);assert.equal((await db.getMessageById(notification.id)).envoye,1);assert.equal(sends,2);assert.equal(await core.notifyApplication(r.env,row),false);assert.equal(sends,2);
  }finally{r.close();}
 });
 
@@ -126,7 +132,7 @@ test("Storage reservations cannot exceed the candidature budget and the intake i
 test("A failed second upload rolls back the partial dossier and its first document",async()=>{
  const {r,id,api}=await setup();try{
  const put=r.env.UPLOADS.put;let count=0;r.env.UPLOADS.put=async(...args)=>{if(++count===2)throw Error("storage unavailable");return put(...args);};
- const response=await api.POST(request(id,{lettre:new File([pdf],"lettre.pdf",{type:"application/pdf"})}),{params:Promise.resolve({slug:id})});assert.equal(response.status,503);assert.equal(r.files.size,0);assert.equal(r.sqlite.prepare("SELECT count(*) n FROM candidatures").get().n,0);
+ const response=await api.POST(request(id,{lettre:new File([pdf],"lettre.pdf",{type:"application/pdf"})}),{params:Promise.resolve({slug:id})});assert.equal(response.status,503);assert.equal(r.sqlite.prepare("SELECT count(*) n FROM messages").get().n,0);assert.equal(r.files.size,0);assert.equal(r.sqlite.prepare("SELECT count(*) n FROM candidatures").get().n,0);
  }finally{r.close();}
 });
 
@@ -166,5 +172,31 @@ test("A retry can recover an interrupted pending upload without leaving orphaned
  const requestId=randomUUID();await api.POST(request(id,{request_id:requestId}),{params:Promise.resolve({slug:id})});const old=r.sqlite.prepare("SELECT * FROM candidatures").get();
  r.sqlite.prepare("UPDATE candidatures SET upload_statut='pending',email_statut='pending',cree_le='2000-01-01T00:00:00.000Z'").run();
  assert.equal((await api.POST(request(id,{request_id:requestId}),{params:Promise.resolve({slug:id})})).status,200);const row=r.sqlite.prepare("SELECT * FROM candidatures").get();assert.notEqual(row.id,old.id);assert.equal(row.upload_statut,"ready");assert.equal(r.files.size,1);assert.ok(!r.files.has(old.cv_key));
+ }finally{r.close();}
+});
+
+
+test("Application notifications link to the protected dossier; deleting a notification preserves the dossier",async()=>{
+ const {r,id,api}=await setup();try{
+  await api.POST(request(id),{params:Promise.resolve({slug:id})});
+  const db=await r.module("src/lib/db.js"),notification=(await db.getAllMessages())[0];
+  const Messages=(await r.module("src/components/admin/AdminMessages.jsx")).default;
+  const html=renderToStaticMarkup((await import("react")).createElement(Messages,{messages:[notification],initialSelectedId:notification.id}));
+  assert.ok(html.includes(`href="/admin/candidatures/${notification.candidature_id}"`));assert.match(html,/Voir la candidature/);
+  const actions=await r.module("src/app/api/admin/messages/[id]/route.js");
+  assert.equal((await actions.DELETE(new Request(base,{method:"DELETE",headers:{origin:base}}),params(notification.id))).status,200);
+  assert.equal(r.sqlite.prepare("SELECT count(*) n FROM candidatures").get().n,1);
+  assert.equal(r.sqlite.prepare("SELECT count(*) n FROM message_applications").get().n,0);
+  assert.equal(r.files.size,1);
+ }finally{r.close();}
+});
+
+test("Deleted dossiers no longer expose an application link in their notification",async()=>{
+ const {r,id,api}=await setup();try{
+  await api.POST(request(id),{params:Promise.resolve({slug:id})});
+  const db=await r.module("src/lib/db.js"),notification=(await db.getAllMessages())[0];
+  const actions=await r.module("src/app/api/admin/candidatures/[id]/route.js");
+  assert.equal((await actions.DELETE(new Request(base,{method:"DELETE",headers:{origin:base}}),params(notification.candidature_id))).status,200);
+  assert.equal((await db.getMessageById(notification.id)).candidature_id,null);
  }finally{r.close();}
 });
