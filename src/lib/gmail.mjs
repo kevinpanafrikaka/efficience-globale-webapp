@@ -47,6 +47,7 @@ export async function googleToken(params) {
   const result = await response.json();
   if (!response.ok || !result.access_token) {
     const error = new Error("Gmail authorization failed");
+    error.mailStage = "authorization"; error.httpStatus = response.status;
     // Conserver uniquement un code standard connu, jamais la réponse Google,
     // ses descriptions, les identifiants, codes d'autorisation ou jetons.
     const allowed = ["invalid_client", "invalid_grant", "invalid_request", "unauthorized_client", "deleted_client"];
@@ -100,22 +101,27 @@ export function buildMime({ nom, email, sujet, message, attachments = [], recipi
 }
 
 export async function sendGmail(env, message) {
-  const recipients = await readNotificationRecipients(env);
+  let recipients;
+  try { recipients = await readNotificationRecipients(env); }
+  catch (error) { error.mailStage="recipients"; throw error; }
   return sendRawGmail(env, buildMime({ ...message, recipients }));
 }
 
 async function sendRawGmail(env, mime) {
   const row = await connection(env);
-  if (!row) throw new Error("Gmail is not connected");
-  const { refreshToken } = await unseal(row.token, env);
-  const token = await googleToken({ client_id: env.GOOGLE_CLIENT_ID, client_secret: env.GOOGLE_CLIENT_SECRET, grant_type: "refresh_token", refresh_token: refreshToken });
+  if (!row) throw Object.assign(new Error("Gmail is not connected"),{mailStage:"connection"});
+  let refreshToken,token;
+  try { ({refreshToken}=await unseal(row.token,env)); }
+  catch(error){error.mailStage="credentials";throw error;}
+  try { token = await googleToken({ client_id: env.GOOGLE_CLIENT_ID, client_secret: env.GOOGLE_CLIENT_SECRET, grant_type: "refresh_token", refresh_token: refreshToken }); }
+  catch(error){error.mailStage="authorization";throw error;}
   const response = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
     method: "POST", headers: { Authorization: `Bearer ${token.access_token}`, "Content-Type": "application/json" },
     body: JSON.stringify({ raw: base64url(encoder.encode(mime)) }), signal: AbortSignal.timeout(15000),
   });
-  if (!response.ok) throw new Error("Gmail delivery failed");
+  if (!response.ok) throw Object.assign(new Error("Gmail delivery failed"),{mailStage:"sending",httpStatus:response.status});
   const result = await response.json();
-  if (!result.id) throw new Error("Gmail delivery not confirmed");
+  if (!result.id) throw Object.assign(new Error("Gmail delivery not confirmed"),{mailStage:"confirmation"});
   return result.id;
 }
 

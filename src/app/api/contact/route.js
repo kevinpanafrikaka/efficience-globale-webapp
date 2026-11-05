@@ -1,3 +1,4 @@
+import { recordMailDelivery } from "@/lib/mail-delivery.mjs";
 import { validateMessageTopic } from "@/lib/message-topics.mjs";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createMessage, markMessageSent, getReglages } from "@/lib/db";
@@ -57,17 +58,25 @@ export async function POST(request) {
   // Brevo prend le relais quand la clé et l'expéditeur sont configurés.
   // Un échec du prestataire choisi laisse le message enregistré, sans bascule
   // vers un autre destinataire et sans risque de double envoi.
+  let provider="none",accepted=false;
   try {
     if (isBrevoConfigured(env)) {
+      provider="brevo";
       await sendBrevo(env, { nom, email, sujet, message });
+      accepted=true;
+      await recordMailDelivery(env,id,provider,{sent:true});
       await markMessageSent(id);
     } else if (await isGmailConnected(env)) {
+      provider="gmail";
       await sendGmail(env, { nom, email, sujet, message });
+      accepted=true;
+      await recordMailDelivery(env,id,provider,{sent:true});
       await markMessageSent(id);
     } else {
       const apiKey = env.RESEND_API_KEY;
       if (apiKey) {
-        try {
+        provider="resend";
+        {
           const { email_destinataire } = await getReglages();
           const resendRes = await fetch("https://api.resend.com/emails", {
             method: "POST",
@@ -86,14 +95,15 @@ export async function POST(request) {
               text: `De : ${nom} (${email})\n\n${message}`,
             }),
           });
-          if (resendRes.ok) await markMessageSent(id);
-        } catch {
-          // Le message reste consultable dans l'admin (marqué « email non envoyé »).
+          if (!resendRes.ok) throw Object.assign(new Error("Resend rejected the email"),{mailStage:"sending",httpStatus:resendRes.status});
+          accepted=true;
+          await recordMailDelivery(env,id,provider,{sent:true});
+          await markMessageSent(id);
         }
-      }
+      } else await recordMailDelivery(env,id,provider,{code:"no_provider"});
     }
-  } catch {
-    // Le message reste disponible dans Admin → Messages, email non envoyé.
+  } catch(error) {
+    if(!accepted) await recordMailDelivery(env,id,provider,{error});
   }
 
   return Response.json({ success: true });

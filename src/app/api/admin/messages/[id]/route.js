@@ -1,3 +1,4 @@
+import { getMailDelivery, ensureMailDelivery } from "@/lib/mail-delivery.mjs";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { isAdminRequest } from "@/lib/adminAuth";
 import { getMessageById, setMessageLu } from "@/lib/db";
@@ -21,7 +22,7 @@ export async function GET(request, { params }) {
     const replies = await getMessageReplies(env, id);
     const connected = await isGmailConnected(env);
     const replyTo = await readNotificationRecipients(env);
-    return Response.json({ replies, connected, sender: GMAIL_OWNER, replyTo }, { headers: { "Cache-Control": "no-store" } });
+    return Response.json({ replies, connected, sender: GMAIL_OWNER, replyTo, delivery: await getMailDelivery(env,id) }, { headers: { "Cache-Control": "no-store" } });
   } catch {
     return Response.json({ error: "Le chargement du message a échoué." }, { status: 503 });
   }
@@ -45,6 +46,7 @@ export async function DELETE(request, { params }) {
   const { id } = await params;
   if (!(await getMessageById(id))) return Response.json({ error: "Message introuvable." }, { status: 404 });
   await ensureMessageReplies(env);
+  await ensureMailDelivery(env);
   // One atomic conditional delete closes the race with the send claim.
   const results = await env.DB.batch([
     env.DB.prepare("DELETE FROM messages WHERE id = ? AND NOT EXISTS (SELECT 1 FROM message_replies WHERE message_id = ? AND status = 'pending' AND cree_le > datetime('now', '-2 minutes'))").bind(id, id),
@@ -52,6 +54,7 @@ export async function DELETE(request, { params }) {
     env.DB.prepare("DELETE FROM message_topics WHERE message_id = ? AND NOT EXISTS (SELECT 1 FROM messages WHERE id = ?)").bind(id, id),
     env.DB.prepare("DELETE FROM message_applications WHERE message_id = ? AND NOT EXISTS (SELECT 1 FROM messages WHERE id = ?)").bind(id, id),
   ]);
+  await env.DB.prepare("DELETE FROM message_delivery WHERE message_id=? AND NOT EXISTS (SELECT 1 FROM messages WHERE id=?)").bind(id,id).run();
   if (!results[0].meta.changes) return Response.json({ error: "Un envoi est encore en cours. Réessayez dans quelques instants." }, { status: 409 });
   return Response.json({ success: true });
 }

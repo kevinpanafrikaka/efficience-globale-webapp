@@ -69,6 +69,7 @@ async function routeFor(runtimeEnv, events, { saveFails = false } = {}) {
     },
     "@/lib/brevo.mjs": { isBrevoConfigured, sendBrevo },
     "@/lib/message-topics.mjs": { validateMessageTopic },
+    "@/lib/mail-delivery.mjs": { recordMailDelivery: async()=>{} },
   };
   // fetch in the route uses the same mocked fetch as the actual Brevo module.
   context.fetch = (...args) => globalThis.fetch(...args);

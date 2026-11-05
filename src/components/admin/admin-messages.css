@@ -169,3 +169,11 @@
  .admin-space .admin-topbar.is-messages[data-message-search=true] .admin-topbar-actions { width:100%; }
  .messages-navbar-search { width:100%; }
 }
+
+.message-delivery-details { flex-basis:100%; min-width:0; color:var(--ink-soft); }
+.message-delivery-details summary { cursor:pointer; padding:4px 0; font-weight:600; }
+.message-delivery-details p { margin:8px 0; line-height:1.6; }
+.message-delivery-details dl { display:flex; flex-wrap:wrap; gap:8px 24px; margin:12px 0 2px; }
+.message-delivery-details dl > div { min-width:0; }
+.message-delivery-details dt { font-size:11px; }
+.message-delivery-details dd { margin:2px 0 0; overflow-wrap:anywhere; font-size:12px; }

@@ -1,3 +1,4 @@
+import { recordMailDelivery } from "./mail-delivery.mjs";
 import { APPLICATION_MESSAGE_SCHEMA, applicationMessageId } from "./application-messages.mjs";
 import { MAX_APPLICATION_DOCUMENTS,MAX_DOCUMENT_BYTES,applicationDocumentFilename } from "./application-documents.mjs";
 import { isGmailConnected, sendGmail } from "./gmail.mjs";
@@ -128,20 +129,24 @@ export async function notifyApplication(env,row) {
  if(row.documents_supprimes || row.expire_le<=now || row.upload_statut!=="ready")throw new ApplicationError("Les documents ne sont plus disponibles.",410);
  const claim=await env.DB.prepare("UPDATE candidatures SET email_statut='sending',email_lock_le=? WHERE id=? AND (email_statut IN ('pending','failed') OR (email_statut='sending' AND email_lock_le<?))").bind(new Date(Date.now()+120000).toISOString(),row.id,now).run();
  if(!claim.meta?.changes)return false;
+ let provider="none",accepted=false;
  try {
   const documents=await applicationDocuments(env,row),attachments=[];
   const dossier={...row,documents};
   for(const doc of documents)attachments.push({name:applicationDocumentFilename(doc),bytes:await applicationDocument(env,dossier,doc.id)});
   const message={nom:row.nom,email:row.email,sujet:`Candidature — ${row.offre_titre}`,message:`Poste : ${row.offre_titre}\nTéléphone : ${row.telephone||"Non renseigné"}\nRéférence : ${row.id}\n\n${row.message||(attachments.length?"Documents de candidature en pièces jointes.":"Candidature sans pièce jointe.")}`,attachments};
-  if(isBrevoConfigured(env))await sendBrevo(env,message);
-  else if(await isGmailConnected(env))await sendGmail(env,message);
-  else throw new Error("No application email provider configured");
+  if(isBrevoConfigured(env)){provider="brevo";await sendBrevo(env,message);}
+  else if(await isGmailConnected(env)){provider="gmail";await sendGmail(env,message);}
+  else throw Object.assign(new Error("No application email provider configured"),{mailNoProvider:true});
+  accepted=true;
+  await recordMailDelivery(env,applicationMessageId(row.id),provider,{sent:true});
   await env.DB.batch([
    env.DB.prepare("UPDATE candidatures SET email_statut='sent',email_envoye_le=?,email_lock_le=NULL WHERE id=?").bind(new Date().toISOString(),row.id),
    env.DB.prepare("UPDATE messages SET envoye=1 WHERE id=?").bind(applicationMessageId(row.id)),
   ]);
   return true;
- }catch{
+ }catch(error){
+  if(!accepted) await recordMailDelivery(env,applicationMessageId(row.id),provider,error.mailNoProvider?{code:"no_provider"}:{error});
   await env.DB.prepare("UPDATE candidatures SET email_statut='failed',email_lock_le=NULL WHERE id=?").bind(row.id).run();
   return false;
  }

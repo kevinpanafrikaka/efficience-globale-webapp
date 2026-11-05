@@ -32,10 +32,10 @@ export async function sendBrevo(env, { nom, email, sujet, message, attachments =
   });
 
   // Ne pas exposer la réponse du prestataire (ni la clé) dans les journaux.
-  if (!response.ok) throw new Error(`Brevo request rejected (${response.status})`);
+  if (!response.ok) throw Object.assign(new Error(`Brevo request rejected (${response.status})`),{mailStage:"sending",httpStatus:response.status});
   const result = await response.json();
   if (typeof result.messageId !== "string" || !result.messageId.trim()) {
-    throw new Error("Brevo did not acknowledge the message");
+    throw Object.assign(new Error("Brevo did not acknowledge the message"),{mailStage:"confirmation"});
   }
   return result.messageId;
 }
