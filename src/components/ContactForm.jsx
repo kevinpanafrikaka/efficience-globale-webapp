@@ -15,6 +15,7 @@ export default function ContactForm({ emailContact }) {
   const [topic, setTopic] = useState("");
   const [subject, setSubject] = useState("");
   const successRef = useRef(null);
+  const subjectEdited = useRef(false);
   const selected = TOPICS.find((item) => item.id === topic);
 
   useEffect(() => {
@@ -56,7 +57,7 @@ export default function ContactForm({ emailContact }) {
         <span className="contact-success-icon" aria-hidden="true">✓</span>
         <h3>Votre message est bien reçu.</h3>
         <p>Merci de nous avoir présenté votre besoin. L’équipe Efficience Globale reviendra vers vous à l’adresse indiquée.</p>
-        <button type="button" onClick={() => { setTopic(""); setSubject(""); setErrorMsg(""); setStatus("idle"); }}>Écrire un autre message</button>
+        <button type="button" onClick={() => { setTopic(""); setSubject(""); subjectEdited.current = false; setErrorMsg(""); setStatus("idle"); }}>Écrire un autre message</button>
       </div>
     );
   }
@@ -71,7 +72,7 @@ export default function ContactForm({ emailContact }) {
         <legend>Comment pouvons-nous vous accompagner ?</legend>
         <div className="contact-topic-grid">
           {TOPICS.map((item) => <label key={item.id} className="contact-topic">
-            <input type="radio" required name="type_demande" value={item.id} checked={topic === item.id} onChange={() => { setTopic(item.id); setSubject(item.subject); }} />
+            <input type="radio" required name="type_demande" value={item.id} checked={topic === item.id} onChange={() => { setTopic(item.id); if (!subjectEdited.current || !subject.trim()) setSubject(item.subject); }} />
             <span className="contact-topic-face"><span aria-hidden="true" className="contact-topic-icon">{item.icon}</span><span>{item.label}</span><span className="contact-topic-dot" aria-hidden="true" /></span>
           </label>)}
         </div>
@@ -124,7 +125,7 @@ export default function ContactForm({ emailContact }) {
           maxLength={200}
           type="text"
           value={subject}
-          onChange={(e) => setSubject(e.target.value)}
+          onChange={(e) => { subjectEdited.current = Boolean(e.target.value.trim()); setSubject(e.target.value); }}
           placeholder="De quoi souhaitez-vous discuter ?"
           className="rounded-lg border border-line px-3.5 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-lime"
         />

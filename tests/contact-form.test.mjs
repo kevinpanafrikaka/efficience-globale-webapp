@@ -99,3 +99,14 @@ test("A failed submission keeps the form and custom subject for retry", async ()
   assert.equal(find(tree, n => n.props?.name === "sujet").props.value, "À conserver");
   assert.equal(find(tree, n => n.type === "button" && n.props.type === "submit").props.disabled, false);
 });
+
+
+test("Choosing or changing accompaniment preserves a manually entered subject; a blank subject can be suggested", async () => {
+ const harness=await formHarness();
+ const input=()=>find(harness.render(),n=>n.props?.name==="sujet");
+ const choose=topic=>find(harness.render(),n=>n.type==="input"&&n.props.value===topic).props.onChange();
+ input().props.onChange({target:{value:"Mon projet personnel"}});
+ for(const topic of ["projet","formation","partenariat"]){choose(topic);assert.equal(input().props.value,"Mon projet personnel");}
+ input().props.onChange({target:{value:""}});choose("formation");assert.equal(input().props.value,"Demande de formation");
+ input().props.onChange({target:{value:"Sujet après sélection"}});choose("projet");assert.equal(input().props.value,"Sujet après sélection");
+});
