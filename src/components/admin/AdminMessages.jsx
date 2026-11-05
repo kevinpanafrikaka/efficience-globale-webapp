@@ -25,8 +25,10 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
   const [detail, setDetail] = useState(null), [detailError, setDetailError] = useState(""), [actionError, setActionError] = useState("");
   const [loading, setLoading] = useState(false), [busy, setBusy] = useState(false), [deleting, setDeleting] = useState(false);
   const [drafts, setDrafts] = useState({}), [reload, setReload] = useState(0);
+  const [page, setPage] = useState(0);
   const [replyOpen, setReplyOpen] = useState(false), [optionsOpen, setOptionsOpen] = useState(false);
   const optionsRef = useRef(null), replyRef = useRef(null);
+  const centerRef = useRef(null), inboxHeadingRef = useRef(null), listScroll = useRef(null);
   const searchRef = useRef(null), searchToggle = useRef(null), titleRef = useRef(null), selectedButton = useRef(null);
   const busyRef = useRef(false);
   useEffect(() => setMessages(initialMessages), [initialMessages]);
@@ -45,8 +47,21 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
     if (replyOpen) replyRef.current?.querySelector("textarea")?.focus();
   }, [replyOpen, detail]);
   const selected = messages.find(m => m.id === selectedId);
+  useEffect(() => { setPage(0); }, [filter, query]);
+  useEffect(() => {
+    if (selectedId) centerRef.current?.scrollIntoView({ block: "start" });
+    else if (listScroll.current !== null) {
+      window.scrollTo({ top: listScroll.current });
+      const target = selectedButton.current?.isConnected ? selectedButton.current : inboxHeadingRef.current;
+      target?.focus({ preventScroll: true });
+    }
+  }, [selectedId]);
   const unread = messages.filter(m => !m.lu).length;
   const filtered = messages.filter(m => (filter === "all" || (filter === "unread" ? !m.lu : !!m.lu)) && normalize(`${m.nom} ${m.email} ${m.sujet} ${m.message}`).includes(normalize(query).trim()));
+  const pageSize = 25;
+  const lastPage = Math.max(0, Math.ceil(filtered.length / pageSize) - 1);
+  const currentPage = Math.min(page, lastPage);
+  const visibleMessages = filtered.slice(currentPage * pageSize, (currentPage + 1) * pageSize);
 
   useEffect(() => {
     if (!selectedId) return;
@@ -79,6 +94,7 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
   }
   function openMessage(message, button) {
     if (busyRef.current) return;
+    listScroll.current = window.scrollY;
     selectedButton.current = button;
     if (selectedId !== message.id) setReplyOpen(false);
     setOptionsOpen(false);
@@ -100,7 +116,7 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
   function setSending(value) { busyRef.current = value; setBusy(value); }
   function closeSearch() { setSearchOpen(false); setQuery(""); requestAnimationFrame(() => searchToggle.current?.focus()); }
 
-  return <div className="message-center" data-reading={!!selected}>
+  return <div ref={centerRef} className="message-center" data-reading={!!selected}>
     <div className="messages-toolbar">
       {searchOpen ? <div className="messages-search"><label className="sr-only" htmlFor="messages-query">Rechercher dans les messages</label><input ref={searchRef} id="messages-query" type="search" placeholder="Nom, email, objet…" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === "Escape") closeSearch(); }} /><button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={closeSearch}>Fermer</button></div> : <>
         <div className="messages-filters" role="group" aria-label="Filtrer les messages">
@@ -109,15 +125,16 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
       </>}
     </div>
     <div className="messages-layout">
-      <section className="messages-inbox" aria-label="Messages reçus">
-        <div className="messages-inbox-heading"><h2>Messages reçus</h2><span>{filtered.length}</span></div>
-        {filtered.length ? <ul className="messages-list">{filtered.map(m => <li key={m.id}><button type="button" className="message-row" data-active={m.id === selectedId} data-unread={!m.lu} aria-pressed={m.id === selectedId} disabled={busy} onClick={e => openMessage(m, e.currentTarget)}>
-          <div className="message-row-top"><span className="message-row-sender">{!m.lu && <span className="message-unread-dot" aria-label="Non lu" />}{m.nom}</span><span className="message-row-date">{formatDate(m.cree_le).split(",")[0]}</span></div>
-          <span className="message-row-subject">{m.sujet || "Sans objet"}</span><span className="message-row-excerpt">{m.message}</span>
+      <section className="messages-inbox" aria-label="Messages reçus" hidden={!!selected}>
+        <div className="messages-inbox-heading"><h2 ref={inboxHeadingRef} tabIndex={-1}>Boîte de réception</h2><div className="messages-inbox-controls"><button type="button" className="eg-button eg-button--secondary eg-button--icon" aria-label="Actualiser les messages" onClick={() => router.refresh()}><svg aria-hidden="true" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M6.1 6.1A8 8 0 0 1 20 12M4 12a8 8 0 0 0 13.9 5.9"/></svg></button><span className="messages-range">{filtered.length ? `${currentPage * pageSize + 1}–${Math.min((currentPage + 1) * pageSize, filtered.length)} sur ${filtered.length}` : "0 message"}</span>{lastPage > 0 && <><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>Précédent</button><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={currentPage === lastPage} onClick={() => setPage(currentPage + 1)}>Suivant</button></>}</div></div>
+        {visibleMessages.length ? <ul className="messages-list">{visibleMessages.map(m => <li key={m.id}><button type="button" className="message-row" data-unread={!m.lu} aria-label={`${m.lu ? "" : "Non lu. "}Ouvrir le message de ${m.nom} : ${m.sujet || "Sans objet"}`} disabled={busy} onClick={e => openMessage(m, e.currentTarget)}>
+          <span className="message-row-sender" title={m.email}>{!m.lu && <span className="message-unread-dot" aria-hidden="true" />}<span className="message-row-name">{m.nom}</span></span>
+          <span className="message-row-summary"><span className="message-row-subject">{m.sujet || "Sans objet"}</span><span className="message-row-separator" aria-hidden="true"> — </span><span className="message-row-excerpt">{m.message.replace(/\s+/g, " ")}</span></span>
+          <time className="message-row-date">{formatDate(m.cree_le).split(",")[0]}</time>
         </button></li>)}</ul> : <div className="messages-empty-list"><h3>{messages.length ? "Aucun résultat" : "Aucun message"}</h3>{messages.length > 0 && <button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={() => { setFilter("all"); setQuery(""); }}>Réinitialiser</button>}</div>}
       </section>
-      <section className="messages-reader" aria-label="Lecture du message">
-        {!selected ? <div className="messages-placeholder"><div className="messages-placeholder-mark" aria-hidden="true"><MailMark /></div><h2>Vos échanges, au même endroit.</h2><p>Sélectionnez un message pour le consulter.</p></div> : <>
+      <section id="message-reader" className="messages-reader" aria-label="Lecture du message" hidden={!selected}>
+        {selected && <>
           <div className="message-reader-tools">
             <button type="button" onClick={closeMessage} disabled={busy} className="eg-button eg-button--secondary eg-button--compact message-back" aria-label="Tous les messages">Messages</button>
             <h2 ref={titleRef} tabIndex={-1} className="message-reader-subject">{selected.sujet || "Sans objet"}</h2>
@@ -176,6 +193,3 @@ function ReplyComposer({ message, detail, draft, onDraft, onBusy, onSent, onClos
   </form>;
 }
 
-function MailMark() {
-  return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg>;
-}
