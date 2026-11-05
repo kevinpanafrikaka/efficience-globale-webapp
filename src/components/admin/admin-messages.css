@@ -22,9 +22,7 @@
 .message-row-sender { display:flex; align-items:center; gap:8px; min-width:0; font-size:14px; font-weight:400; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .message-row-name { min-width:0; overflow:hidden; text-overflow:ellipsis; }
 .message-row-summary { display:flex; align-items:baseline; min-width:0; gap:0; white-space:nowrap; overflow:hidden; }
-.message-row-subject { flex:0 1 auto; min-width:0; max-width:65%; overflow:hidden; text-overflow:ellipsis; font-size:14px; font-weight:400; }
-.message-row-separator { flex-shrink:0; color:var(--ink-soft); white-space:pre; }
-.message-row-excerpt { flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; font-size:14px; color:var(--ink-soft); }
+.message-row-subject { flex:0 1 auto; min-width:0; max-width:100%; overflow:hidden; text-overflow:ellipsis; font-size:14px; font-weight:400; }
 .message-row-date { white-space:nowrap; text-align:right; font-size:12px; color:var(--ink-soft); }
 .message-row[data-unread=true] :is(.message-row-sender,.message-row-subject,.message-row-date) { font-weight:600; color:var(--ink); }
 .messages-reader { min-width:0; padding:28px 30px; border:1px solid #dde5d7; border-top:3px solid #9bc66e; border-radius:18px; background:white; box-shadow:0 14px 45px -40px #263d2866; }
@@ -102,13 +100,11 @@
  .messages-inbox-heading { padding:12px 16px; gap:10px; flex-wrap:wrap; }
  .messages-inbox-controls { gap:8px; }
  .messages-inbox-controls .eg-button--compact { padding-inline:8px; font-size:12px; }
- .message-row { grid-template-columns:minmax(0,1fr) auto; gap:7px 12px; min-height:92px; padding:16px; }
+ .message-row { grid-template-columns:minmax(0,1fr) auto; gap:7px 12px; min-height:76px; padding:16px; }
  .message-row-sender { grid-column:1; grid-row:1; font-size:13px; }
  .message-row-date { grid-column:2; grid-row:1; font-size:10px; }
  .message-row-summary { grid-column:1 / -1; grid-row:2; display:block; white-space:normal; }
  .message-row-subject { display:block; max-width:none; font-size:14px; white-space:nowrap; }
- .message-row-separator { display:none; }
- .message-row-excerpt { display:block; margin-top:3px; font-size:13px; white-space:nowrap; }
  .messages-reader { padding:18px; border-radius:16px; }
  .message-reader-tools { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:18px 10px; margin-bottom:20px; }
  .admin-main .message-reader-subject { grid-column:1 / -1; grid-row:2; margin:0; font-size:24px; }
