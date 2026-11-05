@@ -3,9 +3,9 @@ import { isAdminRequest, safeEqual } from "@/lib/adminAuth";
 import { GMAIL_OWNER, GMAIL_SCOPE, OAUTH_COOKIE, configured, googleToken, redirectUri, saveConnection, unseal } from "@/lib/gmail.mjs";
 
 const FAILURES = {
-  cookie_missing: "Le témoin de connexion est absent. Gardez le même navigateur et autorisez les cookies du site.",
+  cookie_missing: "Le témoin de connexion est absent ou a expiré. Recommencez dans le même navigateur, autorisez les cookies du site et terminez la nouvelle tentative en moins de trente minutes.",
   cookie_invalid: "Le témoin de connexion ne peut plus être vérifié. Recommencez après toute modification des secrets Google.",
-  state_expired: "La tentative de connexion a expiré après dix minutes. Recommencez la connexion.",
+  state_expired: "La tentative de connexion a expiré après trente minutes. Recommencez la connexion.",
   state_invalid: "La tentative ne correspond pas à celle de ce navigateur. Fermez les anciennes tentatives et recommencez.",
   authorization_denied: "L’autorisation Google n’a pas été accordée. Acceptez l’autorisation d’envoyer des emails.",
   token_exchange: "L’échange avec Google a échoué. Recommencez ; si le problème persiste, vérifiez la configuration Google.",
