@@ -106,7 +106,7 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
     if (busyRef.current) return;
     listScroll.current = window.scrollY;
     selectedButton.current = button;
-    if (selectedId !== message.id) setReplyOpen(false);
+    if (selectedId !== message.id) { setReplyOpen(false); setDetail(null); setDetailError(""); setLoading(true); }
     setOptionsOpen(false);
     setSelectedId(message.id);
     if (!message.lu) markRead(message.id, true);
@@ -156,7 +156,7 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
           </div>
           {deleting && <div className="message-delete-confirm" role="group" aria-label="Confirmer la suppression"><p>Supprimer ce message et son historique de réponses ?</p><div><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={busy} onClick={() => setDeleting(false)}>Annuler</button><button type="button" className="eg-button eg-button--danger eg-button--compact" disabled={busy} onClick={remove}>{busy ? "Suppression…" : "Confirmer la suppression"}</button></div></div>}
           {actionError && <p role="alert" className="message-alert">{actionError}</p>}
-          <header className="message-heading"><div className="message-contact"><div className="message-sender"><strong>{selected.nom}</strong><a href={`mailto:${selected.email}`}>{selected.email}</a></div><time>{formatDate(selected.cree_le)}</time></div>{!selected.envoye && <div className="message-delivery-note" role="status"><span>Message enregistré</span><span>Envoi par email au cabinet non confirmé</span><details className="message-delivery-details"><summary>Détails de l’envoi</summary>{loading ? <p>Chargement…</p> : detailError ? <p>Diagnostic momentanément indisponible.</p> : <><p>{deliveryDescription(detail?.delivery)}</p>{detail?.delivery && <dl><div><dt>Service</dt><dd>{({gmail:"Gmail",brevo:"Brevo",resend:"Resend",none:"Non configuré"})[detail.delivery.provider]}</dd></div><div><dt>Étape</dt><dd>{({connection:"Connexion",credentials:"Lecture de la connexion",authorization:"Autorisation Google",recipients:"Destinataires",sending:"Envoi",confirmation:"Confirmation"})[detail.delivery.stage] || "Non identifiée"}</dd></div><div><dt>Code</dt><dd>{detail.delivery.error_code || "accepted"}{detail.delivery.http_status ? ` · HTTP ${detail.delivery.http_status}` : ""}</dd></div><div><dt>Vérifié le</dt><dd>{formatDate(detail.delivery.checked_le)}</dd></div></dl>}</>}</details></div>}</header>
+          <header className="message-heading"><div className="message-contact"><div className="message-sender"><strong>{selected.nom}</strong><a href={`mailto:${selected.email}`}>{selected.email}</a></div><time>{formatDate(selected.cree_le)}</time></div><MessageDeliveryStatus message={selected} delivery={detail?.delivery} loading={loading} error={detailError}/></header>
           <div className="message-original"><MessageText text={selected.message}/>{selected.candidature_id && <p className="message-application-link"><Link href={`/admin/candidatures/${encodeURIComponent(selected.candidature_id)}`} className="eg-button eg-button--primary eg-button--compact">Voir la candidature</Link></p>}</div>
           {loading && <div className="message-loading" role="status"><span aria-hidden="true"/><span>Chargement des réponses…</span></div>}
           {detailError && <div className="message-alert" role="alert"><p>{detailError}</p><button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={() => setReload(value => value + 1)}>Réessayer</button></div>}
@@ -170,6 +170,24 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
       </section>
     </div>
   </div>;
+}
+
+export function MessageDeliveryStatus({message,delivery,loading=false,error=""}) {
+ const sent=delivery?.status==="accepted" || Boolean(message.envoye);
+ const provider=({gmail:"Gmail",brevo:"Brevo",resend:"Resend",none:"Non configuré"})[delivery?.provider];
+ const checking=loading && !sent;
+ return <div className="message-delivery-note" data-sent={sent} role="status">
+  <span>{sent ? "Notification email envoyée" : "Message enregistré"}</span>
+  {sent ? delivery?.checked_le && <span>{provider} · {formatDate(delivery.checked_le)}</span> : <span>{checking ? "Vérification de l’envoi…" : "Envoi par email au cabinet non confirmé"}</span>}
+  <details className="message-delivery-details"><summary>Détails de l’envoi</summary>
+   {loading ? <p>Chargement…</p> : sent ? <><p>Le service d’envoi a confirmé la prise en charge de l’email. La réception dans la boîte du destinataire reste à vérifier.</p>{!delivery && <p>Les détails de cet ancien envoi ne sont pas disponibles.</p>}</> : error ? <p>Diagnostic momentanément indisponible.</p> : <p>{deliveryDescription(delivery)}</p>}
+   {!loading && delivery && <dl>
+    <div><dt>Service</dt><dd>{provider}</dd></div>
+    <div><dt>{sent ? "Confirmé le" : "Vérifié le"}</dt><dd>{formatDate(delivery.checked_le)}</dd></div>
+    {!sent && <><div><dt>Étape</dt><dd>{({connection:"Connexion",credentials:"Lecture de la connexion",authorization:"Autorisation Google",recipients:"Destinataires",sending:"Envoi",confirmation:"Confirmation"})[delivery.stage] || "Non identifiée"}</dd></div><div><dt>Code</dt><dd>{delivery.error_code || "unknown"}{delivery.http_status ? ` · HTTP ${delivery.http_status}` : ""}</dd></div></>}
+   </dl>}
+  </details>
+ </div>;
 }
 
 export function MessageText({text,className="message-text"}) {

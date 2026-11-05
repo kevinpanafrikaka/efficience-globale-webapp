@@ -104,3 +104,17 @@ test("Message reading uses compact paragraphs while preserving line breaks and e
   assert.ok(html.includes("&lt;script&gt;"));assert.doesNotMatch(html,/<script>/);
  }finally{r.close();}
 });
+
+
+test("Message delivery visibly distinguishes confirmed sending, historical sending and unconfirmed delivery",async()=>{
+ const r=await adminRuntime();try{
+  const {MessageDeliveryStatus}=await r.module("src/components/admin/AdminMessages.jsx");
+  const render=props=>renderToStaticMarkup(React.createElement(MessageDeliveryStatus,props));
+  const confirmed=render({message:{envoye:0},delivery:{status:"accepted",provider:"gmail",checked_le:"2026-11-05T15:19:42.000Z"}});
+  assert.match(confirmed,/Notification email envoyée/);assert.match(confirmed,/Gmail/);assert.match(confirmed,/Confirmé le/);assert.match(confirmed,/data-sent="true"/);assert.doesNotMatch(confirmed,/Envoi par email au cabinet non confirmé/);
+  assert.match(confirmed,/réception dans la boîte du destinataire reste à vérifier/);
+  const older=render({message:{envoye:1}});assert.match(older,/Notification email envoyée/);assert.match(older,/ancien envoi/);assert.doesNotMatch(older,/Gmail/);
+  const failed=render({message:{envoye:0},delivery:{status:"unconfirmed",provider:"gmail",error_code:"invalid_grant",stage:"authorization",http_status:400,checked_le:"2026-11-05T15:00:00.000Z"}});assert.match(failed,/Envoi par email au cabinet non confirmé/);assert.doesNotMatch(failed,/Notification email envoyée/);assert.match(failed,/invalid_grant/);
+  assert.match(render({message:{envoye:0},loading:true}),/Vérification de l’envoi/);
+ }finally{r.close();}
+});
