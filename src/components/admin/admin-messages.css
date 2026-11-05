@@ -24,9 +24,9 @@
 .message-row-date { white-space:nowrap; text-align:right; font-size:12px; color:var(--ink-soft); }
 .message-row[data-unread=true] :is(.message-row-sender,.message-row-subject,.message-row-date) { font-weight:600; color:var(--ink); }
 .messages-reader { min-width:0; padding:28px 30px; border:1px solid #dde5d7; border-top:3px solid #9bc66e; border-radius:18px; background:white; box-shadow:0 14px 45px -40px #263d2866; }
-.messages-empty-list { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:20px; min-height:300px; padding:48px 24px; text-align:center; color:var(--ink-soft); background:radial-gradient(ellipse at center,#f4f8ee,white 70%); }
-.messages-empty-symbol { display:grid; place-items:center; width:64px; height:64px; border:1px solid #dce6d2; border-radius:22px; color:#66834f; background:#f1f6ea; box-shadow:0 0 0 10px #f8faf5; }
-.messages-empty-symbol svg { width:28px; height:28px; }
+.messages-empty-list { display:flex; flex-direction:row; align-items:center; justify-content:center; gap:18px; padding:28px 24px; text-align:left; color:var(--ink-soft); background:radial-gradient(ellipse at center,#f4f8ee,white 70%); }
+.messages-empty-symbol { display:grid; place-items:center; flex-shrink:0; width:44px; height:44px; border:1px solid #dce6d2; border-radius:15px; color:#66834f; background:#f1f6ea; box-shadow:0 0 0 6px #f8faf5; }
+.messages-empty-symbol svg { width:23px; height:23px; }
 .messages-empty-list p { max-width:390px; margin:0; font-size:15px; line-height:1.7; text-wrap:balance; }
 .message-reader-tools { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px; margin-bottom:22px; }
 .admin-main .message-reader-subject { order:3; flex-basis:100%; min-width:0; margin:4px 0 0; font-size:clamp(23px,1.9vw,28px); line-height:1.3; letter-spacing:-.025em; }
@@ -153,7 +153,8 @@
 .messages-navbar-search input:focus-visible { outline:2px solid #7cb342; outline-offset:2px; }
 @media(max-width:639px) {
  .message-category-tabs > button:last-child { grid-column:1 / -1; min-height:54px; }
- .messages-empty-list { min-height:260px; padding:40px 22px; }
+ .messages-empty-list { padding:24px 18px; gap:14px; }
+ .messages-empty-list p { font-size:14px; }
  .messages-empty-symbol svg { display:block; }
  .admin-space .admin-topbar.is-messages[data-message-search=true] .admin-topbar-title,
  .admin-space .admin-topbar.is-messages[data-message-search=true] .message-header-count { display:none; }
