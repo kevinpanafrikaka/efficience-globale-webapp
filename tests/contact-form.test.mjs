@@ -59,7 +59,9 @@ test("The three topics prefill an editable subject and preserve the existing for
   const harness = await formHarness();
   for (const [topic, expected] of [["projet", "Accompagnement d’un projet"], ["formation", "Demande de formation"], ["partenariat", "Proposition de partenariat"]]) {
     const tree = harness.render();
-    find(tree, n => n.type === "input" && n.props.value === topic).props.onChange();
+    const radio = find(tree, n => n.type === "input" && n.props.value === topic);
+    assert.equal(radio.props.required, true);
+    radio.props.onChange();
     const updated = harness.render();
     assert.equal(find(updated, n => n.props?.name === "sujet").props.value, expected);
     assert.equal(find(updated, n => n.props?.value === topic).props.checked, true);

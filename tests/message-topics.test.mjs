@@ -24,14 +24,18 @@ test("Contact stores the selected category independently from the subject, witho
  }finally{r.close();}
 });
 
-test("Unknown contact categories are rejected before saving; old unclassified messages remain readable",async()=>{
+test("Missing and unknown contact categories are rejected before saving; old unclassified messages remain readable",async()=>{
  const r=await adminRuntime();try{
   const route=await r.module("src/app/api/contact/route.js"),db=await r.module("src/lib/db.js");
   assert.equal((await route.POST(contact({type_demande:"inconnue"}))).status,400);
   assert.equal(r.sqlite.prepare("SELECT COUNT(*) n FROM messages").get().n,0);
   r.sqlite.prepare("INSERT INTO messages (id,nom,email,sujet,message) VALUES (?,?,?,?,?)").run("legacy","Ancien visiteur","legacy@example.org","Demande de formation","Ancien message");
-  assert.equal((await route.POST(contact({}))).status,200);
-  const items=await db.getAllMessages();assert.equal(items.length,2);
+  for (const values of [{}, {type_demande:""}, {type_demande:"   "}]) {
+   const response=await route.POST(contact(values));
+   assert.equal(response.status,400);
+   assert.equal((await response.json()).error,"Choisissez un type d’accompagnement.");
+  }
+  const items=await db.getAllMessages();assert.equal(items.length,1);
   assert.ok(items.every(m=>m.type_demande===null));
   assert.equal(items.find(m=>m.id==="legacy").message,"Ancien message");
  }finally{r.close();}

@@ -71,12 +71,12 @@ export default function ContactForm({ emailContact }) {
         <legend>Comment pouvons-nous vous accompagner ?</legend>
         <div className="contact-topic-grid">
           {TOPICS.map((item) => <label key={item.id} className="contact-topic">
-            <input type="radio" name="type_demande" value={item.id} checked={topic === item.id} onChange={() => { setTopic(item.id); setSubject(item.subject); }} />
+            <input type="radio" required name="type_demande" value={item.id} checked={topic === item.id} onChange={() => { setTopic(item.id); setSubject(item.subject); }} />
             <span className="contact-topic-face"><span aria-hidden="true" className="contact-topic-icon">{item.icon}</span><span>{item.label}</span><span className="contact-topic-dot" aria-hidden="true" /></span>
           </label>)}
         </div>
       </fieldset>
-      <p className="contact-required-note">Votre nom, votre email et votre message sont nécessaires.</p>
+      <p className="contact-required-note">Le type d’accompagnement, votre nom, votre email et votre message sont nécessaires.</p>
       {/* Champ piège anti-spam : invisible pour les humains, rempli par les robots. */}
       <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
         <label htmlFor="site_web">Ne pas remplir</label>

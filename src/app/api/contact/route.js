@@ -42,6 +42,10 @@ export async function POST(request) {
   try { type_demande = validateMessageTopic(data.get("type_demande")?.toString().trim()); }
   catch { return Response.json({ error: "Type de demande invalide." }, { status: 400 }); }
 
+  if (!type_demande) {
+    return Response.json({ error: "Choisissez un type d’accompagnement." }, { status: 400 });
+  }
+
   // 1. On enregistre d'abord : le message n'est jamais perdu, même si l'email échoue.
   let id;
   try {

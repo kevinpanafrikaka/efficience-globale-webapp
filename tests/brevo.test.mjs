@@ -87,7 +87,7 @@ async function routeFor(runtimeEnv, events, { saveFails = false } = {}) {
 
 function request(values = message) {
   const form = new FormData();
-  for (const [key, value] of Object.entries(values)) form.set(key, value);
+  for (const [key, value] of Object.entries({ type_demande: "projet", ...values })) form.set(key, value);
   return new Request("https://example.org/api/contact", { method: "POST", body: form });
 }
 
