@@ -131,7 +131,8 @@
 .message-category-tabs > button[aria-selected=true] { color:#3f6529; font-weight:600; background:#f7faf3; }
 .message-category-tabs > button[aria-selected=true]::after { position:absolute; content:""; left:14px; right:14px; bottom:0; height:3px; border-radius:3px 3px 0 0; background:#7cb342; }
 .message-category-tabs svg { flex-shrink:0; }
-.message-tab-label { white-space:nowrap; }
+.message-tab-label { white-space:nowrap; font-weight:400; }
+.message-category-tabs > button[data-unread=true] .message-tab-label { font-weight:700; }
 .message-tab-count { flex-shrink:0; margin-left:auto; padding:3px 6px; border-radius:5px; background:#e8f1dd; color:#3d6325; font-size:10px; font-weight:600; white-space:nowrap; }
 @media(hover:hover) { .message-category-tabs > button:hover { background:#f4f7ef; } }
 @media(max-width:1250px) { .message-category-tabs > button { flex-wrap:wrap; gap:8px; padding:16px; } .message-tab-count { margin-left:0; } .message-tab-count-label { display:none; } }

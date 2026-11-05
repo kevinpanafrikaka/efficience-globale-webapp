@@ -62,6 +62,10 @@ test("Inbox category tabs expose separate unread counts while keeping body text 
   assert.ok(html.includes('aria-label="2 messages non lus"'));
   assert.doesNotMatch(html,/Filtrer par état de lecture|Réinitialiser/);
   assert.doesNotMatch(html,/Private body/);
+  const tabs=[...html.matchAll(/<button[^>]*role="tab"[^>]*>/g)].map(match=>match[0]);
+  assert.equal(tabs.filter(tab=>tab.includes('data-unread="true"')).length,3);
+  const readHtml=renderToStaticMarkup(React.createElement(Messages,{messages:messages.map(m=>({...m,lu:1}))}));
+  assert.doesNotMatch(readHtml,/data-unread="true"|class="message-tab-count"/);
  }finally{r.close();}
 });
 
