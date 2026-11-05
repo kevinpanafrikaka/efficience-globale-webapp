@@ -60,6 +60,8 @@ test("Inbox category tabs expose separate unread counts while keeping body text 
   assert.equal((html.match(/role="tab"/g)||[]).length,5);
   for(const label of ["Projets","Formations","Partenariats","Candidatures"])assert.ok(html.includes(label));
   assert.ok(html.includes('aria-label="2 messages non lus"'));
+  assert.match(html,/class="message-tab-count" aria-label="2 messages non lus">2<\/span>/);
+  assert.doesNotMatch(html,/message-tab-count-label/);
   assert.doesNotMatch(html,/Filtrer par état de lecture|Réinitialiser/);
   assert.doesNotMatch(html,/Private body/);
   const tabs=[...html.matchAll(/<button[^>]*role="tab"[^>]*>/g)].map(match=>match[0]);
