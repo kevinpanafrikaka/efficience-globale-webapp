@@ -21,7 +21,6 @@
 .message-row[data-unread=true] { background:#f0f5eb; }
 .message-row-sender { display:flex; align-items:center; gap:8px; min-width:0; font-size:14px; font-weight:400; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .message-row-name { min-width:0; overflow:hidden; text-overflow:ellipsis; }
-.message-unread-dot { flex-shrink:0; width:6px; height:6px; border-radius:50%; background:#56802d; }
 .message-row-summary { display:flex; align-items:baseline; min-width:0; gap:0; white-space:nowrap; overflow:hidden; }
 .message-row-subject { flex:0 1 auto; min-width:0; max-width:65%; overflow:hidden; text-overflow:ellipsis; font-size:14px; font-weight:400; }
 .message-row-separator { flex-shrink:0; color:var(--ink-soft); white-space:pre; }
