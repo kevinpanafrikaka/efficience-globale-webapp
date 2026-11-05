@@ -93,3 +93,14 @@ test("Application category isolates dossiers and empty inboxes use contextual te
   }finally{other.close();}
  }finally{r.close();}
 });
+
+
+test("Message reading uses compact paragraphs while preserving line breaks and escaping content",async()=>{
+ const r=await adminRuntime();try{
+  const {MessageText}=await r.module("src/components/admin/AdminMessages.jsx");
+  const html=renderToStaticMarkup(React.createElement(MessageText,{text:"Bonjour,\r\n\r\n\r\nUne première ligne.\r\nUne seconde ligne.\r\n\r\n<script>Texte</script>"}));
+  assert.equal((html.match(/<p>/g)||[]).length,3);
+  assert.ok(html.includes("Une première ligne.\nUne seconde ligne."));
+  assert.ok(html.includes("&lt;script&gt;"));assert.doesNotMatch(html,/<script>/);
+ }finally{r.close();}
+});

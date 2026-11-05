@@ -143,7 +143,7 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
       <section id="message-reader" className="messages-reader" aria-label="Lecture du message" hidden={!selected}>
         {selected && <>
           <div className="message-reader-tools">
-            <button type="button" onClick={closeMessage} disabled={busy} className="eg-button eg-button--secondary eg-button--compact message-back" aria-label="Tous les messages">Messages</button>
+            <button type="button" onClick={closeMessage} disabled={busy} className="eg-button eg-button--secondary eg-button--compact message-back" aria-label="Tous les messages">Boîte de réception</button>
             <h2 ref={titleRef} tabIndex={-1} className="message-reader-subject">{selected.sujet || "Sans objet"}</h2>
             <div className="message-reader-actions">
               <button type="button" className="eg-button eg-button--primary eg-button--compact" aria-expanded={replyOpen} aria-controls="message-reply" disabled={busy || !detail?.connected} onClick={() => setReplyOpen(true)}>{drafts[selected.id]?.text?.trim() ? "Reprendre la réponse" : "Répondre"}</button>
@@ -155,12 +155,12 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
           </div>
           {deleting && <div className="message-delete-confirm" role="group" aria-label="Confirmer la suppression"><p>Supprimer ce message et son historique de réponses ?</p><div><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={busy} onClick={() => setDeleting(false)}>Annuler</button><button type="button" className="eg-button eg-button--danger eg-button--compact" disabled={busy} onClick={remove}>{busy ? "Suppression…" : "Confirmer la suppression"}</button></div></div>}
           {actionError && <p role="alert" className="message-alert">{actionError}</p>}
-          <header className="message-heading"><div className="message-contact"><div><strong>{selected.nom}</strong><a href={`mailto:${selected.email}`}>{selected.email}</a></div><time>{formatDate(selected.cree_le)}</time></div>{!selected.envoye && <span className="message-delivery-note">Notification email non envoyée</span>}</header>
-          <div className="message-original">{selected.message}{selected.candidature_id && <p className="message-application-link"><Link href={`/admin/candidatures/${encodeURIComponent(selected.candidature_id)}`} className="eg-button eg-button--primary eg-button--compact">Voir la candidature</Link></p>}</div>
+          <header className="message-heading"><div className="message-contact"><div className="message-sender"><strong>{selected.nom}</strong><a href={`mailto:${selected.email}`}>{selected.email}</a></div><time>{formatDate(selected.cree_le)}</time></div>{!selected.envoye && <div className="message-delivery-note" role="status"><span>Message reçu sur le site</span><span>Notification au cabinet non envoyée</span></div>}</header>
+          <div className="message-original"><MessageText text={selected.message}/>{selected.candidature_id && <p className="message-application-link"><Link href={`/admin/candidatures/${encodeURIComponent(selected.candidature_id)}`} className="eg-button eg-button--primary eg-button--compact">Voir la candidature</Link></p>}</div>
           {loading && <div className="message-loading" role="status"><span aria-hidden="true"/><span>Chargement des réponses…</span></div>}
           {detailError && <div className="message-alert" role="alert"><p>{detailError}</p><button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={() => setReload(value => value + 1)}>Réessayer</button></div>}
           {detail && <>
-            {detail.replies.length > 0 && <section className="message-history" aria-label="Historique des réponses"><h3>Réponses du cabinet <span>{detail.replies.length}</span></h3>{detail.replies.map((reply, index) => <details key={reply.id} className="message-reply-record" open={index === detail.replies.length - 1}><summary><strong>{reply.status === "sent" ? "Réponse envoyée" : "Envoi à vérifier dans Gmail"}</strong><time>{formatDate(reply.cree_le)}</time><span className="message-record-toggle" aria-hidden="true">+</span></summary><div><p className="message-reply-destination">À : {reply.recipient}</p><h4>{reply.subject}</h4><p className="message-reply-body">{reply.body}</p></div></details>)}</section>}
+            {detail.replies.length > 0 && <section className="message-history" aria-label="Historique des réponses"><h3>Réponses du cabinet <span>{detail.replies.length}</span></h3>{detail.replies.map((reply, index) => <details key={reply.id} className="message-reply-record" open={index === detail.replies.length - 1}><summary><strong>{reply.status === "sent" ? "Réponse envoyée" : "Envoi à vérifier dans Gmail"}</strong><time>{formatDate(reply.cree_le)}</time><span className="message-record-toggle" aria-hidden="true">+</span></summary><div><p className="message-reply-destination">À : {reply.recipient}</p><h4>{reply.subject}</h4><MessageText text={reply.body} className="message-reply-body"/></div></details>)}</section>}
             <div id="message-reply" ref={replyRef}>
               {detail.connected ? replyOpen ? <ReplyComposer key={selected.id} message={selected} detail={detail} draft={drafts[selected.id]} onDraft={draft => setDrafts(prev => ({ ...prev, [selected.id]: draft }))} onBusy={setSending} onClose={() => { setReplyOpen(false); titleRef.current?.focus({ preventScroll: true }); }} onSent={() => { setReload(value => value + 1); router.refresh(); }} /> : null : <div className="message-connect"><p>Connectez Gmail pour répondre depuis cet espace.</p><Link href="/admin/reglages" className="eg-button eg-button--secondary eg-button--compact">Ouvrir les réglages</Link></div>}
             </div>
@@ -169,6 +169,11 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
       </section>
     </div>
   </div>;
+}
+
+export function MessageText({text,className="message-text"}) {
+ const paragraphs=String(text||"").replace(/\r\n?/g,"\n").split(/\n[\t ]*\n(?:[\t ]*\n)*/).filter(part=>part.trim());
+ return <div className={className}>{paragraphs.map((paragraph,index)=><p key={index}>{paragraph}</p>)}</div>;
 }
 
 function ReplyComposer({ message, detail, draft, onDraft, onBusy, onSent, onClose }) {
