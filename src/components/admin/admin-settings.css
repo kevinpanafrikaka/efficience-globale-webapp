@@ -1,0 +1,69 @@
+.admin-main form.settings-form { width:100%; max-width:none; min-width:0; padding:0; border:1px solid #dfe6d8; border-radius:16px; background:white; box-shadow:0 10px 30px -28px #26362a55; }
+.settings-tabs { display:flex; gap:22px; padding:0 26px; border-bottom:1px solid #e2e8dc; }
+.settings-tabs button { position:relative; min-height:62px; padding:16px 2px; color:var(--ink-soft); font-size:14px; font-weight:500; white-space:nowrap; }
+.settings-tabs button[aria-selected=true] { color:#3e642b; font-weight:600; }
+.settings-tabs button[aria-selected=true]::after { content:""; position:absolute; height:3px; border-radius:3px 3px 0 0; left:0; right:0; bottom:-1px; background:#7cb342; }
+.admin-main .settings-form .settings-panel { min-width:0; padding:26px; border:0; }
+.settings-panel[hidden] { display:none; }
+.settings-panel:focus-visible { outline-offset:-3px; }
+.settings-section-heading { margin-bottom:24px; }
+.admin-main .settings-section-heading h2 { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin:0; font-family:var(--font-source-sans),sans-serif; font-size:18px; font-weight:600; line-height:1.4; }
+.settings-section-heading p { margin:6px 0 0; color:var(--ink-soft); font-size:13px; line-height:1.6; }
+.settings-fields-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px 24px; }
+.settings-full-field { grid-column:1 / -1; }
+.settings-field { display:flex; flex-direction:column; gap:8px; min-width:0; }
+.settings-field label { font-size:13px; font-weight:600; }
+.admin-main .settings-form input { width:100%; min-width:0; min-height:46px; padding:10px 13px; border:1px solid #d4dfcb; border-radius:9px; font-size:15px; line-height:1.5; background:white; color:var(--ink); }
+.admin-main .settings-form input:focus { outline:2px solid #7cb342; outline-offset:2px; }
+.admin-main .settings-form input[aria-invalid=true] { border-color:#ba655f; }
+.admin-main .settings-form input:disabled { background:#f7f8f4; color:#697561; }
+.settings-hint { margin:0; color:var(--ink-soft); font-size:12px; line-height:1.6; }
+.settings-email-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:32px; }
+.settings-email-service,.settings-recipient-section { min-width:0; }
+.settings-email-grid .settings-section-heading { margin-bottom:18px; }
+.settings-recipient-section { padding-left:32px; border-left:1px solid #e2e8dc; }
+.settings-connection { padding:18px; border:1px solid #dfe7d6; border-radius:12px; background:#f8faf5; }
+.settings-connection-top { display:flex; flex-wrap:wrap; align-items:center; gap:10px 12px; }
+.settings-connection-top > strong { font-size:15px; font-weight:600; }
+.settings-connection-status { display:inline-flex; align-items:center; gap:6px; padding:4px 7px; border-radius:5px; background:#ecf0e6; color:#637257; font-size:11px; font-weight:600; }
+.settings-connection-status::before { content:""; width:5px; height:5px; background:currentColor; border-radius:50%; }
+.settings-connection-status[data-status=verified] { background:#e9f3df; color:#3f6d22; }
+.settings-connection-status:is([data-status=invalid],[data-status=disconnected],[data-status=unavailable],[data-status=unconfigured]) { color:#936018; background:#faf0df; }
+.settings-sender { margin:14px 0 6px; font-size:14px; font-weight:500; overflow-wrap:anywhere; }
+.settings-check-date { margin:8px 0 0; color:var(--ink-soft); font-size:11px; line-height:1.5; }
+.settings-connection-actions { display:flex; align-items:flex-start; flex-direction:column; gap:10px; margin-top:16px; }
+.settings-manage-link { display:inline-flex; align-items:center; gap:7px; min-height:44px; color:#4b7728; font-size:12px; text-decoration:underline; text-underline-offset:3px; }
+.settings-manage-link svg { width:14px; height:14px; flex-shrink:0; }
+.settings-recipient-count { display:inline-flex; align-items:center; padding:3px 6px; border-radius:5px; background:#eff4e8; color:#55723d; font-size:11px; font-weight:500; }
+.settings-recipients { display:grid; gap:10px; }
+.settings-recipient-row { display:grid; grid-template-columns:minmax(0,1fr) 40px; align-items:center; gap:8px; }
+.settings-remove-recipient { display:grid; place-items:center; width:40px; color:#75826b; border:1px solid transparent; border-radius:8px; }
+.settings-remove-recipient svg { width:18px; height:18px; }
+.settings-add-recipient { min-height:44px; margin-top:8px; color:#4b7728; font-size:13px; font-weight:600; text-align:left; }
+.settings-savebar { position:sticky; bottom:0; z-index:10; display:flex; align-items:center; justify-content:space-between; gap:14px 24px; padding:16px 26px; border-top:1px solid #e2e8dc; border-radius:0 0 16px 16px; background:#fff; box-shadow:0 -8px 24px -24px #26362a66; }
+.settings-savebar > div:first-child { min-width:0; }
+.settings-savebar p { margin:0; font-size:12px; line-height:1.6; }
+.settings-save-state { color:var(--ink-soft); }
+.settings-saved { color:#4b7728; font-weight:600; }
+.settings-save-actions { display:flex; flex-shrink:0; gap:8px; }
+.admin-main .settings-form .settings-save-actions > .eg-button { width:auto; }
+.settings-form :is(button,a):focus-visible { outline:2px solid #5c8a3c; outline-offset:3px; }
+@media(hover:hover) { .settings-tabs button:hover,.settings-manage-link:hover { color:#3f6c25; } .settings-remove-recipient:hover:not(:disabled) { color:#a32929; background:#fff5f3; border-color:#f1d9d4; } }
+@media(max-width:1000px) {
+ .settings-email-grid { grid-template-columns:minmax(0,1fr); gap:26px; }
+ .settings-recipient-section { padding-left:0; padding-top:24px; border-left:0; border-top:1px solid #e2e8dc; }
+}
+@media(max-width:639px) {
+ .settings-tabs { padding:0 16px; gap:16px; }
+ .settings-tabs button { min-height:56px; font-size:13px; }
+ .admin-main .settings-form .settings-panel { padding:20px 16px; }
+ .settings-fields-grid { grid-template-columns:minmax(0,1fr); gap:18px; }
+ .settings-section-heading { margin-bottom:20px; }
+ .admin-main .settings-section-heading h2 { font-size:16px; }
+ .admin-main .settings-form input { font-size:16px; }
+ .settings-connection { padding:14px; }
+ .settings-savebar { align-items:stretch; flex-direction:column; padding:14px 16px; gap:12px; }
+ .settings-save-actions { justify-content:flex-end; }
+ .admin-main .settings-form .settings-connection-actions > .eg-button { width:auto; }
+}
+@media(max-width:359px) { .settings-tabs { gap:12px; padding-inline:12px; } .settings-tabs button { font-size:12px; } }

@@ -1,6 +1,5 @@
-import { notificationRecipients } from "@/lib/notification-recipients.mjs";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { isGmailConnected, GMAIL_OWNER, GMAIL_RECIPIENT } from "@/lib/gmail.mjs";
+import { configured, isGmailConnected, GMAIL_OWNER } from "@/lib/gmail.mjs";
 import { isBrevoConfigured } from "@/lib/brevo.mjs";
 import { adminPageAllowed } from "@/lib/admin-page";
 import { getReglages } from "@/lib/db";
@@ -13,15 +12,14 @@ export default async function AdminReglagesPage() {
   const reglages = await getReglages();
   const { env } = await getCloudflareContext({ async: true });
   const notification = isBrevoConfigured(env)
-    ? { provider: "Brevo", recipient: GMAIL_RECIPIENT, sender: env.BREVO_SENDER_EMAIL }
+    ? { provider: "Brevo", status: "configured", sender: env.BREVO_SENDER_EMAIL }
     : await isGmailConnected(env)
-      ? { provider: "Gmail connecté", recipient: notificationRecipients(reglages).join(", "), sender: GMAIL_OWNER }
-      : { provider: env.RESEND_API_KEY ? "Resend" : "Non configurées", recipient: reglages.email_destinataire };
+      ? { provider: "Gmail", status: "registered", sender: GMAIL_OWNER }
+      : env.RESEND_API_KEY
+        ? { provider: "Resend", status: "configured" }
+        : { provider: "Gmail", status: configured(env) ? "disconnected" : "unconfigured", sender: GMAIL_OWNER };
 
   return (
-    <div>
-      <h1 className="text-[24px] mb-6">Réglages du site</h1>
-      <ReglagesForm reglages={reglages} notification={notification} />
-    </div>
+    <ReglagesForm reglages={reglages} notification={notification} />
   );
 }

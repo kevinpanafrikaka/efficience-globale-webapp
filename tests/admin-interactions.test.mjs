@@ -5,6 +5,7 @@ import { webcrypto } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import * as jsx from "react/jsx-runtime";
+import { cloneElement } from "react";
 const require = createRequire(import.meta.url);
 const { transformSync } = require("next/dist/build/swc");
 
@@ -14,7 +15,7 @@ async function harness(path, props = {}, { fail = false, network = false, respon
   let pendingEffects = [];
   let cursor = 0;
   const context = vm.createContext({
-    URL, URLSearchParams, FormData, File, crypto: webcrypto,
+    URL, URLSearchParams, FormData, File, AbortSignal, crypto: webcrypto,
     fetch: async (url, options) => { requests.push({ url, options }); if (respond) return respond(url, options); if (network) throw Error("offline"); return Response.json(fail ? { error: "Échec de test" } : { success: true }, { status: fail ? 401 : 200 }); },
     window: {
       confirm: () => true, innerHeight: 700,
@@ -28,6 +29,8 @@ async function harness(path, props = {}, { fail = false, network = false, respon
   });
   const imports = {
     "react": {
+      cloneElement,
+      useId() { const i=cursor++; return state[i] ??= `test-id-${i}`; },
       useState(initial) { const i = cursor++; if (!(i in state)) state[i] = initial; return [state[i], value => { state[i] = typeof value === "function" ? value(state[i]) : value; }]; },
       useRef(value) { const i = cursor++; return state[i] ??= { current: value }; },
       useEffect(effect, dependencies) {
@@ -46,6 +49,7 @@ async function harness(path, props = {}, { fail = false, network = false, respon
     "./admin-team.css": {},
     "./admin-partners.css": {},
     "./project-editor.css": {},
+    "./admin-settings.css": {},
     "./member-editor.css": {},
     "./admin-announcements.css": {},
     "./announcement-editor.css": {},
@@ -64,7 +68,7 @@ async function harness(path, props = {}, { fail = false, network = false, respon
   const cache = new Map(),linking=new Map();
   async function load(name) {
     if (imports[name]) return new vm.SyntheticModule(Object.keys(imports[name]), function () { for (const [k,v] of Object.entries(imports[name])) this.setExport(k,v); }, { context });
-    const file = name === "./PartnerOptions" ? "src/components/admin/PartnerOptions.jsx" : name === "@/lib/partner-projects.mjs" ? "src/lib/partner-projects.mjs" : name === "@/lib/announcement-fields.mjs" ? "src/lib/announcement-fields.mjs" : name === "./announcement-fields.mjs" ? "src/lib/announcement-fields.mjs" : name === "./announcements.mjs" ? "src/lib/announcements.mjs" : name === "./EditorTime" ? "src/components/admin/EditorTime.jsx" : name === "./PublicationPdfUpload" ? "src/components/admin/PublicationPdfUpload.jsx" : name === "@/lib/application-documents.mjs" ? "src/lib/application-documents.mjs" : name === "./AnnouncementGalleryUpload" ? "src/components/admin/AnnouncementGalleryUpload.jsx" : name === "./EditorDate" ? "src/components/admin/EditorDate.jsx" : name === "./AdminAnnouncementCard" ? "src/components/admin/AdminAnnouncementCard.jsx" : name === "./AnnouncementOptions" ? "src/components/admin/AnnouncementOptions.jsx" : name === "./AnnouncementCard" ? "src/components/AnnouncementCard.jsx" : name === "@/lib/announcements.mjs" ? "src/lib/announcements.mjs" : name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./MemberCard" ? "src/components/admin/MemberCard.jsx" : name === "./MemberOptions" ? "src/components/admin/MemberOptions.jsx" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name === "@/lib/member-expertises.mjs" ? "src/lib/member-expertises.mjs" : name;
+    const file = name === "@/lib/notification-recipients.mjs" ? "src/lib/notification-recipients.mjs" : name === "./PartnerOptions" ? "src/components/admin/PartnerOptions.jsx" : name === "@/lib/partner-projects.mjs" ? "src/lib/partner-projects.mjs" : name === "@/lib/announcement-fields.mjs" ? "src/lib/announcement-fields.mjs" : name === "./announcement-fields.mjs" ? "src/lib/announcement-fields.mjs" : name === "./announcements.mjs" ? "src/lib/announcements.mjs" : name === "./EditorTime" ? "src/components/admin/EditorTime.jsx" : name === "./PublicationPdfUpload" ? "src/components/admin/PublicationPdfUpload.jsx" : name === "@/lib/application-documents.mjs" ? "src/lib/application-documents.mjs" : name === "./AnnouncementGalleryUpload" ? "src/components/admin/AnnouncementGalleryUpload.jsx" : name === "./EditorDate" ? "src/components/admin/EditorDate.jsx" : name === "./AdminAnnouncementCard" ? "src/components/admin/AdminAnnouncementCard.jsx" : name === "./AnnouncementOptions" ? "src/components/admin/AnnouncementOptions.jsx" : name === "./AnnouncementCard" ? "src/components/AnnouncementCard.jsx" : name === "@/lib/announcements.mjs" ? "src/lib/announcements.mjs" : name === "./useAdminAction" ? "src/components/admin/useAdminAction.js" : name === "./MemberCard" ? "src/components/admin/MemberCard.jsx" : name === "./MemberOptions" ? "src/components/admin/MemberOptions.jsx" : name === "./EditorSelect" ? "src/components/admin/EditorSelect.jsx" : name === "./ProjectPeriodField" ? "src/components/admin/ProjectPeriodField.jsx" : name === "@/lib/project-period.mjs" ? "src/lib/project-period.mjs" : name === "@/lib/member-expertises.mjs" ? "src/lib/member-expertises.mjs" : name;
     if (!cache.has(file)) {
       const source = await readFile(new URL("../" + file, import.meta.url), "utf8");
       const { code } = transformSync(source, { filename: file, jsc: { target: "es2022", parser: { syntax: "ecmascript", jsx: true }, transform: { react: { runtime: "automatic" } } }, module: { type: "es6" } });
@@ -695,4 +699,40 @@ test("Existing images, gallery photos and PDFs are reused by URL without another
  const added=[];const gallery=await harness('src/components/admin/AnnouncementGalleryUpload.jsx',{photos:[{url:'/uploads/current.png'}],onAdd:p=>added.push(...p),onChange(){}});
  const picker=find(gallery.render(),n=>n.type?.name==='MediaPicker');assert.deepEqual(Array.from(picker.props.excludeUrls),['/uploads/current.png']);assert.equal(picker.props.max,49);
  picker.props.onChoose([{url:'/uploads/one.png'},{url:'/uploads/two.png'}]);assert.deepEqual(added.map(p=>p.url),['/uploads/one.png','/uploads/two.png']);assert.equal(gallery.requests.length,0);
+});
+
+const settingsProps={reglages:{email:'cabinet@example.org',telephone:'123',adresse:'Conakry',facebook:'',linkedin:'',x:'',email_notifications:JSON.stringify(['oumar@example.org'])},notification:{provider:'Gmail',status:'registered',sender:'sender@example.org'}};
+const settingsButton=(tree,label)=>find(tree,n=>n.type==='button'&&n.props.children===label);
+const settingsInput=(tree,name)=>find(tree,n=>n.type==='input'&&n.props.name===name);
+test('Settings preserve edits across tabs, cancel restores the last saved values and saving sends all groups once',async()=>{
+ const h=await harness('src/components/admin/ReglagesForm.jsx',settingsProps);
+ assert.equal(find(h.render(),n=>n.type==='button'&&n.props.type==='submit').props.disabled,true);
+ settingsInput(h.render(),'telephone').props.onChange({target:{value:'456'}});
+ settingsButton(h.render(),'Emails').props.onClick();settingsButton(h.render(),'+ Ajouter une adresse').props.onClick();
+ settingsInput(h.render(),'notification-1').props.onChange({target:{value:' AMINATA@example.org '}});
+ settingsButton(h.render(),'Réseaux sociaux').props.onClick();settingsInput(h.render(),'linkedin').props.onChange({target:{value:'https://example.org/cabinet'}});
+ await h.render().props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,1);
+ const payload=JSON.parse(h.requests[0].options.body);assert.equal(payload.telephone,'456');assert.equal(payload.linkedin,'https://example.org/cabinet');assert.deepEqual(payload.email_notifications,['oumar@example.org','aminata@example.org']);
+ assert.equal(find(h.render(),n=>n.type==='button'&&n.props.type==='submit').props.disabled,true);
+ settingsInput(h.render(),'telephone').props.onChange({target:{value:'789'}});settingsButton(h.render(),'Annuler').props.onClick();assert.equal(settingsInput(h.render(),'telephone').props.value,'456');
+ assert.equal(h.requests.length,1);
+});
+test('Settings reveal invalid hidden fields, reject duplicate recipients and retain drafts after server failures',async()=>{
+ const h=await harness('src/components/admin/ReglagesForm.jsx',settingsProps,{fail:true});
+ settingsButton(h.render(),'+ Ajouter une adresse').props.onClick();
+ await h.render().props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,0);
+ assert.equal(find(h.render(),n=>n.props?.role==='tab'&&n.props['aria-selected']).props.children,'Emails');
+ settingsInput(h.render(),'notification-1').props.onChange({target:{value:'OUMAR@example.org'}});
+ await h.render().props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,0);assert.match(find(h.render(),n=>n.props?.role==='alert').props.children,/déjà/);
+ settingsInput(h.render(),'notification-1').props.onChange({target:{value:'aminata@example.org'}});
+ await h.render().props.onSubmit({preventDefault(){}});assert.equal(h.requests.length,1);assert.ok(find(h.render(),n=>n.props?.role==='alert'));
+ assert.equal(settingsInput(h.render(),'notification-1').props.value,'aminata@example.org');assert.equal(find(h.render(),n=>n.type==='button'&&n.props.type==='submit').props.disabled,false);
+});
+test('Settings limit recipient rows, expose keyboard tab navigation and check Gmail through a separate request without saving',async()=>{
+ const h=await harness('src/components/admin/ReglagesForm.jsx',settingsProps,{respond:async()=>Response.json({status:'verified',message:'Autorisation vérifiée sans email.'})});
+ for(let i=1;i<10;i++)settingsButton(h.render(),'+ Ajouter une adresse').props.onClick();
+ assert.equal(settingsButton(h.render(),'+ Ajouter une adresse').props.disabled,true);assert.equal(settingsInput(h.render(),'notification-10'),null);
+ const first=find(h.render(),n=>n.props?.role==='tab'&&n.props.children==='Cabinet');first.props.onKeyDown({key:'End',preventDefault(){}});
+ assert.equal(find(h.render(),n=>n.props?.role==='tab'&&n.props['aria-selected']).props.children,'Réseaux sociaux');
+ await settingsButton(h.render(),'Vérifier l’autorisation').props.onClick();assert.equal(h.requests.length,1);assert.equal(h.requests[0].url,'/api/admin/reglages/gmail');assert.ok(find(h.render(),n=>n.props?.['data-status']==='verified'));
 });

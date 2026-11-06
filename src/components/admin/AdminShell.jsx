@@ -21,6 +21,7 @@ export default function AdminShell({ children, unread }) {
   const dashboard = pathname === "/admin";
   const projects = pathname === "/admin/projets";
   const media = pathname === "/admin/medias";
+  const settings = pathname === "/admin/reglages";
   const messages = pathname === "/admin/messages" || pathname.startsWith("/admin/messages/");
   const partners = pathname === "/admin/partenaires";
   const partnerEditor = pathname === "/admin/partenaires/nouveau" || /^\/admin\/partenaires\/[^/]+\/modifier$/.test(pathname);
@@ -47,8 +48,8 @@ export default function AdminShell({ children, unread }) {
       </div>
     </aside>
     <div className="admin-workspace">
-      {!projectEditor && !memberEditor && !announcementEditor && !partnerEditor && <header data-message-search={messages ? messageSearchOpen : undefined} className={`admin-topbar ${dashboard || projects || team || announcements || partners || messages || media ? "is-dashboard" : ""}${projects ? " is-projects" : team ? " is-team" : announcements ? " is-announcements" : partners ? " is-partners" : messages ? " is-messages" : ""}`}>
-        {dashboard || projects || team || announcements || partners || messages || media ? <div className="admin-topbar-title"><h1>{media ? "Médiathèque" : messages ? "Messages" : partners ? "Partenaires" : announcements ? "Annonces" : team ? "Équipe" : projects ? "Projets" : "Tableau de bord"}</h1></div> : <span>Administration <span aria-hidden="true">/</span> <strong>{current}</strong></span>}
+      {!projectEditor && !memberEditor && !announcementEditor && !partnerEditor && <header data-message-search={messages ? messageSearchOpen : undefined} className={`admin-topbar ${dashboard || projects || team || announcements || partners || messages || media || settings ? "is-dashboard" : ""}${projects ? " is-projects" : team ? " is-team" : announcements ? " is-announcements" : partners ? " is-partners" : messages ? " is-messages" : ""}`}>
+        {dashboard || projects || team || announcements || partners || messages || media || settings ? <div className="admin-topbar-title"><h1>{settings ? "Réglages" : media ? "Médiathèque" : messages ? "Messages" : partners ? "Partenaires" : announcements ? "Annonces" : team ? "Équipe" : projects ? "Projets" : "Tableau de bord"}</h1></div> : <span>Administration <span aria-hidden="true">/</span> <strong>{current}</strong></span>}
         <div className="admin-topbar-actions">{messages ? <><span className="message-header-count">{unread} non lu{unread > 1 ? "s" : ""}</span><AdminMessageSearch /></> : <a href="/admin/messages" aria-label={`${unread} message${unread > 1 ? "s" : ""} non lu${unread > 1 ? "s" : ""}`}>Messages <span className="admin-unread-count">{unread}</span></a>}{dashboard && <DashboardCreateMenu />}{projects && <a href="/admin/projets/nouveau" className="eg-button eg-button--primary">+ Nouveau projet</a>}{team && <a href="/admin/membres/nouveau" className="eg-button eg-button--primary">+ Nouveau membre</a>}{partners && <a href="/admin/partenaires/nouveau" className="eg-button eg-button--primary">+ Nouveau partenaire</a>}{announcements && <a href="/admin/annonces/nouveau" className="eg-button eg-button--primary">+ Nouvelle annonce</a>}</div>
       </header>}
       <main id="admin-main" className="admin-main" tabIndex={-1}>{children}</main>

@@ -51,7 +51,8 @@ test("Settings display the actual Gmail sender and recipient without exposing se
     runtime.sqlite.prepare("INSERT INTO gmail_connection VALUES (1,?)").run("encrypted-test-token");
     const page = await runtime.module("src/app/admin/reglages/page.js");
     const html = renderToStaticMarkup(await page.default());
-    assert.ok(html.includes("Gmail connecté"));
+    assert.ok(html.includes("Connexion enregistrée"));
+    assert.doesNotMatch(html, /Gmail connecté|Autorisation vérifiée/);
     assert.ok(html.includes("oumar.camara@efficienceglobale.com"));
     assert.ok(html.includes("kevinkandet05@gmail.com"));
     assert.doesNotMatch(html, /test-google-secret|encrypted-test-token|Destinataire Resend|Chiffres de l|Ajouter un chiffre/);

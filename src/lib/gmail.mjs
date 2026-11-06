@@ -73,6 +73,25 @@ export async function isGmailConnected(env) {
   return configured(env) && Boolean(await connection(env));
 }
 
+// Check only the saved Google authorization; never send an email or return tokens.
+export async function verifyGmailAuthorization(env) {
+  const checkedAt = new Date().toISOString();
+  if (!configured(env)) return { status: "unconfigured", checkedAt, message: "La configuration Google doit être complétée." };
+  try {
+    const row = await connection(env);
+    if (!row) return { status: "disconnected", checkedAt, message: "Connectez le compte Gmail pour activer les envois." };
+    let saved;
+    try { saved = await unseal(row.token, env); }
+    catch { return { status: "invalid", checkedAt, message: "L’autorisation enregistrée ne peut plus être lue. Reconnectez Gmail." }; }
+    if (typeof saved?.refreshToken !== "string" || !saved.refreshToken) return { status: "invalid", checkedAt, message: "L’autorisation est incomplète. Reconnectez Gmail." };
+    await googleToken({ client_id: env.GOOGLE_CLIENT_ID, client_secret: env.GOOGLE_CLIENT_SECRET, grant_type: "refresh_token", refresh_token: saved.refreshToken });
+    return { status: "verified", checkedAt, message: "Google a validé l’autorisation. Aucun email de test n’a été envoyé." };
+  } catch (error) {
+    if (error?.oauthCode === "invalid_grant") return { status: "invalid", checkedAt, message: "L’autorisation Google n’est plus valide. Reconnectez Gmail." };
+    return { status: "unavailable", checkedAt, message: "L’autorisation n’a pas pu être vérifiée. Réessayez ou consultez la connexion Gmail." };
+  }
+}
+
 export function buildMime({ nom, email, sujet, message, attachments = [], recipients = DEFAULT_NOTIFICATION_RECIPIENTS }) {
   // All user content in headers is encoded or strictly validated against CR/LF.
   if (!/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email)) throw new Error("Invalid reply address");
