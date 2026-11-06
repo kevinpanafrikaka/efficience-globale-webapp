@@ -8,11 +8,11 @@
 .media-storage .media-storage-unused { border-left:1px solid #dbe3d4; padding-left:22px; margin-left:6px; }
 .media-storage-unused strong { font-size:17px; color:#627058; }
 .media-browser-tools { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:14px; }
-.media-library-toolbar { display:grid; grid-template-columns:auto auto minmax(180px,1fr) auto; gap:20px; }
+.media-library-toolbar { display:grid; grid-template-columns:auto auto minmax(180px,1fr) auto; gap:16px; }
 .media-toolbar-summary,.media-toolbar-action { min-width:0; }
 .media-toolbar-summary .media-storage { white-space:nowrap; }
 .media-library-toolbar > .media-usage-filters { flex-wrap:nowrap; }
-.media-library-toolbar > .media-search { width:100%; max-width:320px; justify-self:center; }
+.media-library-toolbar > .media-search { width:100%; max-width:none; justify-self:stretch; }
 .media-toolbar-action > .eg-button { white-space:nowrap; }
 @container media-library (max-width:1099px) {
  .media-library-toolbar { grid-template-columns:auto minmax(180px,1fr) auto; gap:18px 16px; }
@@ -33,6 +33,12 @@
 .media-search svg { width:19px; height:19px; flex:0 0 19px; color:#5d7053; }
 .admin-main .media-search input,.media-dialog .media-search input { width:100%; min-width:0; border:0; background:transparent; padding:10px 0; font-size:15px; outline:none; }
 .media-search:focus-within { outline:2px solid #7cb342; outline-offset:2px; }
+.media-library-toolbar > .media-usage-filters button,
+.media-library-toolbar > .media-search,
+.media-toolbar-action > .eg-button { box-sizing:border-box; height:48px; min-height:48px; border-radius:10px; }
+.media-library-toolbar > .media-usage-filters button { padding-block:0; line-height:1.2; }
+.media-toolbar-action > .eg-button { padding:0 18px; font-size:14px; line-height:1.2; }
+.admin-main .media-library-toolbar > .media-search input { height:100%; padding-block:0; font-size:14px; line-height:1.2; }
 .media-results-bar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; padding:20px 0 16px; color:var(--ink-soft); font-size:12px; }
 .media-type-filters { display:flex; flex-wrap:wrap; gap:12px; }
 .media-type-filters button { padding:5px 0; border-bottom:2px solid transparent; font-size:12px; color:var(--ink-soft); }
