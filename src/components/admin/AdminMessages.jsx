@@ -214,11 +214,11 @@ export function MessageDeliveryStatus({message,delivery,loading=false,error=""})
        <div><dt>Destinataire{recipients.length>1?"s":""}</dt><dd>{recipients.length>0?recipients.map(email=><div key={email}>{email}</div>):"Non enregistré pour cet envoi"}</dd></div>
        <div><dt>Expéditeur</dt><dd>{delivery.sender || "Non enregistré pour cet envoi"}</dd></div>
       </dl>}
-      {!sent && <dl className="message-delivery-meta">
+      <dl className="message-delivery-meta">
        <div><dt>Service d’envoi</dt><dd>{provider}</dd></div>
        <div><dt>{sent ? "Envoi confirmé le" : "Vérifié le"}</dt><dd>{deliveryTime(delivery.checked_le)}</dd></div>
        {!sent && <><div><dt>Étape</dt><dd>{({connection:"Connexion",credentials:"Lecture de la connexion",authorization:"Autorisation Google",recipients:"Destinataires",sending:"Envoi",confirmation:"Confirmation"})[delivery.stage] || "Non identifiée"}</dd></div><div><dt>Code</dt><dd>{delivery.error_code || "unknown"}{delivery.http_status ? ` · HTTP ${delivery.http_status}` : ""}</dd></div></>}
-      </dl>}
+      </dl>
      </>}
      <div className="message-delivery-bottom">
       {!loading && sent && delivery?.provider_message_id && <div className="message-delivery-reference"><span>Référence {provider}</span><code>{delivery.provider_message_id}</code></div>}

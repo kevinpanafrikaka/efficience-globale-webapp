@@ -187,6 +187,7 @@
 .message-delivery-dialog dt { color:var(--ink-soft,#60705a); font-size:12px; font-weight:400; }
 .message-delivery-dialog dd { margin:5px 0 0; font-size:14px; line-height:1.5; overflow-wrap:anywhere; }
 .message-delivery-meta { display:grid; grid-template-columns:minmax(100px,.7fr) minmax(0,1.7fr); gap:14px 20px; margin:0; }
+.message-delivery-addresses + .message-delivery-meta { margin-top:14px; }
 .message-delivery-meta > div { min-width:0; }
 .message-delivery-explanation { margin:0 0 16px; color:var(--ink-soft,#60705a); font-size:14px; line-height:1.6; }
 .message-delivery-bottom { display:flex; flex-wrap:wrap; align-items:center; gap:12px 16px; margin-top:16px; }

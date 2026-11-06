@@ -115,7 +115,8 @@ test("Message delivery visibly distinguishes confirmed sending, historical sendi
   assert.doesNotMatch(confirmed,/a confirmé l’envoi de cet email/);assert.match(confirmed,/<dialog[^>]*aria-label="Détails de l’envoi"/);assert.match(confirmed,/aria-haspopup="dialog"/);assert.match(confirmed,/aria-label="Informations sur l’envoi"/);assert.match(confirmed,/aria-label="Copier la référence Gmail"/);assert.doesNotMatch(confirmed,/<details|message-delivery-dialog-header/);assert.doesNotMatch(confirmed,/<dt>Réception<|<dt>Lecture<|Non suivie par le site/);
   assert.match(confirmed,/oumar@example.org/);assert.match(confirmed,/aminata@example.org/);assert.match(confirmed,/cabinet@example.org/);assert.match(confirmed,/18c000ab42/);
   const dialog=confirmed.match(/<dialog[\s\S]*?<\/dialog>/)[0];
-  assert.doesNotMatch(dialog,/Email envoyé au cabinet|Informations sur l’envoi|Service d’envoi|Envoi confirmé le/);
+  assert.doesNotMatch(dialog,/Email envoyé au cabinet|Informations sur l’envoi/);
+  assert.match(dialog,/<dt>Service d’envoi<\/dt><dd>Gmail<\/dd>/);assert.match(dialog,/Envoi confirmé le/);assert.match(dialog,/15:19:42/);assert.match(dialog,/heure de Conakry/);
   assert.match(dialog,/Référence Gmail/);assert.match(dialog,/>Copier<|>Copier<!--/);assert.match(dialog,/>Fermer</);
   const historical=render({message:{envoye:1},delivery:{status:"accepted",provider:"gmail",checked_le:"2026-11-05T15:19:42.000Z"}});assert.match(historical,/Non enregistré pour cet envoi/);assert.doesNotMatch(historical,/oumar@example.org/);
   const older=render({message:{envoye:1}});assert.match(older,/Email envoyé au cabinet/);assert.match(older,/ses détails ne sont pas disponibles/);assert.doesNotMatch(older,/Gmail/);
