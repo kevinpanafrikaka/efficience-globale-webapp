@@ -1,6 +1,6 @@
 "use client";
 
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { MessageSearchContext } from "./AdminMessageSearch";
@@ -156,7 +156,7 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
           </div>
           {deleting && <div className="message-delete-confirm" role="group" aria-label="Confirmer la suppression"><p>Supprimer ce message et son historique de réponses ?</p><div><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={busy} onClick={() => setDeleting(false)}>Annuler</button><button type="button" className="eg-button eg-button--danger eg-button--compact" disabled={busy} onClick={remove}>{busy ? "Suppression…" : "Confirmer la suppression"}</button></div></div>}
           {actionError && <p role="alert" className="message-alert">{actionError}</p>}
-          <header className="message-heading"><div className="message-contact"><div className="message-sender"><strong>{selected.nom}</strong><a href={`mailto:${selected.email}`}>{selected.email}</a></div><time>{formatDate(selected.cree_le)}</time></div><MessageDeliveryStatus message={selected} delivery={detail?.delivery} loading={loading} error={detailError}/></header>
+          <header className="message-heading"><div className="message-contact"><div className="message-sender"><strong>{selected.nom}</strong><a href={`mailto:${selected.email}`}>{selected.email}</a></div><time>{formatDate(selected.cree_le)}</time></div><MessageDeliveryStatus key={selected.id} message={selected} delivery={detail?.delivery} loading={loading} error={detailError}/></header>
           <div className="message-original"><MessageText text={selected.message}/>{selected.candidature_id && <p className="message-application-link"><Link href={`/admin/candidatures/${encodeURIComponent(selected.candidature_id)}`} className="eg-button eg-button--primary eg-button--compact">Voir la candidature</Link></p>}</div>
           {loading && <div className="message-loading" role="status"><span aria-hidden="true"/><span>Chargement des réponses…</span></div>}
           {detailError && <div className="message-alert" role="alert"><p>{detailError}</p><button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={() => setReload(value => value + 1)}>Réessayer</button></div>}
@@ -178,25 +178,56 @@ function deliveryTime(value) {
 }
 
 export function MessageDeliveryStatus({message,delivery,loading=false,error=""}) {
+ const [open,setOpen]=useState(false),[copyStatus,setCopyStatus]=useState("");
+ const dialogRef=useRef(null),infoRef=useRef(null),titleId=useId();
  const sent=delivery ? delivery.status==="accepted" : Boolean(message.envoye);
  const provider=({gmail:"Gmail",brevo:"Brevo",resend:"Resend",none:"Non configuré"})[delivery?.provider];
  const checking=loading && !sent;
  const recipients=delivery?.recipients || [];
- return <div className="message-delivery-note" data-sent={sent} role="status">
-  <span>{sent ? "Email envoyé au cabinet" : "Message enregistré"}</span>
-  {sent ? delivery?.checked_le && <span>Envoi confirmé par {provider} · {deliveryTime(delivery.checked_le)}</span> : <span>{checking ? "Vérification de l’envoi…" : "Envoi par email au cabinet non confirmé"}</span>}
-  {sent && recipients.length>0 && <div className="message-delivery-recipients">À : {recipients.join(", ")}</div>}
-  <details className="message-delivery-details"><summary>Détails de l’envoi</summary>
-   {loading ? <p>Chargement…</p> : sent ? <>{delivery && <p>{provider} a confirmé l’envoi de cet email.</p>}{!delivery && <p>L’envoi a été enregistré, mais ses détails ne sont pas disponibles.</p>}</> : error ? <p>Diagnostic momentanément indisponible.</p> : <p>{deliveryDescription(delivery)}</p>}
-   {!loading && delivery && <dl>
-    {sent && <><div><dt>Destinataire{recipients.length>1?"s":""}</dt><dd>{recipients.length>0?recipients.map(email=><div key={email}>{email}</div>):"Non enregistré pour cet envoi"}</dd></div>{delivery.sender && <div><dt>Expéditeur</dt><dd>{delivery.sender}</dd></div>}</>}
-    <div><dt>Service d’envoi</dt><dd>{provider}</dd></div>
-    <div><dt>{sent ? "Envoi confirmé le" : "Vérifié le"}</dt><dd>{deliveryTime(delivery.checked_le)}</dd></div>
-    {sent && delivery.provider_message_id && <div><dt>Référence {provider}</dt><dd>{delivery.provider_message_id}</dd></div>}
-    {!sent && <><div><dt>Étape</dt><dd>{({connection:"Connexion",credentials:"Lecture de la connexion",authorization:"Autorisation Google",recipients:"Destinataires",sending:"Envoi",confirmation:"Confirmation"})[delivery.stage] || "Non identifiée"}</dd></div><div><dt>Code</dt><dd>{delivery.error_code || "unknown"}{delivery.http_status ? ` · HTTP ${delivery.http_status}` : ""}</dd></div></>}
-   </dl>}
-  </details>
- </div>;
+ useEffect(()=>{
+  if(!open)return;
+  const dialog=dialogRef.current,overflow=document.body.style.overflow;
+  dialog.showModal();
+  document.body.style.overflow="hidden";
+  return ()=>{dialog.close();document.body.style.overflow=overflow;};
+ },[open]);
+ async function copyReference(){
+  try{await navigator.clipboard.writeText(delivery.provider_message_id);setCopyStatus("Référence copiée.");}
+  catch{setCopyStatus("Copie indisponible. Sélectionnez la référence pour la copier.");}
+ }
+ return <>
+  <div className="message-delivery-note" data-sent={sent}>
+   <div className="message-delivery-summary" role="status">
+    <strong>{sent ? "Email envoyé au cabinet" : "Message enregistré"}</strong>
+    {sent ? delivery?.checked_le && <span>{provider} · {formatDate(delivery.checked_le)}</span> : <span>{checking ? "Vérification de l’envoi…" : "Envoi par email au cabinet non confirmé"}</span>}
+   </div>
+   <button ref={infoRef} type="button" className="message-delivery-info" aria-label="Informations sur l’envoi" title="Informations sur l’envoi" aria-haspopup="dialog" onClick={()=>{setCopyStatus("");setOpen(true);}}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10.5v6M12 7.5v.2" strokeLinecap="round"/></svg>
+   </button>
+  </div>
+  <dialog ref={dialogRef} className="message-delivery-dialog" aria-labelledby={titleId} onClose={()=>{setOpen(false);infoRef.current?.focus({preventScroll:true});}}>
+   <div className="message-delivery-dialog-layout">
+    <header className="message-delivery-dialog-header"><h3 id={titleId}>Informations sur l’envoi</h3><button type="button" autoFocus className="eg-button eg-button--secondary eg-button--compact" onClick={()=>setOpen(false)}>Fermer</button></header>
+    <div className="message-delivery-dialog-body">
+     <div className="message-delivery-dialog-status" data-sent={sent}><span aria-hidden="true"/>{sent ? "Email envoyé au cabinet" : checking ? "Vérification de l’envoi…" : "Envoi email non confirmé"}</div>
+     {loading ? <p className="message-delivery-explanation" role="status">Chargement…</p> : error ? <p className="message-delivery-explanation">Diagnostic momentanément indisponible.</p> : sent ? !delivery && <p className="message-delivery-explanation">L’envoi a été enregistré, mais ses détails ne sont pas disponibles.</p> : <p className="message-delivery-explanation">{deliveryDescription(delivery)}</p>}
+     {!loading && delivery && <>
+      {sent && <dl className="message-delivery-addresses">
+       <div><dt>Destinataire{recipients.length>1?"s":""}</dt><dd>{recipients.length>0?recipients.map(email=><div key={email}>{email}</div>):"Non enregistré pour cet envoi"}</dd></div>
+       <div><dt>Expéditeur</dt><dd>{delivery.sender || "Non enregistré pour cet envoi"}</dd></div>
+      </dl>}
+      <dl className="message-delivery-meta">
+       <div><dt>Service d’envoi</dt><dd>{provider}</dd></div>
+       <div><dt>{sent ? "Envoi confirmé le" : "Vérifié le"}</dt><dd>{deliveryTime(delivery.checked_le)}</dd></div>
+       {!sent && <><div><dt>Étape</dt><dd>{({connection:"Connexion",credentials:"Lecture de la connexion",authorization:"Autorisation Google",recipients:"Destinataires",sending:"Envoi",confirmation:"Confirmation"})[delivery.stage] || "Non identifiée"}</dd></div><div><dt>Code</dt><dd>{delivery.error_code || "unknown"}{delivery.http_status ? ` · HTTP ${delivery.http_status}` : ""}</dd></div></>}
+      </dl>
+      {sent && delivery.provider_message_id && <div className="message-delivery-reference"><div><span>Référence {provider}</span><code>{delivery.provider_message_id}</code></div><button type="button" className="eg-button eg-button--secondary eg-button--compact" aria-label={`Copier la référence ${provider}`} onClick={copyReference}>{copyStatus==="Référence copiée."?"Copié":"Copier"}</button></div>}
+      {copyStatus && <p className="message-delivery-copy-status" role="status">{copyStatus}</p>}
+     </>}
+    </div>
+   </div>
+  </dialog>
+ </>;
 }
 
 export function MessageText({text,className="message-text"}) {
