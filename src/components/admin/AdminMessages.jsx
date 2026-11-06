@@ -30,7 +30,9 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
   const [drafts, setDrafts] = useState({}), [reload, setReload] = useState(0);
   const [page, setPage] = useState(0), [category, setCategory] = useState("all");
   const [replyOpen, setReplyOpen] = useState(false), [optionsOpen, setOptionsOpen] = useState(false);
-  const optionsRef = useRef(null), replyRef = useRef(null);
+  const optionsRef = useRef(null), replyRef = useRef(null), deliveryInfoRef = useRef(null);
+  const [deliveryInfoOpen,setDeliveryInfoOpen]=useState(false);
+  useEffect(()=>setDeliveryInfoOpen(false),[selectedId]);
   const centerRef = useRef(null), inboxHeadingRef = useRef(null), listScroll = useRef(null);
   const titleRef = useRef(null), selectedButton = useRef(null);
   const busyRef = useRef(false);
@@ -145,7 +147,12 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
         {selected && <>
           <div className="message-reader-tools">
             <button type="button" onClick={closeMessage} disabled={busy} className="eg-button eg-button--secondary eg-button--compact message-back" aria-label="Tous les messages">Boîte de réception</button>
-            <h2 ref={titleRef} tabIndex={-1} className="message-reader-subject">{selected.sujet || "Sans objet"}</h2>
+            <div className="message-reader-title">
+   <button ref={deliveryInfoRef} type="button" className="message-delivery-info" aria-label="Informations sur l’envoi" title="Informations sur l’envoi" aria-haspopup="dialog" onClick={()=>setDeliveryInfoOpen(true)}>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10.5v6M12 7.5v.2" strokeLinecap="round"/></svg>
+   </button>
+             <h2 ref={titleRef} tabIndex={-1} className="message-reader-subject">{selected.sujet || "Sans objet"}</h2>
+            </div>
             <div className="message-reader-actions">
               <button type="button" className="eg-button eg-button--primary eg-button--compact" aria-expanded={replyOpen} aria-controls="message-reply" disabled={busy || !detail?.connected} onClick={() => setReplyOpen(true)}>{drafts[selected.id]?.text?.trim() ? "Reprendre la réponse" : "Répondre"}</button>
               <div className="message-options" ref={optionsRef} onKeyDown={e => { if (e.key === "Escape") { setOptionsOpen(false); optionsRef.current?.querySelector("button")?.focus(); } }}>
@@ -156,7 +163,7 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
           </div>
           {deleting && <div className="message-delete-confirm" role="group" aria-label="Confirmer la suppression"><p>Supprimer ce message et son historique de réponses ?</p><div><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={busy} onClick={() => setDeleting(false)}>Annuler</button><button type="button" className="eg-button eg-button--danger eg-button--compact" disabled={busy} onClick={remove}>{busy ? "Suppression…" : "Confirmer la suppression"}</button></div></div>}
           {actionError && <p role="alert" className="message-alert">{actionError}</p>}
-          <header className="message-heading"><div className="message-contact"><div className="message-sender"><strong>{selected.nom}</strong><a href={`mailto:${selected.email}`}>{selected.email}</a></div><time>{formatDate(selected.cree_le)}</time></div><MessageDeliveryStatus key={selected.id} message={selected} delivery={detail?.delivery} loading={loading} error={detailError}/></header>
+          <header className="message-heading"><div className="message-contact"><div className="message-sender"><strong>{selected.nom}</strong><a href={`mailto:${selected.email}`}>{selected.email}</a></div><time>{formatDate(selected.cree_le)}</time></div><MessageDeliveryStatus key={selected.id} message={selected} delivery={detail?.delivery} loading={loading} error={detailError} open={deliveryInfoOpen} onClose={()=>{setDeliveryInfoOpen(false);deliveryInfoRef.current?.focus({preventScroll:true});}}/></header>
           <div className="message-original"><MessageText text={selected.message}/>{selected.candidature_id && <p className="message-application-link"><Link href={`/admin/candidatures/${encodeURIComponent(selected.candidature_id)}`} className="eg-button eg-button--primary eg-button--compact">Voir la candidature</Link></p>}</div>
           {loading && <div className="message-loading" role="status"><span aria-hidden="true"/><span>Chargement des réponses…</span></div>}
           {detailError && <div className="message-alert" role="alert"><p>{detailError}</p><button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={() => setReload(value => value + 1)}>Réessayer</button></div>}
@@ -177,9 +184,9 @@ function deliveryTime(value) {
  return value && !Number.isNaN(date.getTime()) ? date.toLocaleString("fr-FR",{day:"2-digit",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit",timeZone:"Africa/Conakry"})+" (heure de Conakry)" : "—";
 }
 
-export function MessageDeliveryStatus({message,delivery,loading=false,error=""}) {
- const [open,setOpen]=useState(false),[copyStatus,setCopyStatus]=useState("");
- const dialogRef=useRef(null),infoRef=useRef(null);
+export function MessageDeliveryStatus({message,delivery,loading=false,error="",open=false,onClose}) {
+ const [copyStatus,setCopyStatus]=useState("");
+ const dialogRef=useRef(null);
  const sent=delivery ? delivery.status==="accepted" : Boolean(message.envoye);
  const provider=({gmail:"Gmail",brevo:"Brevo",resend:"Resend",none:"Non configuré"})[delivery?.provider];
  const checking=loading && !sent;
@@ -187,6 +194,7 @@ export function MessageDeliveryStatus({message,delivery,loading=false,error=""})
  useEffect(()=>{
   if(!open)return;
   const dialog=dialogRef.current,overflow=document.body.style.overflow;
+  setCopyStatus("");
   dialog.showModal();
   document.body.style.overflow="hidden";
   return ()=>{dialog.close();document.body.style.overflow=overflow;};
@@ -201,11 +209,9 @@ export function MessageDeliveryStatus({message,delivery,loading=false,error=""})
     <strong>{sent ? "Email envoyé au cabinet" : "Message enregistré"}</strong>
     {sent ? delivery?.checked_le && <span>{provider} · {formatDate(delivery.checked_le)}</span> : <span>{checking ? "Vérification de l’envoi…" : "Envoi par email au cabinet non confirmé"}</span>}
    </div>
-   <button ref={infoRef} type="button" className="message-delivery-info" aria-label="Informations sur l’envoi" title="Informations sur l’envoi" aria-haspopup="dialog" onClick={()=>{setCopyStatus("");setOpen(true);}}>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10.5v6M12 7.5v.2" strokeLinecap="round"/></svg>
-   </button>
+
   </div>
-  <dialog ref={dialogRef} className="message-delivery-dialog" aria-label="Détails de l’envoi" onClose={()=>{setOpen(false);infoRef.current?.focus({preventScroll:true});}}>
+  <dialog ref={dialogRef} className="message-delivery-dialog" aria-label="Détails de l’envoi" onClose={()=>onClose?.()}>
    <div className="message-delivery-dialog-layout">
     <div className="message-delivery-dialog-body">
      {loading ? <p className="message-delivery-explanation" role="status">Chargement…</p> : error ? <p className="message-delivery-explanation">Diagnostic momentanément indisponible.</p> : sent ? !delivery && <p className="message-delivery-explanation">L’envoi a été enregistré, mais ses détails ne sont pas disponibles.</p> : <p className="message-delivery-explanation">{deliveryDescription(delivery)}</p>}
@@ -224,7 +230,7 @@ export function MessageDeliveryStatus({message,delivery,loading=false,error=""})
       {!loading && sent && delivery?.provider_message_id && <div className="message-delivery-reference"><span>Référence {provider}</span><code>{delivery.provider_message_id}</code></div>}
       <div className="message-delivery-buttons">
        {!loading && sent && delivery?.provider_message_id && <button type="button" className="eg-button eg-button--secondary eg-button--compact" aria-label={`Copier la référence ${provider}`} onClick={copyReference}>{copyStatus==="Référence copiée."?"Copié":"Copier"}</button>}
-       <button type="button" autoFocus className="eg-button eg-button--secondary eg-button--compact" onClick={()=>setOpen(false)}>Fermer</button>
+       <button type="button" autoFocus className="eg-button eg-button--secondary eg-button--compact" onClick={()=>onClose?.()}>Fermer</button>
       </div>
      </div>
      {copyStatus && <p className="message-delivery-copy-status" role="status">{copyStatus}</p>}

@@ -108,16 +108,19 @@ test("Message reading uses compact paragraphs while preserving line breaks and e
 
 test("Message delivery visibly distinguishes confirmed sending, historical sending and unconfirmed delivery",async()=>{
  const r=await adminRuntime();try{
-  const {MessageDeliveryStatus}=await r.module("src/components/admin/AdminMessages.jsx");
+  const {MessageDeliveryStatus,default:Messages}=await r.module("src/components/admin/AdminMessages.jsx");
   const render=props=>renderToStaticMarkup(React.createElement(MessageDeliveryStatus,props));
   const confirmed=render({message:{envoye:0},delivery:{status:"accepted",provider:"gmail",checked_le:"2026-11-05T15:19:42.000Z",sender:"cabinet@example.org",recipients:["oumar@example.org","aminata@example.org"],provider_message_id:"18c000ab42"}});
   assert.match(confirmed,/Email envoyé au cabinet/);assert.match(confirmed,/Gmail/);assert.match(confirmed,/data-sent="true"/);assert.doesNotMatch(confirmed,/Envoi par email au cabinet non confirmé/);
-  assert.doesNotMatch(confirmed,/a confirmé l’envoi de cet email/);assert.match(confirmed,/<dialog[^>]*aria-label="Détails de l’envoi"/);assert.match(confirmed,/aria-haspopup="dialog"/);assert.match(confirmed,/aria-label="Informations sur l’envoi"/);assert.match(confirmed,/aria-label="Copier la référence Gmail"/);assert.doesNotMatch(confirmed,/<details|message-delivery-dialog-header/);assert.doesNotMatch(confirmed,/<dt>Réception<|<dt>Lecture<|Non suivie par le site/);
+  assert.doesNotMatch(confirmed,/a confirmé l’envoi de cet email/);assert.match(confirmed,/<dialog[^>]*aria-label="Détails de l’envoi"/);assert.doesNotMatch(confirmed,/aria-haspopup="dialog"|aria-label="Informations sur l’envoi"/);assert.match(confirmed,/aria-label="Copier la référence Gmail"/);assert.doesNotMatch(confirmed,/<details|message-delivery-dialog-header/);assert.doesNotMatch(confirmed,/<dt>Réception<|<dt>Lecture<|Non suivie par le site/);
   assert.match(confirmed,/oumar@example.org/);assert.match(confirmed,/aminata@example.org/);assert.match(confirmed,/cabinet@example.org/);assert.match(confirmed,/18c000ab42/);
   const dialog=confirmed.match(/<dialog[\s\S]*?<\/dialog>/)[0];
   assert.doesNotMatch(dialog,/Email envoyé au cabinet|Informations sur l’envoi/);
   assert.match(dialog,/<dt>Service d’envoi<\/dt><dd>Gmail<\/dd>/);assert.match(dialog,/Envoi confirmé le/);assert.match(dialog,/15:19:42/);assert.match(dialog,/heure de Conakry/);
   assert.match(dialog,/Référence Gmail/);assert.match(dialog,/>Copier<|>Copier<!--/);assert.match(dialog,/>Fermer</);
+  const reader=renderToStaticMarkup(React.createElement(Messages,{messages:[{id:"one",nom:"Visiteur",email:"visitor@example.org",sujet:"Objet du message",message:"Texte",envoye:1}],initialSelectedId:"one"}));
+  assert.match(reader,/class="message-reader-title">[\s\S]*?aria-label="Informations sur l’envoi"[\s\S]*?<h2[^>]*>Objet du message<\/h2>/);
+  assert.equal((reader.match(/aria-haspopup="dialog"/g)||[]).length,1);
   const historical=render({message:{envoye:1},delivery:{status:"accepted",provider:"gmail",checked_le:"2026-11-05T15:19:42.000Z"}});assert.match(historical,/Non enregistré pour cet envoi/);assert.doesNotMatch(historical,/oumar@example.org/);
   const older=render({message:{envoye:1}});assert.match(older,/Email envoyé au cabinet/);assert.match(older,/ses détails ne sont pas disponibles/);assert.doesNotMatch(older,/Gmail/);
   const failed=render({message:{envoye:0},delivery:{status:"unconfirmed",provider:"gmail",error_code:"invalid_grant",stage:"authorization",http_status:400,checked_le:"2026-11-05T15:00:00.000Z"}});assert.match(failed,/Envoi par email au cabinet non confirmé/);assert.doesNotMatch(failed,/Email envoyé au cabinet/);assert.match(failed,/invalid_grant/);
