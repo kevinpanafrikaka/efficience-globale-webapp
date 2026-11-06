@@ -35,6 +35,7 @@ export async function POST(request) {
 
   await env.UPLOADS.put(key, await file.arrayBuffer(), {
     httpMetadata: { contentType: file.type },
+    customMetadata: { filename: encodeURIComponent(file.name.replace(/[\x00-\x1f\x7f]/g, "").slice(0, 200)) },
   });
 
   return Response.json({ success: true, url: `/uploads/${key}` });

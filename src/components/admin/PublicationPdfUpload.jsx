@@ -1,9 +1,11 @@
 "use client";
 import { useRef,useState } from "react";
 import { PUBLICATION_PDF_LIMIT } from "@/lib/announcement-fields.mjs";
-export default function PublicationPdfUpload({value,filename,onChange,disabled=false,onUploadingChange}){
+import MediaPicker from "./MediaPicker";
+export default function PublicationPdfUpload({value,filename,onChange,disabled=false,onUploadingChange,allowLibrary=true}){
  const input=useRef(null),lock=useRef(false);
  const [busy,setBusy]=useState(false),[error,setError]=useState("");
+ const [libraryOpen,setLibraryOpen]=useState(false);
  async function choose(e){
   const file=e.target.files?.[0];e.target.value="";if(!file||lock.current||disabled)return;
   setError("");if(!/\.pdf$/i.test(file.name)||file.size>PUBLICATION_PDF_LIMIT||!file.size){setError("Choisissez un PDF de 8 Mo maximum.");return;}
@@ -16,6 +18,7 @@ export default function PublicationPdfUpload({value,filename,onChange,disabled=f
   <input ref={input} type="file" accept="application/pdf,.pdf" className="admin-upload-input" aria-label="Choisir un document PDF" tabIndex={-1} disabled={disabled||busy} onChange={choose}/>
   {value&&<div className="publication-pdf-selected"><span className="publication-pdf-mark" aria-hidden="true">PDF</span><a href={value} target="_blank" rel="noopener noreferrer">{filename||"Document PDF"}</a></div>}
   <div className="publication-pdf-actions"><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={disabled||busy} onClick={()=>input.current?.click()}>{busy?"Envoi du PDF…":value?"Changer le PDF":"Choisir un PDF sur l’ordinateur"}</button>{value&&<button type="button" className="eg-button eg-button--quiet eg-button--compact" disabled={disabled||busy} onClick={()=>onChange("","")}>Retirer le PDF</button>}</div>
+  {allowLibrary&&<><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={disabled||busy} onClick={()=>setLibraryOpen(true)}>Choisir dans la médiathèque</button><MediaPicker type="pdf" open={libraryOpen} onClose={()=>setLibraryOpen(false)} onChoose={files=>{setError("");onChange(files[0].url,files[0].name);}}/></>}
   <span className="editor-help">PDF · 8 Mo maximum</span>{error&&<p role="alert" className="editor-help publication-pdf-error">{error}</p>}
  </div>;
 }

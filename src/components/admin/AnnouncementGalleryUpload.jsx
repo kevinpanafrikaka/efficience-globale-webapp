@@ -1,10 +1,12 @@
 "use client";
 import { useRef,useState } from "react";
 import AdminImage from "@/components/admin/AdminImage";
+import MediaPicker from "./MediaPicker";
 const MAX_PHOTOS=50;
 export default function AnnouncementGalleryUpload({photos,onChange,onAdd,onUploadingChange,disabled=false}){
  const input=useRef(null),busy=useRef(false);
  const [uploading,setUploading]=useState(false),[progress,setProgress]=useState(""),[errors,setErrors]=useState([]);
+ const [libraryOpen,setLibraryOpen]=useState(false);
  async function choose(e){
   const files=Array.from(e.target.files||[]);e.target.value="";
   if(!files.length||disabled||busy.current)return;
@@ -26,6 +28,8 @@ export default function AnnouncementGalleryUpload({photos,onChange,onAdd,onUploa
  function move(index,offset){const target=index+offset;if(target<0||target>=photos.length||disabled||uploading)return;const next=[...photos];[next[index],next[target]]=[next[target],next[index]];onChange(next);}
  return <div className="announcement-gallery-editor" aria-busy={uploading}>
   <div className="gallery-editor-toolbar"><input type="file" ref={input} multiple accept="image/jpeg,image/png,image/webp,image/gif" className="admin-upload-input" aria-label="Choisir plusieurs photos pour la galerie" disabled={disabled||uploading||photos.length>=MAX_PHOTOS} onChange={choose}/><button type="button" className="eg-button eg-button--secondary" disabled={disabled||uploading||photos.length>=MAX_PHOTOS} onClick={()=>input.current?.click()}>{uploading?"Envoi des photos…":"+ Ajouter des photos"}</button><span>{photos.length} photo{photos.length>1?"s":""}</span></div>
+  <button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={disabled||uploading||photos.length>=MAX_PHOTOS} onClick={()=>setLibraryOpen(true)}>Choisir dans la médiathèque</button>
+  <MediaPicker open={libraryOpen} onClose={()=>setLibraryOpen(false)} multiple max={MAX_PHOTOS-photos.length} excludeUrls={photos.map(photo=>photo.url)} onChoose={files=>{onAdd(files.map(file=>({url:file.url,legende:""})));setErrors([]);setProgress("Photos ajoutées.");}}/>
   <p className="editor-help">JPG, PNG, WebP ou GIF · 8 Mo par photo · 50 photos maximum.</p>
   {progress&&<p className="gallery-upload-progress" role="status">{progress}</p>}
   {errors.length>0&&<ul className="gallery-upload-errors" role="alert">{errors.map((error,i)=><li key={i}>{error}</li>)}</ul>}

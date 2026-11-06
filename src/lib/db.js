@@ -588,6 +588,32 @@ export async function getUsedMediaUrls({ strict = false } = {}) {
   return used;
 }
 
+// Include drafts: their files must remain available while the content is edited.
+export async function getMediaUsages() {
+  const db = await getDB();
+  await ensureAnnouncementPhotos(db);
+  await db.prepare(`CREATE TABLE IF NOT EXISTS annonce_informations (annonce_id TEXT PRIMARY KEY REFERENCES annonces(id) ON DELETE CASCADE, donnees_json TEXT NOT NULL)`).run();
+  const sources = [
+    { query: "SELECT id, titre AS title, photo_url AS url FROM projets", section: "projets", label: "Projet" },
+    { query: "SELECT id, nom AS title, photo_url AS url FROM membres", section: "membres", label: "Équipe" },
+    { query: "SELECT id, titre AS title, image_url AS url FROM annonces", section: "annonces", label: "Annonce" },
+    { query: "SELECT a.id, a.titre AS title, p.url FROM annonce_photos p JOIN annonces a ON a.id=p.annonce_id", section: "annonces", label: "Galerie d’annonce" },
+    { query: "SELECT id, nom AS title, logo_url AS url FROM partenaires", section: "partenaires", label: "Partenaire" },
+    { query: "SELECT a.id, a.titre AS title, json_extract(i.donnees_json, '$.publication.fichier_url') AS url FROM annonce_informations i JOIN annonces a ON a.id=i.annonce_id", section: "annonces", label: "Publication" },
+  ];
+  const usages = Object.create(null);
+  for (const source of sources) {
+    const { results } = await db.prepare(source.query).all();
+    for (const row of results) {
+      if (!row.url || typeof row.url !== "string") continue;
+      const list = usages[row.url] ||= [];
+      const href = `/admin/${source.section}/${encodeURIComponent(row.id)}/modifier`;
+      if (!list.some(item => item.href === href && item.label === source.label)) list.push({ title: row.title, href, label: source.label });
+    }
+  }
+  return usages;
+}
+
 export const secteurs = {
   sante: { label: "Santé publique", color: "#00897B" },
   ia: { label: "Intelligence Artificielle", color: "#7CB342" },

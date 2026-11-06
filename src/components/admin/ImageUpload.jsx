@@ -2,11 +2,13 @@
 
 import { useRef, useState } from "react";
 import AdminImage from "./AdminImage";
+import MediaPicker from "./MediaPicker";
 
-export default function ImageUpload({ value, onChange, required, disabled = false, onUploadingChange, allowRemove = false, showPreview = true }) {
+export default function ImageUpload({ value, onChange, required, disabled = false, onUploadingChange, allowRemove = false, showPreview = true, allowLibrary = true }) {
   const inputRef = useRef(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
+  const [libraryOpen, setLibraryOpen] = useState(false);
 
   async function handleFileChange(e) {
     const file = e.target.files?.[0];
@@ -67,6 +69,8 @@ export default function ImageUpload({ value, onChange, required, disabled = fals
       >
         {uploading ? "Envoi…" : value ? "Changer l'image" : "Choisir une image sur l’ordinateur"}
       </button>
+      {allowLibrary && <button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={uploading || disabled} onClick={() => setLibraryOpen(true)}>Choisir dans la médiathèque</button>}
+      {allowLibrary && <MediaPicker open={libraryOpen} onClose={() => setLibraryOpen(false)} onChoose={files => { setError(""); onChange(files[0].url); }}/>}
       {allowRemove && value && !required && <button type="button" disabled={disabled || uploading} className="eg-button eg-button--quiet eg-button--compact admin-upload-clear" onClick={() => onChange("")}>Retirer cette image du contenu</button>}
 
       <p className="text-[12px] text-ink-soft">JPG, PNG, WebP ou GIF · 8 Mo maximum.</p>

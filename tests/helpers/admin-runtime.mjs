@@ -6,6 +6,7 @@ import { resolve, dirname, extname } from "node:path";
 import { createRequire } from "node:module";
 import { webcrypto } from "node:crypto";
 import * as react from "react";
+import * as reactDom from "react-dom";
 import * as jsx from "react/jsx-runtime";
 const require = createRequire(import.meta.url);
 const { transformSync } = require("next/dist/build/swc");
@@ -40,7 +41,7 @@ export async function adminRuntime({ authenticated = true, pathname = "/admin", 
   const externals = {
     "@opennextjs/cloudflare": { getCloudflareContext: async () => ({ env }) },
     "@/lib/adminAuth": { isAdminRequest: async () => authenticated, isAdminAuthenticated: async () => authenticated },
-    "react": react, "react/jsx-runtime": jsx,
+    "react": react, "react-dom": reactDom, "react/jsx-runtime": jsx,
     "next/link": { default: ({ href, children, ...props }) => react.createElement("a", { href, ...props }, children) },
     "next/image": { default: ({ fill, priority, ...props }) => react.createElement("img", props) },
     "next/navigation": { notFound() { throw new Error("NOT_FOUND"); }, useRouter: () => router, usePathname: () => pathname },

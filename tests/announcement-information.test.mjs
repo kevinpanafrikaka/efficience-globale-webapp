@@ -94,7 +94,7 @@ test("Media management protects PDFs used in drafts or inactive settings and can
  const db=await r.module("src/lib/db.js"),id=await db.createAnnonce({...base,categorie:"publication",statut:"brouillon",informations:{publication:{support:"pdf",fichier_url:url}}});
  const route=await r.module("src/app/api/admin/medias/route.js");assert.equal((await route.DELETE(json({key},"DELETE"))).status,409);
  await db.updateAnnonce(id,{...base,categorie:"actualite"});assert.equal((await route.DELETE(json({key},"DELETE"))).status,409);
- const Page=(await r.module("src/app/admin/medias/page.js")).default;const html=renderToStaticMarkup(await Page());assert.match(html,/Document PDF/);assert.match(html,new RegExp(url));assert.doesNotMatch(html,/private-applications/);
+ const Page=(await r.module("src/app/admin/medias/page.js")).default;const page=await Page();const html=renderToStaticMarkup(page);assert.match(html,/media-pdf-preview/);assert.equal(page.props.items[0].url,url);assert.doesNotMatch(html,/private-applications/);
  await db.updateAnnonce(id,{...base,categorie:"publication",informations:{publication:{support:"pdf",fichier_url:""}}});assert.equal((await route.DELETE(json({key},"DELETE"))).status,200);assert.ok(!r.files.has(key));assert.ok(r.files.has("private-applications/secret/cv.bin"));
  }finally{r.close();}
 });

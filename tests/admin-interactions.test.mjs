@@ -51,6 +51,8 @@ async function harness(path, props = {}, { fail = false, network = false, respon
     "./announcement-editor.css": {},
     "./announcements.css": {},
     "./announcement-gallery.css": {},
+    "./MediaPicker": { default: function MediaPicker() {} },
+    "./AdminImage": { default: function AdminImage() {} },
     "@/components/PublicImage": { default: function PublicImage() {} },
     "@/components/AnnouncementCover": { default: function AnnouncementCover() {} },
     "./AnnouncementCover": { default: function AnnouncementCover() {} },
@@ -680,4 +682,17 @@ test("Partner editor keeps manual position hidden, supports a custom status and 
  await h.render().props.onSubmit({preventDefault(){}});
  const payload=JSON.parse(h.requests[0].options.body);assert.equal(payload.ordre_affichage,12);assert.equal(payload.statut,"publie");assert.equal(payload.nom,"Institution modifiée");assert.ok(find(h.render(),n=>n.props?.role==="alert"));assert.equal(h.navigations.length,0);
  const fresh=await harness("src/components/admin/PartenaireForm.jsx",{initialOrder:13});await fresh.render().props.onSubmit({preventDefault(){}});assert.equal(JSON.parse(fresh.requests[0].options.body).ordre_affichage,13);
+});
+
+test("Existing images, gallery photos and PDFs are reused by URL without another upload",async()=>{
+ for(const [name,props] of [["ImageUpload",{}],["PublicationPdfUpload",{}]]){
+  const changes=[];const h=await harness(`src/components/admin/${name}.jsx`,{...props,onChange:(...args)=>changes.push(args)});
+  find(h.render(),n=>n.type==='button'&&n.props.children==='Choisir dans la médiathèque').props.onClick();
+  const picker=find(h.render(),n=>n.type?.name==='MediaPicker');assert.equal(picker.props.open,true);
+  picker.props.onChoose([{url:name==='ImageUpload'?'/uploads/existing.png':'/documents/existing',name:'Guide.pdf'}]);
+  assert.equal(changes.length,1);assert.equal(changes[0][0],name==='ImageUpload'?'/uploads/existing.png':'/documents/existing');assert.equal(h.requests.length,0);
+ }
+ const added=[];const gallery=await harness('src/components/admin/AnnouncementGalleryUpload.jsx',{photos:[{url:'/uploads/current.png'}],onAdd:p=>added.push(...p),onChange(){}});
+ const picker=find(gallery.render(),n=>n.type?.name==='MediaPicker');assert.deepEqual(Array.from(picker.props.excludeUrls),['/uploads/current.png']);assert.equal(picker.props.max,49);
+ picker.props.onChoose([{url:'/uploads/one.png'},{url:'/uploads/two.png'}]);assert.deepEqual(added.map(p=>p.url),['/uploads/one.png','/uploads/two.png']);assert.equal(gallery.requests.length,0);
 });

@@ -2,6 +2,15 @@ import { publicationDocumentUrl } from "@/lib/publication-documents.mjs";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { isAdminRequest } from "@/lib/adminAuth";
 import { getUsedMediaUrls } from "@/lib/db";
+import { getMediaLibrary } from "@/lib/media-library.mjs";
+
+export async function GET(request) {
+  const { env } = await getCloudflareContext({ async: true });
+  const headers = { "Cache-Control": "no-store" };
+  if (!(await isAdminRequest(request, env))) return Response.json({ error: "Non autorisé." }, { status: 401, headers });
+  try { return Response.json({ items: await getMediaLibrary(env) }, { headers }); }
+  catch { return Response.json({ error: "La médiathèque est momentanément indisponible. Réessayez." }, { status: 503, headers }); }
+}
 
 // Supprime un média du bucket R2, sauf s'il est encore référencé en base.
 export async function DELETE(request) {
@@ -9,6 +18,7 @@ export async function DELETE(request) {
   if (!(await isAdminRequest(request, env))) {
     return Response.json({ error: "Non autorisé." }, { status: 401 });
   }
+  if (request.headers.get("origin") !== new URL(request.url).origin) return Response.json({ error: "Origine refusée." }, { status: 403 });
 
   let data;
   try { data = await request.json(); } catch { return Response.json({ error: "Demande JSON invalide." }, { status: 400 }); }
@@ -18,7 +28,6 @@ export async function DELETE(request) {
   }
 
   const documentUrl=publicationDocumentUrl(key);
-  if(documentUrl&&request.headers.get("origin")!==new URL(request.url).origin)return Response.json({error:"Origine refusée."},{status:403});
   if (!env.UPLOADS) return Response.json({ error: "Stockage des images indisponible." }, { status: 503 });
   let used;
   try { used = await getUsedMediaUrls({ strict: true }); }
