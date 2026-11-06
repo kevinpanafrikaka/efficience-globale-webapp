@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-export default function AdminNavLink({ href, children, badge = 0, relatedPaths = [] }) {
+export default function AdminNavLink({ href, children, badge = 0, relatedPaths = [], label }) {
   const pathname = usePathname();
   const active = [href, ...relatedPaths].some(path => pathname === path || (path !== "/admin" && pathname.startsWith(`${path}/`)));
 
@@ -11,13 +11,13 @@ export default function AdminNavLink({ href, children, badge = 0, relatedPaths =
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`flex items-center justify-between px-3.5 py-2.5 rounded text-[14px] font-medium transition-colors ${
-        active ? "bg-lime text-ink" : "text-[#b9c4b4] hover:bg-white/10 hover:text-white"
-      }`}
+      aria-label={label ? `${label}${badge > 0 ? ` · ${badge} message${badge > 1 ? "s" : ""} non lu${badge > 1 ? "s" : ""}` : ""}` : undefined}
+      title={label}
+      className="admin-nav-link"
     >
       {children}
       {badge > 0 && (
-        <span className={`ml-2 min-w-5 h-5 px-1.5 rounded-full text-[11px] font-bold flex items-center justify-center ${active ? "bg-ink text-white" : "bg-lime text-ink"}`}>
+        <span className="admin-nav-badge" aria-hidden="true">
           {badge}
         </span>
       )}

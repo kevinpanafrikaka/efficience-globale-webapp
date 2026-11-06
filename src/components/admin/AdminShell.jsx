@@ -1,22 +1,39 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import AdminNavLink from "./AdminNavLink";
 import LogoutButton from "./LogoutButton";
 import AdminMessageSearch, { MessageSearchContext } from "./AdminMessageSearch";
 import DashboardCreateMenu from "./DashboardCreateMenu";
+import AdminSidebarIcon from "./AdminSidebarIcon";
+import "./admin-sidebar.css";
 
 const NAV = [
-  ["/admin", "Tableau de bord", "◫"], ["/admin/projets", "Projets", "▤"],
-  ["/admin/membres", "Équipe", "♧"], ["/admin/annonces", "Annonces", "◷"],
-  ["/admin/partenaires", "Partenaires", "◇"], ["/admin/messages", "Messages", "✉"],
-  ["/admin/medias", "Médiathèque", "▧"], ["/admin/reglages", "Réglages", "⚙"],
+  ["/admin", "Tableau de bord", "dashboard"], ["/admin/projets", "Projets", "projects"],
+  ["/admin/membres", "Équipe", "team"], ["/admin/annonces", "Annonces", "announcements"],
+  ["/admin/partenaires", "Partenaires", "partners"], ["/admin/messages", "Messages", "messages"],
+  ["/admin/medias", "Médiathèque", "media"], ["/admin/reglages", "Réglages", "settings"],
 ];
 
 export default function AdminShell({ children, unread }) {
   const [messageQuery,setMessageQuery]=useState(""), [messageSearchOpen,setMessageSearchOpen]=useState(false);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false), [collapsed, setCollapsed] = useState(false);
+  const menuButton = useRef(null);
+  useEffect(() => {
+    try { setCollapsed(window.localStorage.getItem("eg-admin-sidebar-collapsed") === "1"); } catch { /* Storage can be disabled. */ }
+  }, []);
+  useEffect(() => {
+    if (!open) return;
+    const close = event => { if (event.key === "Escape") { setOpen(false); menuButton.current?.focus(); } };
+    document.addEventListener("keydown", close);
+    return () => document.removeEventListener("keydown", close);
+  }, [open]);
+  function toggleSidebar() {
+    const next = !collapsed;
+    setCollapsed(next);
+    try { window.localStorage.setItem("eg-admin-sidebar-collapsed", next ? "1" : "0"); } catch { /* Keep the current-session preference. */ }
+  }
   const pathname = usePathname();
   const dashboard = pathname === "/admin";
   const projects = pathname === "/admin/projets";
@@ -33,18 +50,19 @@ export default function AdminShell({ children, unread }) {
   const memberEditor = pathname === "/admin/membres/nouveau" || /^\/admin\/membres\/[^/]+\/modifier$/.test(pathname);
   useEffect(() => { setOpen(false); setMessageQuery(""); setMessageSearchOpen(false); }, [pathname]);
   const current = [...NAV].reverse().find(([href]) => pathname === href || (href !== "/admin" && pathname.startsWith(`${href}/`)))?.[1] || "Administration";
-  return <MessageSearchContext.Provider value={{query:messageQuery,setQuery:setMessageQuery,searchOpen:messageSearchOpen,setSearchOpen:setMessageSearchOpen}}><div className="admin-space admin-shell">
+  return <MessageSearchContext.Provider value={{query:messageQuery,setQuery:setMessageQuery,searchOpen:messageSearchOpen,setSearchOpen:setMessageSearchOpen}}><div className="admin-space admin-shell" data-sidebar-collapsed={collapsed}>
     <a href="#admin-main" className="admin-skip-link">Aller au contenu</a>
     <aside className="admin-sidebar">
       <div className="admin-brand-row">
-        <span className="admin-brand">Espace administration</span>
-        <button type="button" className="eg-button eg-button--inverse eg-button--compact admin-menu-button" aria-expanded={open} aria-controls="admin-navigation" onClick={() => setOpen(!open)}>{open ? "Fermer ×" : "Menu ☰"}</button>
+        <a href="/admin" className="admin-brand-link" aria-label="Efficience Globale · Administration" title="Efficience Globale · Administration"><span className="admin-brand-logo"><img src="/img/logo-eg.png" width="345" height="109" alt=""/></span><span className="admin-brand-caption">Administration</span></a>
+        <button type="button" className="admin-sidebar-toggle" aria-label={collapsed ? "Développer le menu" : "Réduire le menu"} title={collapsed ? "Développer le menu" : "Réduire le menu"} aria-expanded={!collapsed} aria-controls="admin-navigation" onClick={toggleSidebar}><AdminSidebarIcon type={collapsed ? "expand" : "collapse"}/></button>
+        <button ref={menuButton} type="button" className="admin-menu-button" aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} aria-expanded={open} aria-controls="admin-navigation" onClick={() => setOpen(!open)}><AdminSidebarIcon type={open ? "close" : "menu"}/></button>
       </div>
       <div id="admin-navigation" className="admin-navigation" data-open={open}>
         <nav aria-label="Administration" onClick={(event) => { if (event.target.closest("a")) setOpen(false); }}>
-          {NAV.map(([href, label, icon]) => <AdminNavLink key={href} href={href} relatedPaths={href === "/admin/annonces" ? ["/admin/candidatures"] : []} badge={href === "/admin/messages" ? unread : 0}><span className="admin-nav-label"><span aria-hidden="true" className="admin-nav-icon">{icon}</span>{label}</span></AdminNavLink>)}
+          {NAV.map(([href, label, icon]) => <AdminNavLink key={href} href={href} label={label} relatedPaths={href === "/admin/annonces" ? ["/admin/candidatures"] : []} badge={href === "/admin/messages" ? unread : 0}><span className="admin-nav-label"><span className="admin-nav-icon"><AdminSidebarIcon type={icon}/></span><span className="admin-sidebar-text">{label}</span></span></AdminNavLink>)}
         </nav>
-        <div className="admin-sidebar-bottom"><a href="/" target="_blank" rel="noopener noreferrer">Voir le site public <span aria-hidden="true">↗</span></a><LogoutButton /></div>
+        <div className="admin-sidebar-bottom"><a href="/" target="_blank" rel="noopener noreferrer" aria-label="Voir le site public (nouvel onglet)" title="Voir le site public"><AdminSidebarIcon type="external"/><span className="admin-sidebar-text">Voir le site public</span></a><LogoutButton sidebar/></div>
       </div>
     </aside>
     <div className="admin-workspace">
