@@ -148,10 +148,9 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
           <div className="message-reader-tools">
             <button type="button" onClick={closeMessage} disabled={busy} className="eg-button eg-button--secondary eg-button--compact message-back" aria-label="Tous les messages">Boîte de réception</button>
             <div className="message-reader-title">
-   <button ref={deliveryInfoRef} type="button" className="message-delivery-info" aria-label="Informations sur l’envoi" title="Informations sur l’envoi" aria-haspopup="dialog" onClick={()=>setDeliveryInfoOpen(true)}>
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10.5v6M12 7.5v.2" strokeLinecap="round"/></svg>
-   </button>
-             <h2 ref={titleRef} tabIndex={-1} className="message-reader-subject">{selected.sujet || "Sans objet"}</h2>
+             <h2 ref={titleRef} tabIndex={-1} className="message-reader-subject"><span>{selected.sujet || "Sans objet"}</span><button ref={deliveryInfoRef} type="button" className="message-delivery-info" aria-label="Informations sur l’envoi" title="Informations sur l’envoi" aria-haspopup="dialog" onClick={()=>setDeliveryInfoOpen(true)}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10.5v6M12 7.5v.2" strokeLinecap="round"/></svg>
+             </button></h2>
             </div>
             <div className="message-reader-actions">
               <button type="button" className="eg-button eg-button--primary eg-button--compact" aria-expanded={replyOpen} aria-controls="message-reply" disabled={busy || !detail?.connected} onClick={() => setReplyOpen(true)}>{drafts[selected.id]?.text?.trim() ? "Reprendre la réponse" : "Répondre"}</button>

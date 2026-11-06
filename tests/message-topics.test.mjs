@@ -119,7 +119,7 @@ test("Message delivery visibly distinguishes confirmed sending, historical sendi
   assert.match(dialog,/<dt>Service d’envoi<\/dt><dd>Gmail<\/dd>/);assert.match(dialog,/Envoi confirmé le/);assert.match(dialog,/15:19:42/);assert.match(dialog,/heure de Conakry/);
   assert.match(dialog,/Référence Gmail/);assert.match(dialog,/>Copier<|>Copier<!--/);assert.match(dialog,/>Fermer</);
   const reader=renderToStaticMarkup(React.createElement(Messages,{messages:[{id:"one",nom:"Visiteur",email:"visitor@example.org",sujet:"Objet du message",message:"Texte",envoye:1}],initialSelectedId:"one"}));
-  assert.match(reader,/class="message-reader-title">[\s\S]*?aria-label="Informations sur l’envoi"[\s\S]*?<h2[^>]*>Objet du message<\/h2>/);
+  assert.match(reader,/class="message-reader-title">[\s\S]*?<h2[^>]*><span>Objet du message<\/span><button[^>]*aria-label="Informations sur l’envoi"/);
   assert.equal((reader.match(/aria-haspopup="dialog"/g)||[]).length,1);
   const historical=render({message:{envoye:1},delivery:{status:"accepted",provider:"gmail",checked_le:"2026-11-05T15:19:42.000Z"}});assert.match(historical,/Non enregistré pour cet envoi/);assert.doesNotMatch(historical,/oumar@example.org/);
   const older=render({message:{envoye:1}});assert.match(older,/Email envoyé au cabinet/);assert.match(older,/ses détails ne sont pas disponibles/);assert.doesNotMatch(older,/Gmail/);
