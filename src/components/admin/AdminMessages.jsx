@@ -30,7 +30,9 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
   const [drafts, setDrafts] = useState({}), [reload, setReload] = useState(0);
   const [page, setPage] = useState(0), [category, setCategory] = useState("all");
   const [replyOpen, setReplyOpen] = useState(false), [optionsOpen, setOptionsOpen] = useState(false);
+  const [replyNotice, setReplyNotice] = useState("");
   const optionsRef = useRef(null), replyRef = useRef(null), deliveryInfoRef = useRef(null);
+  const restoreReplyFocus = useRef(false);
   const [deliveryInfoOpen,setDeliveryInfoOpen]=useState(false);
   useEffect(()=>setDeliveryInfoOpen(false),[selectedId]);
   const centerRef = useRef(null), inboxHeadingRef = useRef(null), listScroll = useRef(null);
@@ -49,12 +51,18 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
     return () => document.removeEventListener("pointerdown", close);
   }, [optionsOpen]);
   useEffect(() => {
-    if (replyOpen) replyRef.current?.querySelector("textarea")?.focus();
+    if (replyOpen) {
+      replyRef.current?.scrollIntoView({ block: "nearest" });
+      replyRef.current?.querySelector("textarea")?.focus({ preventScroll: true });
+    } else if (restoreReplyFocus.current) {
+      replyRef.current?.querySelector("button")?.focus({ preventScroll: true });
+      restoreReplyFocus.current = false;
+    }
   }, [replyOpen, detail]);
   const selected = messages.find(m => m.id === selectedId);
   useEffect(() => { setPage(0); }, [query, category]);
   useEffect(() => {
-    if (selectedId) centerRef.current?.scrollIntoView({ block: "start" });
+    if (selectedId) { centerRef.current?.scrollIntoView({ block: "start" }); titleRef.current?.focus({ preventScroll: true }); }
     else if (listScroll.current !== null) {
       window.scrollTo({ top: listScroll.current });
       const target = selectedButton.current?.isConnected ? selectedButton.current : inboxHeadingRef.current;
@@ -80,14 +88,13 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
     let cancelled = false;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 14000);
-    setDetail(null); setDetailError(""); setActionError(""); setDeleting(false); setOptionsOpen(false); setLoading(true);
-    titleRef.current?.focus({ preventScroll: true });
+    setDetail(previous => previous?.messageId === selectedId ? previous : null); setDetailError(""); setActionError(""); setDeleting(false); setOptionsOpen(false); setLoading(true);
     async function load() {
       try {
         const response = await fetch(endpoint(selectedId), { cache: "no-store", signal: controller.signal });
         const data = await response.json();
         if (!response.ok) throw new Error(response.status === 401 ? "Session expirée. Reconnectez-vous à l’administration." : data.error || "Chargement impossible.");
-        if (!cancelled) setDetail(data);
+        if (!cancelled) setDetail({ ...data, messageId: selectedId });
       } catch (error) { if (!cancelled) setDetailError(controller.signal.aborted ? "Le chargement prend trop de temps. Réessayez." : error.message || "Chargement impossible."); }
       finally { clearTimeout(timeout); if (!cancelled) setLoading(false); }
     }
@@ -108,7 +115,7 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
     if (busyRef.current) return;
     listScroll.current = window.scrollY;
     selectedButton.current = button;
-    if (selectedId !== message.id) { setReplyOpen(false); setDetail(null); setDetailError(""); setLoading(true); }
+    if (selectedId !== message.id) { setReplyOpen(false); setReplyNotice(""); setDetail(null); setDetailError(""); setLoading(true); }
     setOptionsOpen(false);
     setSelectedId(message.id);
     if (!message.lu) markRead(message.id, true);
@@ -126,6 +133,18 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
     finally { busyRef.current = false; setBusy(false); }
   }
   function setSending(value) { busyRef.current = value; setBusy(value); }
+  function openReply() {
+    setReplyNotice("");
+    setReplyOpen(true);
+    if (replyOpen) {
+      replyRef.current?.scrollIntoView({ block: "nearest" });
+      replyRef.current?.querySelector("textarea")?.focus({ preventScroll: true });
+    }
+  }
+  function closeReply() {
+    restoreReplyFocus.current = true;
+    setReplyOpen(false);
+  }
 
   return <div ref={centerRef} className="message-center" data-reading={!!selected}>
     <div className="messages-layout">
@@ -149,7 +168,7 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
             <button type="button" onClick={closeMessage} disabled={busy} className="eg-button eg-button--secondary eg-button--compact message-back" aria-label="Tous les messages">Boîte de réception</button>
 
             <div className="message-reader-actions">
-              <button type="button" className="eg-button eg-button--primary eg-button--compact" aria-expanded={replyOpen} aria-controls="message-reply" disabled={busy || !detail?.connected} onClick={() => setReplyOpen(true)}>{drafts[selected.id]?.text?.trim() ? "Reprendre la réponse" : "Répondre"}</button>
+              <button type="button" className="eg-button eg-button--primary eg-button--compact" aria-expanded={replyOpen} aria-controls="message-reply" disabled={busy || !detail?.connected} onClick={openReply}>{drafts[selected.id]?.text?.trim() ? "Reprendre la réponse" : "Répondre"}</button>
               <div className="message-options" ref={optionsRef} onKeyDown={e => { if (e.key === "Escape") { setOptionsOpen(false); optionsRef.current?.querySelector("button")?.focus(); } }}>
                 <button type="button" className="eg-button eg-button--secondary eg-button--icon" aria-label="Options du message" aria-expanded={optionsOpen} aria-controls="message-options" disabled={busy} onClick={() => setOptionsOpen(value => !value)}><span aria-hidden="true">···</span></button>
                 {optionsOpen && <div id="message-options" className="message-options-panel" role="group" aria-label="Actions du message"><button type="button" onClick={() => { setOptionsOpen(false); markRead(selected.id, !selected.lu); }}>{selected.lu ? "Marquer non lu" : "Marquer lu"}</button><button type="button" className="message-option-delete" onClick={() => { setOptionsOpen(false); setDeleting(true); }}>Supprimer</button></div>}
@@ -165,13 +184,13 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
              </button></h2>
             </div>
           <MessageDeliveryStatus key={selected.id} message={selected} delivery={detail?.delivery} loading={loading} error={detailError} open={deliveryInfoOpen} onClose={()=>{setDeliveryInfoOpen(false);deliveryInfoRef.current?.focus({preventScroll:true});}}/></header>
-          <div className="message-original"><MessageText text={selected.message}/>{selected.candidature_id && <p className="message-application-link"><Link href={`/admin/candidatures/${encodeURIComponent(selected.candidature_id)}`} className="eg-button eg-button--primary eg-button--compact">Voir la candidature</Link></p>}</div>
+          <MessageConversation key={selected.id} message={selected} replies={detail?.replies || []}/>
           {loading && <div className="message-loading" role="status"><span aria-hidden="true"/><span>Chargement des réponses…</span></div>}
           {detailError && <div className="message-alert" role="alert"><p>{detailError}</p><button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={() => setReload(value => value + 1)}>Réessayer</button></div>}
           {detail && <>
-            {detail.replies.length > 0 && <section className="message-history" aria-label="Historique des réponses"><h3>Réponses du cabinet <span>{detail.replies.length}</span></h3>{detail.replies.map((reply, index) => <details key={reply.id} className="message-reply-record" open={index === detail.replies.length - 1}><summary><strong>{reply.status === "sent" ? "Réponse envoyée" : "Envoi à vérifier dans Gmail"}</strong><time>{formatDate(reply.cree_le)}</time><span className="message-record-toggle" aria-hidden="true">+</span></summary><div><p className="message-reply-destination">À : {reply.recipient}</p><h4>{reply.subject}</h4><MessageText text={reply.body} className="message-reply-body"/></div></details>)}</section>}
             <div id="message-reply" ref={replyRef}>
-              {detail.connected ? replyOpen ? <ReplyComposer key={selected.id} message={selected} detail={detail} draft={drafts[selected.id]} onDraft={draft => setDrafts(prev => ({ ...prev, [selected.id]: draft }))} onBusy={setSending} onClose={() => { setReplyOpen(false); titleRef.current?.focus({ preventScroll: true }); }} onSent={() => { setReload(value => value + 1); router.refresh(); }} /> : null : <div className="message-connect"><p>Connectez Gmail pour répondre depuis cet espace.</p><Link href="/admin/reglages" className="eg-button eg-button--secondary eg-button--compact">Ouvrir les réglages</Link></div>}
+              {replyNotice && <p role="status" className="message-success message-reply-notice">{replyNotice}</p>}
+              {detail.connected ? replyOpen ? <ReplyComposer key={selected.id} message={selected} detail={detail} draft={drafts[selected.id]} onDraft={draft => setDrafts(prev => ({ ...prev, [selected.id]: draft }))} onBusy={setSending} onClose={closeReply} onSent={() => { restoreReplyFocus.current = true; setReplyOpen(false); setReplyNotice("Réponse envoyée."); setReload(value => value + 1); router.refresh(); }} /> : <button type="button" className="message-reply-start" aria-expanded={false} aria-controls="message-reply" onClick={openReply}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="m10 5-7 6 7 6M3 11h10a7 7 0 0 1 7 7" strokeLinecap="round" strokeLinejoin="round"/></svg>{drafts[selected.id]?.text?.trim() ? "Reprendre la réponse" : "Répondre"}</button> : <div className="message-connect"><p>Connectez Gmail pour répondre depuis cet espace.</p><Link href="/admin/reglages" className="eg-button eg-button--secondary eg-button--compact">Ouvrir les réglages</Link></div>}
             </div>
           </>}
         </>}
@@ -245,10 +264,27 @@ export function MessageText({text,className="message-text"}) {
  return <div className={className}>{paragraphs.map((paragraph,index)=><p key={index}>{paragraph}</p>)}</div>;
 }
 
-function ReplyComposer({ message, detail, draft, onDraft, onBusy, onSent, onClose }) {
+function ThreadChevron() {
+ return <svg className="message-thread-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="m5 7 5 5 5-5" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+}
+const subjectKey = value => String(value || "").replace(/^(?:\s*re\s*:\s*)+/i, "").trim().toLocaleLowerCase("fr-FR");
+const messagePreview = value => String(value || "").replace(/\s+/g, " ").trim().slice(0, 160);
+
+export function MessageConversation({ message, replies = [] }) {
+ return <div className="message-thread" aria-label="Conversation">
+  {replies.length ? <details className="message-thread-original" key="original-replied"><summary><strong>{message.nom}</strong><span className="message-thread-preview">{messagePreview(message.message)}</span><time>{formatDate(message.cree_le)}</time><ThreadChevron/></summary><div className="message-original"><MessageText text={message.message}/></div></details> : <div className="message-original"><MessageText text={message.message}/></div>}
+  {message.candidature_id && <p className="message-application-link"><Link href={`/admin/candidatures/${encodeURIComponent(message.candidature_id)}`} className="eg-button eg-button--primary eg-button--compact">Voir la candidature</Link></p>}
+  {replies.length > 0 && <section className="message-history" aria-label="Historique des réponses">{replies.map((reply, index) => <details key={reply.id} className="message-reply-record" open={index === replies.length - 1} data-status={reply.status}>
+   <summary><strong>Efficience Globale</strong><span className="message-thread-state">{reply.status === "sent" ? "Envoyée" : "Envoi à vérifier"}</span><span className="message-thread-preview">{messagePreview(reply.body)}</span><time>{formatDate(reply.cree_le)}</time><ThreadChevron/></summary>
+   <div className="message-thread-content"><details className="message-reply-details"><summary>Détails de la réponse<ThreadChevron/></summary><dl><div><dt>À</dt><dd>{reply.recipient}</dd></div>{subjectKey(reply.subject) !== subjectKey(message.sujet || "Votre message") && <div><dt>Objet</dt><dd>{reply.subject}</dd></div>}</dl></details><MessageText text={reply.body} className="message-reply-body"/></div>
+  </details>)}</section>}
+ </div>;
+}
+
+export function ReplyComposer({ message, detail, draft, onDraft, onBusy, onSent, onClose }) {
   const initialSubject = `Re: ${message.sujet || "Votre message"}`.replace(/[\r\n]/g, " ").slice(0, 200);
-  const [confirming, setConfirming] = useState(false), [sending, setSending] = useState(false), [error, setError] = useState(""), [sent, setSent] = useState(false), [uncertain, setUncertain] = useState(false);
-  const claim = useRef(null), locked = useRef(false);
+  const [confirming, setConfirming] = useState(false), [sending, setSending] = useState(false), [error, setError] = useState(draft?.uncertain ? "Envoi non confirmé. Vérifiez les messages envoyés dans Gmail avant de renvoyer." : ""), [sent, setSent] = useState(false), [uncertain, setUncertain] = useState(Boolean(draft?.uncertain));
+  const claim = useRef(draft?.requestId || null), locked = useRef(false);
   const subject = draft?.subject ?? initialSubject, text = draft?.text ?? "";
   const update = changes => { onDraft({ subject, text, ...changes }); setSent(false); claim.current = null; };
   async function send() {
@@ -260,17 +296,17 @@ function ReplyComposer({ message, detail, draft, onDraft, onBusy, onSent, onClos
       const response = await fetch(`${endpoint(message.id)}/reponse`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ subject, text, requestId: claim.current }) });
       const data = await response.json();
       receivedResponse = true;
-      if (!response.ok) { if (data.uncertain) setUncertain(true); throw new Error(data.error || "Envoi impossible."); }
+      if (!response.ok) { if (data.uncertain) { setUncertain(true); onDraft({ subject, text, uncertain: true, requestId: claim.current }); } throw new Error(data.error || "Envoi impossible."); }
       onDraft({ subject: initialSubject, text: "" }); setSent(true); setConfirming(false); claim.current = null; onSent();
-    } catch (error) { if (!receivedResponse) setUncertain(true); setError(receivedResponse ? error.message : "Envoi non confirmé. Vérifiez les messages envoyés dans Gmail avant de renvoyer."); }
+    } catch (error) { if (!receivedResponse) { setUncertain(true); onDraft({ subject, text, uncertain: true, requestId: claim.current }); } setError(receivedResponse ? error.message : "Envoi non confirmé. Vérifiez les messages envoyés dans Gmail avant de renvoyer."); }
     finally { locked.current = false; setSending(false); onBusy(false); }
   }
   return <form className="message-composer" onSubmit={e => { e.preventDefault(); setConfirming(true); setError(""); }}>
-    <div className="message-composer-title"><div><h3>Votre réponse</h3><p>À : {message.email}</p></div><button type="button" className="eg-button eg-button--secondary eg-button--icon" aria-label="Fermer la rédaction" disabled={sending} onClick={onClose}><span aria-hidden="true">×</span></button></div>
-    <details className="message-send-details"><summary>Expéditeur et objet <span aria-hidden="true">+</span></summary><div><dl className="message-envelope"><div><dt>De</dt><dd>Efficience Globale · {detail.sender}</dd></div><div><dt>Réponses vers</dt><dd>{detail.replyTo.join(", ")}</dd></div></dl><label htmlFor="reply-subject">Objet</label><input id="reply-subject" value={subject} onChange={e => update({ subject: e.target.value })} maxLength={200} required disabled={sending || confirming || uncertain} /></div></details>
+    <div className="message-composer-title"><h3>Répondre</h3><p>À : <span>{message.email}</span></p></div>
+    <details className="message-send-details"><summary>Expéditeur et objet<ThreadChevron/></summary><div><dl className="message-envelope"><div><dt>De</dt><dd>Efficience Globale · {detail.sender}</dd></div><div><dt>Réponses vers</dt><dd>{detail.replyTo.join(", ")}</dd></div></dl><label htmlFor="reply-subject">Objet</label><input id="reply-subject" value={subject} onChange={e => update({ subject: e.target.value })} maxLength={200} required disabled={sending || confirming || uncertain} /></div></details>
     <label htmlFor="reply-body">Votre réponse</label><textarea id="reply-body" rows={5} placeholder="Bonjour…" value={text} onChange={e => update({ text: e.target.value })} maxLength={20000} required disabled={sending || confirming || uncertain} />
     {error && <p role="alert">{error}</p>}{sent && <p role="status" className="message-success">Réponse envoyée.</p>}
-    {confirming ? <div className="message-send-confirm"><p>Envoyer cette réponse à <strong>{message.email}</strong> ?</p><div><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={sending || uncertain} onClick={() => setConfirming(false)}>Modifier</button><button type="button" className="eg-button eg-button--primary eg-button--compact" disabled={sending || uncertain} onClick={send}>{sending ? "Envoi…" : "Confirmer l’envoi"}</button></div></div> : <div className="message-composer-footer"><button type="submit" className="eg-button eg-button--primary" disabled={!text.trim() || !subject.trim() || uncertain}>Envoyer la réponse</button></div>}
+    {confirming ? <div className="message-send-confirm"><p>Envoyer cette réponse à <strong>{message.email}</strong> ?</p><div><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={sending || uncertain} onClick={() => setConfirming(false)}>Modifier</button><button type="button" className="eg-button eg-button--primary eg-button--compact" disabled={sending || uncertain} onClick={send}>{sending ? "Envoi…" : "Confirmer l’envoi"}</button></div></div> : <div className="message-composer-footer"><button type="submit" className="eg-button eg-button--primary" disabled={!text.trim() || !subject.trim() || uncertain}>Envoyer</button><button type="button" className="eg-button eg-button--secondary" disabled={sending} onClick={onClose}>Annuler</button></div>}
   </form>;
 }
 
