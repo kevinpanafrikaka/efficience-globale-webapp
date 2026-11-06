@@ -4,6 +4,8 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import vm from "node:vm";
 import { isBrevoConfigured, sendBrevo } from "../src/lib/brevo.mjs";
+import * as contactFiles from "../src/lib/contact-attachments.mjs";
+import * as emailFiles from "../src/lib/email-attachments.mjs";
 
 // Valeurs fictives : aucun de ces tests n'appelle le réseau.
 const env = { BREVO_API_KEY: "test-only-key", BREVO_SENDER_EMAIL: "site@example.org" };
@@ -70,6 +72,8 @@ async function routeFor(runtimeEnv, events, { saveFails = false } = {}) {
     "@/lib/brevo.mjs": { isBrevoConfigured, sendBrevo },
     "@/lib/message-topics.mjs": { validateMessageTopic },
     "@/lib/mail-delivery.mjs": { recordMailDelivery: async()=>{} },
+    "@/lib/contact-attachments.mjs": contactFiles,
+    "@/lib/email-attachments.mjs": emailFiles,
   };
   // fetch in the route uses the same mocked fetch as the actual Brevo module.
   context.fetch = (...args) => globalThis.fetch(...args);

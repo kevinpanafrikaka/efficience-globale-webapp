@@ -1,5 +1,7 @@
 import { recordMailDelivery } from "@/lib/mail-delivery.mjs";
 import { validateMessageTopic } from "@/lib/message-topics.mjs";
+import { readContactForm, contactAttachments } from "@/lib/contact-attachments.mjs";
+import { emailAttachments } from "@/lib/email-attachments.mjs";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createMessage, markMessageSent, getReglages } from "@/lib/db";
 
@@ -12,7 +14,9 @@ const MAX = { nom: 120, email: 200, sujet: 200, message: 5000 };
 export async function POST(request) {
   const { env } = await getCloudflareContext({ async: true });
 
-  const data = await request.formData();
+  let data;
+  try { data = await readContactForm(request); }
+  catch (error) { return Response.json({ error: error.status === 413 ? error.message : "Le formulaire est invalide. Réessayez." }, { status: error.status === 413 ? 413 : 400 }); }
 
   // Champ piège : un robot le remplit. On répond « succès » sans rien enregistrer.
   if (data.get("site_web")?.toString().trim()) {
@@ -22,7 +26,7 @@ export async function POST(request) {
   const nom = data.get("nom")?.toString().trim();
   const email = data.get("email")?.toString().trim();
   const sujet = data.get("sujet")?.toString().trim();
-  const message = data.get("message")?.toString().trim();
+  let message = data.get("message")?.toString().trim();
 
   if (!nom || !email || !message) {
     return Response.json({ error: "Merci de renseigner votre nom, votre email et un message." }, { status: 400 });
@@ -47,6 +51,11 @@ export async function POST(request) {
     return Response.json({ error: "Choisissez un type d’accompagnement." }, { status: 400 });
   }
 
+  let attachments;
+  try { attachments = await contactAttachments(data); }
+  catch (error) { return Response.json({ error: error.message }, { status: 400 }); }
+  if (attachments.length) message += `\n\nDocuments joints à l’email :\n${attachments.map(file => `• ${file.name}`).join("\n")}`;
+
   // 1. On enregistre d'abord : le message n'est jamais perdu, même si l'email échoue.
   let id;
   try {
@@ -62,13 +71,13 @@ export async function POST(request) {
   try {
     if (isBrevoConfigured(env)) {
       provider="brevo";
-      await sendBrevo(env, { nom, email, sujet, message });
+      await sendBrevo(env, { nom, email, sujet, message, attachments, category: "formulaire-contact" });
       accepted=true;
       await recordMailDelivery(env,id,provider,{sent:true});
       await markMessageSent(id);
     } else if (await isGmailConnected(env)) {
       provider="gmail";
-      const receipt = await sendGmail(env, { nom, email, sujet, message });
+      const receipt = await sendGmail(env, { nom, email, sujet, message, attachments });
       accepted=true;
       await recordMailDelivery(env,id,provider,{sent:true,receipt});
       await markMessageSent(id);
@@ -93,6 +102,7 @@ export async function POST(request) {
               reply_to: email,
               subject: sujet ? `Nouveau message : ${sujet}` : "Nouveau message depuis le site",
               text: `De : ${nom} (${email})\n\n${message}`,
+              ...(attachments.length ? { attachments: emailAttachments(attachments).map(file => ({ filename: file.name, content: file.content })) } : {}),
             }),
           });
           if (!resendRes.ok) throw Object.assign(new Error("Resend rejected the email"),{mailStage:"sending",httpStatus:resendRes.status});
@@ -106,5 +116,5 @@ export async function POST(request) {
     if(!accepted) await recordMailDelivery(env,id,provider,{error});
   }
 
-  return Response.json({ success: true });
+  return Response.json({ success: true, ...(attachments.length ? { attachments_sent: accepted } : {}) });
 }

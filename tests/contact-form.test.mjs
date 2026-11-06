@@ -4,12 +4,13 @@ import vm from "node:vm";
 import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import * as jsx from "react/jsx-runtime";
+import * as contactFiles from "../src/lib/contact-attachments.mjs";
 
 const require = createRequire(import.meta.url);
 const { transformSync } = require("next/dist/build/swc");
 
 // Execute real handlers with simulated React state; no browser or live email.
-async function formHarness({ reject = false } = {}) {
+async function formHarness({ reject = false, attachmentsSent = true } = {}) {
   const state = [], requests = [];
   let cursor = 0;
   const hook = (initial) => {
@@ -20,9 +21,9 @@ async function formHarness({ reject = false } = {}) {
   const context = vm.createContext({
     fetch: async (url, options) => {
       requests.push({ url, options });
-      return Response.json(reject ? { error: "Erreur de test" } : { success: true }, { status: reject ? 400 : 200 });
+      return Response.json(reject ? { error: "Erreur de test" } : { success: true, attachments_sent: attachmentsSent }, { status: reject ? 400 : 200 });
     },
-    FormData: class { constructor(form) { this.fields = form.fields; } },
+    FormData: class { constructor(form) { this.fields = form.fields; this.files = []; } append(name, file) { this.files.push({name, file}); } },
   });
   const imports = {
     "react": {
@@ -31,6 +32,7 @@ async function formHarness({ reject = false } = {}) {
       useEffect: () => {},
     },
     "react/jsx-runtime": jsx,
+    "@/lib/contact-attachments.mjs": contactFiles,
   };
   const source = await readFile(new URL("../src/components/ContactForm.jsx", import.meta.url), "utf8");
   const { code } = transformSync(source, { filename: "ContactForm.jsx", jsc: { target: "es2022", parser: { syntax: "ecmascript", jsx: true }, transform: { react: { runtime: "automatic" } } }, module: { type: "es6" } });
@@ -109,4 +111,36 @@ test("Choosing or changing accompaniment preserves a manually entered subject; a
  for(const topic of ["projet","formation","partenariat"]){choose(topic);assert.equal(input().props.value,"Mon projet personnel");}
  input().props.onChange({target:{value:""}});choose("formation");assert.equal(input().props.value,"Demande de formation");
  input().props.onChange({target:{value:"Sujet après sélection"}});choose("projet");assert.equal(input().props.value,"Sujet après sélection");
+});
+
+test("Documents can be added across selections, removed, and submitted exactly once", async () => {
+ const h=await formHarness();
+ const a=new File(['%PDF-1.7\n%%EOF'],'projet.pdf',{type:'application/pdf'}),b=new File(['%PDF-1.7\n%%EOF'],'budget.pdf',{type:'application/pdf'});
+ const choose=files=>find(h.render(),n=>n.props?.id==='contact-documents').props.onChange({target:{files,value:'selection'}});
+ choose([a]);choose([b]);
+ assert.ok(find(h.render(),n=>n.props?.['aria-label']==='Retirer projet.pdf'));
+ find(h.render(),n=>n.props?.['aria-label']==='Retirer projet.pdf').props.onClick();
+ await h.render().props.onSubmit({preventDefault(){},currentTarget:{fields:{},reset(){}}});
+ assert.deepEqual(h.requests[0].options.body.files,[{name:'documents',file:b}]);
+ find(h.render(),n=>n.type==='button').props.onClick();
+ assert.equal(find(h.render(),n=>n.props?.['aria-label']==='Retirer budget.pdf'),null);
+});
+
+test("Invalid files are rejected without discarding earlier selections, which survive API failure", async () => {
+ const h=await formHarness({reject:true});
+ const a=new File(['pdf'],'projet.pdf',{type:'application/pdf'});
+ const choose=files=>find(h.render(),n=>n.props?.id==='contact-documents').props.onChange({target:{files,value:'selection'}});
+ choose([a]);choose([new File(['exe'],'test.exe')]);
+ assert.match(find(h.render(),n=>n.props?.role==='alert').props.children,/format PDF/);
+ assert.ok(find(h.render(),n=>n.props?.['aria-label']==='Retirer projet.pdf'));
+ find(h.render(),n=>n.props?.['aria-label']==='Retirer projet.pdf').props.onClick();choose([a]);
+ await h.render().props.onSubmit({preventDefault(){},currentTarget:{fields:{},reset(){throw Error('Must not reset');}}});
+ assert.ok(find(h.render(),n=>n.props?.['aria-label']==='Retirer projet.pdf'));
+});
+
+test("A saved message never conceals failure to transmit its documents", async () => {
+ const h=await formHarness({attachmentsSent:false});
+ await h.render().props.onSubmit({preventDefault(){},currentTarget:{fields:{},reset(){}}});
+ const alert=find(h.render(),n=>n.props?.role==='alert');
+ assert.ok(alert);assert.match(JSON.stringify(alert.props.children),/documents n’ont pas pu être transmis/);
 });

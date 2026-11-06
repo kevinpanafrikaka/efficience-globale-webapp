@@ -41,6 +41,26 @@
 .contact-guided-form input:not([type=radio]), .contact-guided-form textarea { background: #fcfdfb; border-radius: 10px; min-height: 48px; }
 .contact-guided-form input::placeholder, .contact-guided-form textarea::placeholder { color: #788174; opacity: 1; }
 .contact-message-hint { font-size: 12px; line-height: 1.6; color: var(--ink-soft); }
+.contact-attachments { min-width:0; padding:18px; border:1px solid var(--line); border-radius:12px; background:#fafbf8; }
+.contact-attachments-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; font-size:13px; font-weight:600; }
+.contact-files-count { color:var(--ink-soft); font-size:12px; font-weight:400; white-space:nowrap; }
+.contact-guided-form .contact-file-input { position:absolute; width:1px; height:1px; min-height:0; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+.contact-add-file { display:inline-flex; align-items:center; justify-content:center; gap:9px; min-height:44px; padding:10px 14px; border:1px solid #bccbb0; border-radius:8px; background:white; color:var(--ink); font-size:13px; font-weight:600; }
+.contact-add-file svg { width:19px; height:19px; }
+.contact-add-file:disabled { opacity:.5; cursor:default; }
+.contact-add-file:focus-visible,.contact-file-input:focus-visible ~ .contact-add-file,.contact-file-list button:focus-visible { outline:2px solid #4b7728; outline-offset:3px; }
+.contact-attachments > p { margin-top:9px; color:var(--ink-soft); font-size:12px; line-height:1.5; }
+.contact-file-list { display:grid; gap:8px; margin:0 0 12px; padding:0; list-style:none; }
+.contact-file-list li { display:flex; align-items:center; gap:10px; min-width:0; padding:8px 6px 8px 10px; border:1px solid var(--line); border-radius:9px; background:white; }
+.contact-file-symbol { display:grid; place-items:center; flex:0 0 34px; height:40px; border-radius:5px; background:#edf3e6; color:#4b7728; font-size:9px; font-weight:700; }
+.contact-file-meta { display:flex; flex:1; flex-direction:column; gap:2px; min-width:0; }
+.contact-file-meta strong { font-size:13px; font-weight:600; overflow-wrap:anywhere; }
+.contact-file-meta > span { color:var(--ink-soft); font-size:11px; }
+.contact-file-list button { flex:0 0 40px; width:40px; height:40px; border-radius:7px; font-size:23px; color:var(--ink-soft); }
+.contact-attachments .contact-file-error { color:#a32929; }
+.contact-success .contact-files-warning { padding:14px; margin-top:18px; background:#fff7e8; border:1px solid #e5d3ad; border-radius:10px; color:#79551a; }
+.contact-files-warning a { text-decoration:underline; overflow-wrap:anywhere; }
+@media(max-width:420px) { .contact-attachments { padding:14px; } .contact-add-file { width:100%; } }
 .contact-guided-form .contact-send { width: 100%; min-height: 54px; justify-content: space-between; gap: 16px; border-radius: 10px; padding-inline: 20px; }
 .contact-send > span { font-size: 23px; }
 .contact-success { padding: 28px 4px; outline: none; }

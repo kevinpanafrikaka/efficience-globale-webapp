@@ -7,7 +7,7 @@ export function isBrevoConfigured(env) {
   return Boolean(env.BREVO_API_KEY?.trim() && EMAIL_RE.test(env.BREVO_SENDER_EMAIL?.trim() || ""));
 }
 
-export async function sendBrevo(env, { nom, email, sujet, message, attachments = [] }) {
+export async function sendBrevo(env, { nom, email, sujet, message, attachments = [], category = attachments.length ? "candidature" : "formulaire-contact" }) {
   if (!isBrevoConfigured(env)) throw new Error("Brevo configuration incomplete");
   if (!EMAIL_RE.test(email)) throw new Error("Invalid reply address");
 
@@ -26,7 +26,7 @@ export async function sendBrevo(env, { nom, email, sujet, message, attachments =
       replyTo: { email, name: nom },
       subject: sujet ? `Nouveau message : ${sujet}` : "Nouveau message depuis le site",
       textContent: `De : ${nom} (${email})\n\n${message}`,
-      tags: [attachments.length ? "candidature" : "formulaire-contact"],
+      tags: [category],
       ...(files.length ? { attachment: files } : {}),
     }),
   });
