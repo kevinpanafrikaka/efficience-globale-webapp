@@ -147,11 +147,7 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
         {selected && <>
           <div className="message-reader-tools">
             <button type="button" onClick={closeMessage} disabled={busy} className="eg-button eg-button--secondary eg-button--compact message-back" aria-label="Tous les messages">Boîte de réception</button>
-            <div className="message-reader-title">
-             <h2 ref={titleRef} tabIndex={-1} className="message-reader-subject"><span>{selected.sujet || "Sans objet"}</span><button ref={deliveryInfoRef} type="button" className="message-delivery-info" aria-label="Informations sur l’envoi" title="Informations sur l’envoi" aria-haspopup="dialog" onClick={()=>setDeliveryInfoOpen(true)}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10.5v6M12 7.5v.2" strokeLinecap="round"/></svg>
-             </button></h2>
-            </div>
+
             <div className="message-reader-actions">
               <button type="button" className="eg-button eg-button--primary eg-button--compact" aria-expanded={replyOpen} aria-controls="message-reply" disabled={busy || !detail?.connected} onClick={() => setReplyOpen(true)}>{drafts[selected.id]?.text?.trim() ? "Reprendre la réponse" : "Répondre"}</button>
               <div className="message-options" ref={optionsRef} onKeyDown={e => { if (e.key === "Escape") { setOptionsOpen(false); optionsRef.current?.querySelector("button")?.focus(); } }}>
@@ -162,7 +158,13 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
           </div>
           {deleting && <div className="message-delete-confirm" role="group" aria-label="Confirmer la suppression"><p>Supprimer ce message et son historique de réponses ?</p><div><button type="button" className="eg-button eg-button--secondary eg-button--compact" disabled={busy} onClick={() => setDeleting(false)}>Annuler</button><button type="button" className="eg-button eg-button--danger eg-button--compact" disabled={busy} onClick={remove}>{busy ? "Suppression…" : "Confirmer la suppression"}</button></div></div>}
           {actionError && <p role="alert" className="message-alert">{actionError}</p>}
-          <header className="message-heading"><div className="message-contact"><div className="message-sender"><strong>{selected.nom}</strong><a href={`mailto:${selected.email}`}>{selected.email}</a></div><time>{formatDate(selected.cree_le)}</time></div><MessageDeliveryStatus key={selected.id} message={selected} delivery={detail?.delivery} loading={loading} error={detailError} open={deliveryInfoOpen} onClose={()=>{setDeliveryInfoOpen(false);deliveryInfoRef.current?.focus({preventScroll:true});}}/></header>
+          <header className="message-heading"><div className="message-contact"><div className="message-sender"><strong>{selected.nom}</strong><a href={`mailto:${selected.email}`}>{selected.email}</a></div><time>{formatDate(selected.cree_le)}</time></div>
+          <div className="message-reader-title">
+             <h2 ref={titleRef} tabIndex={-1} className="message-reader-subject"><span>{selected.sujet || "Sans objet"}</span><button ref={deliveryInfoRef} type="button" className="message-delivery-info" aria-label="Informations sur l’envoi" title="Informations sur l’envoi" aria-haspopup="dialog" onClick={()=>setDeliveryInfoOpen(true)}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 10.5v6M12 7.5v.2" strokeLinecap="round"/></svg>
+             </button></h2>
+            </div>
+          <MessageDeliveryStatus key={selected.id} message={selected} delivery={detail?.delivery} loading={loading} error={detailError} open={deliveryInfoOpen} onClose={()=>{setDeliveryInfoOpen(false);deliveryInfoRef.current?.focus({preventScroll:true});}}/></header>
           <div className="message-original"><MessageText text={selected.message}/>{selected.candidature_id && <p className="message-application-link"><Link href={`/admin/candidatures/${encodeURIComponent(selected.candidature_id)}`} className="eg-button eg-button--primary eg-button--compact">Voir la candidature</Link></p>}</div>
           {loading && <div className="message-loading" role="status"><span aria-hidden="true"/><span>Chargement des réponses…</span></div>}
           {detailError && <div className="message-alert" role="alert"><p>{detailError}</p><button type="button" className="eg-button eg-button--secondary eg-button--compact" onClick={() => setReload(value => value + 1)}>Réessayer</button></div>}

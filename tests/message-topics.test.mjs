@@ -120,6 +120,9 @@ test("Message delivery visibly distinguishes confirmed sending, historical sendi
   assert.match(dialog,/Référence Gmail/);assert.match(dialog,/>Copier<|>Copier<!--/);assert.match(dialog,/>Fermer</);
   const reader=renderToStaticMarkup(React.createElement(Messages,{messages:[{id:"one",nom:"Visiteur",email:"visitor@example.org",sujet:"Objet du message",message:"Texte",envoye:1}],initialSelectedId:"one"}));
   assert.match(reader,/class="message-reader-title">[\s\S]*?<h2[^>]*><span>Objet du message<\/span><button[^>]*aria-label="Informations sur l’envoi"/);
+  const heading=reader.match(/<header class="message-heading">[\s\S]*?<\/header>/)[0];
+  assert.ok(heading.indexOf("<strong>Visiteur</strong>")<heading.indexOf("Objet du message"));
+  assert.ok(heading.indexOf("mailto:visitor@example.org")<heading.indexOf("Objet du message"));
   assert.equal((reader.match(/aria-haspopup="dialog"/g)||[]).length,1);
   assert.doesNotMatch(reader,/Email envoyé au cabinet|class="message-delivery-note"/);
   const historical=render({message:{envoye:1},delivery:{status:"accepted",provider:"gmail",checked_le:"2026-11-05T15:19:42.000Z"}});assert.match(historical,/Non enregistré pour cet envoi/);assert.doesNotMatch(historical,/oumar@example.org/);
