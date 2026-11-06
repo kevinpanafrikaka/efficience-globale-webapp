@@ -203,13 +203,12 @@ export function MessageDeliveryStatus({message,delivery,loading=false,error="",o
   catch{setCopyStatus("Copie indisponible. Sélectionnez la référence pour la copier.");}
  }
  return <>
-  <div className="message-delivery-note" data-sent={sent}>
+  {!sent && <div className="message-delivery-note" data-sent={false}>
    <div className="message-delivery-summary" role="status">
-    <strong>{sent ? "Email envoyé au cabinet" : "Message enregistré"}</strong>
-    {sent ? delivery?.checked_le && <span>{provider} · {formatDate(delivery.checked_le)}</span> : <span>{checking ? "Vérification de l’envoi…" : "Envoi par email au cabinet non confirmé"}</span>}
+    <strong>Message enregistré</strong>
+    <span>{checking ? "Vérification de l’envoi…" : "Envoi par email au cabinet non confirmé"}</span>
    </div>
-
-  </div>
+  </div>}
   <dialog ref={dialogRef} className="message-delivery-dialog" aria-label="Détails de l’envoi" onClose={()=>onClose?.()}>
    <div className="message-delivery-dialog-layout">
     <div className="message-delivery-dialog-body">
