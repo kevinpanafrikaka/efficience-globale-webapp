@@ -30,8 +30,7 @@ export default function MediaLibrary({ items: initialItems }) {
     catch { setCopied("Copie indisponible. Utilisez le lien « Ouvrir le fichier »."); }
   }
   return <div className="media-library">
-    <div className="media-library-overview"><div className="media-storage"><span className="media-storage-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 14h18M7 17h2m3 0h5M7 8h10"/></svg></span><div><strong>{formatMediaSize(totalBytes)}</strong><span>{items.length} fichier{items.length > 1 ? "s" : ""} public{items.length > 1 ? "s" : ""}</span></div><div className="media-storage-unused"><strong>{formatMediaSize(unusedBytes)}</strong><span>{unused.length} inutilisé{unused.length > 1 ? "s" : ""}</span></div></div><MediaUpload/></div>
-    <MediaBrowser items={items} onChoose={inspect}/>
+    <MediaBrowser items={items} onChoose={inspect} summary={<div className="media-storage"><span className="media-storage-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 14h18M7 17h2m3 0h5M7 8h10"/></svg></span><div><strong>{formatMediaSize(totalBytes)}</strong><span>{items.length} fichier{items.length > 1 ? "s" : ""} public{items.length > 1 ? "s" : ""}</span></div><div className="media-storage-unused"><strong>{formatMediaSize(unusedBytes)}</strong><span>{unused.length} inutilisé{unused.length > 1 ? "s" : ""}</span></div></div>} action={<MediaUpload/>}/>
     <MediaDialog open={!!selected} onClose={() => { if (!loading) setSelected(null); }} title="Détails du fichier" busy={loading} compact>
       {selected && <div className="media-dialog-scroll media-file-detail">
         <div className="media-detail-preview"><MediaPreview item={selected}/></div>
