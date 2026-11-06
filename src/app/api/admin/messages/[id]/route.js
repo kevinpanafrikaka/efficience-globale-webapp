@@ -55,6 +55,7 @@ export async function DELETE(request, { params }) {
     env.DB.prepare("DELETE FROM message_applications WHERE message_id = ? AND NOT EXISTS (SELECT 1 FROM messages WHERE id = ?)").bind(id, id),
   ]);
   await env.DB.prepare("DELETE FROM message_delivery WHERE message_id=? AND NOT EXISTS (SELECT 1 FROM messages WHERE id=?)").bind(id,id).run();
+  await env.DB.prepare("DELETE FROM message_delivery_receipts WHERE message_id=? AND NOT EXISTS (SELECT 1 FROM messages WHERE id=?)").bind(id,id).run();
   if (!results[0].meta.changes) return Response.json({ error: "Un envoi est encore en cours. Réessayez dans quelques instants." }, { status: 409 });
   return Response.json({ success: true });
 }

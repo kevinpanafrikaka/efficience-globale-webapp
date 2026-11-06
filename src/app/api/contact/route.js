@@ -68,9 +68,9 @@ export async function POST(request) {
       await markMessageSent(id);
     } else if (await isGmailConnected(env)) {
       provider="gmail";
-      await sendGmail(env, { nom, email, sujet, message });
+      const receipt = await sendGmail(env, { nom, email, sujet, message });
       accepted=true;
-      await recordMailDelivery(env,id,provider,{sent:true});
+      await recordMailDelivery(env,id,provider,{sent:true,receipt});
       await markMessageSent(id);
     } else {
       const apiKey = env.RESEND_API_KEY;

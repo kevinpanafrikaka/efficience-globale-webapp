@@ -42,7 +42,7 @@ test("The Gmail send request uses the saved recipients and the visitor reply add
   const db=await r.module("src/lib/db.js"),gmail=await r.module("src/lib/gmail.mjs");
   await db.saveReglages({email_notifications:JSON.stringify(["oumar@example.org","aminata@example.org"])});
   await gmail.saveConnection(r.env,"test-refresh");
-  assert.equal(await gmail.sendGmail(r.env,{nom:"Visiteur",email:"visitor@example.org",message:"Bonjour"}),"test-only-message");assert.equal(sent,1);
+  const receipt=await gmail.sendGmail(r.env,{nom:"Visiteur",email:"visitor@example.org",message:"Bonjour"});assert.equal(receipt.id,"test-only-message");assert.deepEqual([...receipt.recipients],["oumar@example.org","aminata@example.org"]);assert.equal(receipt.sender,gmail.GMAIL_OWNER);assert.equal(sent,1);
  }finally{r.close();}
 });
 

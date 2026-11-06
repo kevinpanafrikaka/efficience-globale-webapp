@@ -171,6 +171,7 @@
  .messages-navbar-search { width:100%; }
 }
 
+.message-delivery-recipients { flex-basis:100%; min-width:0; overflow-wrap:anywhere; }
 .message-delivery-details { flex-basis:100%; min-width:0; color:var(--ink-soft); }
 .message-delivery-details summary { cursor:pointer; padding:4px 0; font-weight:600; }
 .message-delivery-details p { margin:8px 0; line-height:1.6; }

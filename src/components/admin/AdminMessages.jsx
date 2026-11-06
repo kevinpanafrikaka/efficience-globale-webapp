@@ -172,18 +172,27 @@ export default function AdminMessages({ messages: initialMessages, initialSelect
   </div>;
 }
 
+function deliveryTime(value) {
+ const date=new Date(value);
+ return value && !Number.isNaN(date.getTime()) ? date.toLocaleString("fr-FR",{day:"2-digit",month:"long",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit",timeZone:"Africa/Conakry"})+" (heure de Conakry)" : "—";
+}
+
 export function MessageDeliveryStatus({message,delivery,loading=false,error=""}) {
- const sent=delivery?.status==="accepted" || Boolean(message.envoye);
+ const sent=delivery ? delivery.status==="accepted" : Boolean(message.envoye);
  const provider=({gmail:"Gmail",brevo:"Brevo",resend:"Resend",none:"Non configuré"})[delivery?.provider];
  const checking=loading && !sent;
+ const recipients=delivery?.recipients || [];
  return <div className="message-delivery-note" data-sent={sent} role="status">
-  <span>{sent ? "Notification email envoyée" : "Message enregistré"}</span>
-  {sent ? delivery?.checked_le && <span>{provider} · {formatDate(delivery.checked_le)}</span> : <span>{checking ? "Vérification de l’envoi…" : "Envoi par email au cabinet non confirmé"}</span>}
+  <span>{sent ? "Email envoyé au cabinet" : "Message enregistré"}</span>
+  {sent ? delivery?.checked_le && <span>Envoi confirmé par {provider} · {deliveryTime(delivery.checked_le)}</span> : <span>{checking ? "Vérification de l’envoi…" : "Envoi par email au cabinet non confirmé"}</span>}
+  {sent && recipients.length>0 && <div className="message-delivery-recipients">À : {recipients.join(", ")}</div>}
   <details className="message-delivery-details"><summary>Détails de l’envoi</summary>
-   {loading ? <p>Chargement…</p> : sent ? <><p>Le service d’envoi a confirmé la prise en charge de l’email. La réception dans la boîte du destinataire reste à vérifier.</p>{!delivery && <p>Les détails de cet ancien envoi ne sont pas disponibles.</p>}</> : error ? <p>Diagnostic momentanément indisponible.</p> : <p>{deliveryDescription(delivery)}</p>}
+   {loading ? <p>Chargement…</p> : sent ? <>{delivery && <p>{provider} a confirmé l’envoi de cet email. Le site ne suit pas sa réception ni sa lecture.</p>}{!delivery && <p>L’envoi a été enregistré, mais ses détails ne sont pas disponibles.</p>}</> : error ? <p>Diagnostic momentanément indisponible.</p> : <p>{deliveryDescription(delivery)}</p>}
    {!loading && delivery && <dl>
-    <div><dt>Service</dt><dd>{provider}</dd></div>
-    <div><dt>{sent ? "Confirmé le" : "Vérifié le"}</dt><dd>{formatDate(delivery.checked_le)}</dd></div>
+    {sent && <><div><dt>Destinataire{recipients.length>1?"s":""}</dt><dd>{recipients.length>0?recipients.map(email=><div key={email}>{email}</div>):"Non enregistré pour cet envoi"}</dd></div>{delivery.sender && <div><dt>Expéditeur</dt><dd>{delivery.sender}</dd></div>}</>}
+    <div><dt>Service d’envoi</dt><dd>{provider}</dd></div>
+    <div><dt>{sent ? "Envoi confirmé le" : "Vérifié le"}</dt><dd>{deliveryTime(delivery.checked_le)}</dd></div>
+    {sent && <><div><dt>Réception</dt><dd>Non suivie par le site</dd></div><div><dt>Lecture</dt><dd>Non suivie par le site</dd></div>{delivery.provider_message_id && <div><dt>Référence {provider}</dt><dd>{delivery.provider_message_id}</dd></div>}</>}
     {!sent && <><div><dt>Étape</dt><dd>{({connection:"Connexion",credentials:"Lecture de la connexion",authorization:"Autorisation Google",recipients:"Destinataires",sending:"Envoi",confirmation:"Confirmation"})[delivery.stage] || "Non identifiée"}</dd></div><div><dt>Code</dt><dd>{delivery.error_code || "unknown"}{delivery.http_status ? ` · HTTP ${delivery.http_status}` : ""}</dd></div></>}
    </dl>}
   </details>

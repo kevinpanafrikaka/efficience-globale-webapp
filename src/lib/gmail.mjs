@@ -104,7 +104,8 @@ export async function sendGmail(env, message) {
   let recipients;
   try { recipients = await readNotificationRecipients(env); }
   catch (error) { error.mailStage="recipients"; throw error; }
-  return sendRawGmail(env, buildMime({ ...message, recipients }));
+  const id = await sendRawGmail(env, buildMime({ ...message, recipients }));
+  return { id, sender: GMAIL_OWNER, recipients };
 }
 
 async function sendRawGmail(env, mime) {

@@ -46,3 +46,31 @@ test('Gmail HTTP rejection records stage and status without response content; su
   denied=false;await api.POST(form());assert.equal(r.sqlite.prepare("SELECT COUNT(*) n FROM message_delivery WHERE status='accepted'").get().n,1);assert.equal(r.sqlite.prepare('SELECT COUNT(*) n FROM messages WHERE envoye=1').get().n,1);
  }finally{r.close();}
 });
+
+test('Gmail receipts retain the actual envelope independently of later settings and are deleted with the message',async()=>{
+ const r=await adminRuntime({fetcher:async url=>String(url).includes('oauth2')?Response.json({access_token:'access'}):Response.json({id:'18c000ab42',extra:'do-not-store-provider-body'})});try{
+  Object.assign(r.env,{GOOGLE_CLIENT_ID:'test-client',GOOGLE_CLIENT_SECRET:'test-secret'});
+  const gmail=await r.module('src/lib/gmail.mjs'),db=await r.module('src/lib/db.js');
+  await gmail.saveConnection(r.env,'refresh-token');
+  await db.saveReglages({email_notifications:JSON.stringify(['oumar@example.org','aminata@example.org'])});
+  const api=await r.module('src/app/api/contact/route.js');await api.POST(form());
+  const message=r.sqlite.prepare('SELECT * FROM messages').get();assert.equal(message.envoye,1);
+  await db.saveReglages({email_notifications:JSON.stringify(['changed@example.org'])});
+  const admin=await r.module('src/app/api/admin/messages/[id]/route.js');
+  const response=await admin.GET(new Request('https://example.org'),{params:Promise.resolve({id:message.id})});
+  const {delivery}=await response.json();
+  assert.equal(delivery.status,'accepted');assert.equal(delivery.provider_message_id,'18c000ab42');
+  assert.equal(delivery.sender,gmail.GMAIL_OWNER);assert.deepEqual(delivery.recipients,['oumar@example.org','aminata@example.org']);
+  assert.ok(Number.isFinite(Date.parse(delivery.checked_le)));
+  const stored=r.sqlite.prepare('SELECT * FROM message_delivery_receipts').get();
+  assert.doesNotMatch(JSON.stringify(stored),/do-not-store-provider-body|refresh-token|test-secret|changed@example.org/);
+  // An unconfirmed retry must not inherit the receipt of an earlier accepted send.
+  const diagnostic=await r.module('src/lib/mail-delivery.mjs');
+  await diagnostic.recordMailDelivery(r.env,message.id,'gmail',{error:{mailStage:'authorization',oauthCode:'invalid_grant'}});
+  assert.equal((await diagnostic.getMailDelivery(r.env,message.id)).recipients,undefined);
+  assert.equal(r.sqlite.prepare('SELECT COUNT(*) n FROM message_delivery_receipts').get().n,0);
+  await diagnostic.recordMailDelivery(r.env,message.id,'gmail',{sent:true,receipt:{id:'18c000ab42',sender:gmail.GMAIL_OWNER,recipients:['oumar@example.org']}});
+  await admin.DELETE(new Request('https://example.org',{method:'DELETE',headers:{origin:'https://example.org'}}),{params:Promise.resolve({id:message.id})});
+  assert.equal(r.sqlite.prepare('SELECT COUNT(*) n FROM message_delivery_receipts').get().n,0);
+ }finally{r.close();}
+});
