@@ -20,6 +20,14 @@ export default function AdminShell({ children, unread }) {
   const [messageQuery,setMessageQuery]=useState(""), [messageSearchOpen,setMessageSearchOpen]=useState(false);
   const [open, setOpen] = useState(false), [collapsed, setCollapsed] = useState(false);
   const menuButton = useRef(null);
+  const [desktop, setDesktop] = useState(true);
+  useEffect(() => {
+    const media = window.matchMedia?.("(min-width: 1024px)");
+    if (!media) return;
+    const update = () => setDesktop(media.matches);
+    update(); media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
   useEffect(() => {
     try { setCollapsed(window.localStorage.getItem("eg-admin-sidebar-collapsed") === "1"); } catch { /* Storage can be disabled. */ }
   }, []);
@@ -54,8 +62,7 @@ export default function AdminShell({ children, unread }) {
     <a href="#admin-main" className="admin-skip-link">Aller au contenu</a>
     <aside className="admin-sidebar">
       <div className="admin-brand-row">
-        <a href="/admin" className="admin-brand-link" aria-label="Efficience Globale · Administration" title="Efficience Globale · Administration"><span className="admin-brand-logo"><img src="/img/logo-eg.png" width="345" height="109" alt=""/></span><span className="admin-brand-caption">Administration</span></a>
-        <button type="button" className="admin-sidebar-toggle" aria-label={collapsed ? "Développer le menu" : "Réduire le menu"} title={collapsed ? "Développer le menu" : "Réduire le menu"} aria-expanded={!collapsed} aria-controls="admin-navigation" onClick={toggleSidebar}><AdminSidebarIcon type={collapsed ? "expand" : "collapse"}/></button>
+        <button type="button" className="admin-brand-link" aria-label={desktop ? (collapsed ? "Développer le menu" : "Réduire le menu") : (open ? "Fermer le menu" : "Ouvrir le menu")} title={desktop ? (collapsed ? "Développer le menu" : "Réduire le menu") : (open ? "Fermer le menu" : "Ouvrir le menu")} aria-expanded={desktop ? !collapsed : open} aria-controls="admin-navigation" onClick={() => { if (desktop) toggleSidebar(); else setOpen(!open); }}><span className="admin-brand-logo"><img src="/img/logo-eg.png" width="345" height="109" alt="Efficience Globale"/></span></button>
         <button ref={menuButton} type="button" className="admin-menu-button" aria-label={open ? "Fermer le menu" : "Ouvrir le menu"} aria-expanded={open} aria-controls="admin-navigation" onClick={() => setOpen(!open)}><AdminSidebarIcon type={open ? "close" : "menu"}/></button>
       </div>
       <div id="admin-navigation" className="admin-navigation" data-open={open}>

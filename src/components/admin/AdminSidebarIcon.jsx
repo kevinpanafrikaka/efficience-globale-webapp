@@ -10,10 +10,8 @@ export default function AdminSidebarIcon({ type }) {
     settings: <><path d="m10 3-.5 2-2 .9-1.9-.6-2 3.4 1.4 1.6v2.4L3.6 14l2 3.4 1.9-.6 2 .9.5 2.3h4l.5-2.3 2-.9 1.9.6 2-3.4-1.4-1.3v-2.4l1.4-1.6-2-3.4-1.9.6-2-.9L14 3Z"/><circle cx="12" cy="11.5" r="3"/></>,
     external: <><path d="M14 3h7v7M10 14 21 3M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5"/></>,
     logout: <><path d="M9 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4M9 12h12m-4-4 4 4-4 4"/></>,
-    collapse: <><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16m7-12-4 4 4 4"/></>,
-    expand: <><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16m4-12 4 4-4 4"/></>,
     menu: <path d="M4 6h16M4 12h16M4 18h16"/>,
     close: <path d="m6 6 12 12M18 6 6 18"/>,
   };
-  return <svg aria-hidden="true" focusable="false" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round">{paths[type] || paths.dashboard}</svg>;
+  return <svg data-sidebar-icon={type} aria-hidden="true" focusable="false" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round">{paths[type] || paths.dashboard}</svg>;
 }
